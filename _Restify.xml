@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 05 12:34:44 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 05 12:58:10 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733342843233</ModTime>
@@ -3509,15 +3509,15 @@ function makeCall(uri, errormsg) {
         </Connector>
         <Connector name="TestScriptConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733398484814</ModTime>
+            <ModTime>1733399876867</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733398484814</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="73" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 05 12:34:44 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1733399876867</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="90" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 05 12:57:56 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1733398484496</ModTime>
+        <ModTime>1733399876425</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -3591,25 +3591,40 @@ function makeCall(uri, errormsg) {
                 <ListItem>Operation</ListItem>
             </FormSectionNames>
         </FormSection>
-        <parameter name="formevents"><![CDATA[function fetchItems() {
+        <parameter name="formevents"><![CDATA[//
+//						INITIALIZATION
+// 
+// Load library scripts used
+eval(system.getScriptText("RestifyLib"))
+eval(system.getScriptText("ENDPOINTS"));
+eval(system.getScriptText("SCHEMA"));
+
+// Some global variables, since buttons cannot pass
+// arguments to functions
+var _GLOBAL = {
+	schema: null 
+} 
+
+// Update the dropdown with resource items
+function fetchItems() {
 	updateDropdown("Object", "Cannot fetch resource items")
 }
 
+// Update the dropdown with operations for the selected item
 function fetchOperations() {
 	updateDropdown("Operation", "Cannot fetch operations for a resource item")
 }
 
-// Return the openAPI schema
+// Return the openAPI schema - @TEST hardcoded for now
 function fetchSchema() {
 	var schemaJSON = loadFileToString("_Restify/itim_swagger.json");
-	_global.schema = fromJson(schemaJSON);
-	return _global.schema
+	_GLOBAL.schema = fromJson(schemaJSON);
+	return _GLOBAL.schema
 }
 
 // Update dropdown based on REST call
 function updateDropdown(controlName, errorMsg) {
 	var jsObj
-	var uri
 	var combo = ""
 	var i
 	var p
@@ -3617,20 +3632,20 @@ function updateDropdown(controlName, errorMsg) {
 	var label
 	var arr
 	
-	
-	
 	try {
-		jsObj = getSchema();
-		if (!jsObj) throw "No schema returned!"
+		fetchSchema();
+		if (!_GLOBAL.schema) throw "No schema returned!"
 	} catch (ex) {
 		form.alert("Cannot get API schema - " + ex);
 		throw "Cannot get API schema"
 	}
 
-	// ------------------- @@Debug @@Test
-
 //	form.getClass()
 	combo = form.getControl(controlName)
+	form.alert("Combo class: " + combo.getClass());
+	var methods = [];
+	for (var method in combo.getClass().getMethods()) methods.push(method + "\n");
+	form.alert(methods)
 	combo.removeAll()
 
 	if (!jsObj.items) {
@@ -3926,19 +3941,9 @@ function write(fname, str) {
 	bw.close()
 }
 
-	]]]]><![CDATA[></parameter>
-        <parameter name="formscript"><![CDATA[// Load library scripts used
-eval(system.getScriptText("RestifyLib"))
-eval(system.getScriptText("ENDPOINTS"));
-eval(system.getScriptText("SCHEMA"));
-
-// Some global variables, since buttons cannot pass
-// arguments to functions
-var global = {
-	schema: null, 	// for storing schema	
-	control: null 	// currently selected control
-} 
-	]]]]><![CDATA[></parameter>
+	
+]]]]><![CDATA[></parameter>
+        <parameter name="formscript"/>
         <parameter name="title">CONN_TITLE</parameter>
         <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
     </Form>
