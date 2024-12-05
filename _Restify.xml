@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 05 12:58:10 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 05 15:18:44 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733342843233</ModTime>
@@ -1331,7 +1331,7 @@ var API = function(schemaStr, format) {
             </InitParams>
         </AssemblyLine>
     <AssemblyLine name="Reading schema 20241201 1319">
-            <ModTime>1733055492511</ModTime>
+            <ModTime>1733408034353</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -1348,7 +1348,7 @@ var API = function(schemaStr, format) {
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1733055492511</ModTime>
+                <ModTime>1733408034353</ModTime>
                 <Script name="RestifyLib">
                     <InheritFrom>/Scripts/RestifyLib</InheritFrom>
                     <ModTime>1732710775141</ModTime>
@@ -1571,7 +1571,7 @@ var API = function(schemaStr, format) {
 }]]></parameter>
                 </Script>
                 <Script name="Test">
-                    <ModTime>1732879474425</ModTime>
+                    <ModTime>1733408034353</ModTime>
                     <parameter name="script"><![CDATA[try {
 
 	var params = {
@@ -1595,7 +1595,8 @@ var API = function(schemaStr, format) {
 	var itimSwagger = loadFileToString("Restify/itim.swagger.txt", "YAML");
 	var api = new API(itimSwagger);
 	
-	var resourceItems = api.getChildren("/paths")
+	var resourceItems = api.getChildren("paths")
+	for (var ri in resourceItems) task.logmsg(ri)
 	
 	
 } catch (e) {
@@ -3509,15 +3510,15 @@ function makeCall(uri, errormsg) {
         </Connector>
         <Connector name="TestScriptConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733399876867</ModTime>
+            <ModTime>1733408278454</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733399876867</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="90" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 05 12:57:56 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1733408278454</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="119" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 05 15:17:58 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1733399876425</ModTime>
+        <ModTime>1733408277944</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -3534,12 +3535,13 @@ function makeCall(uri, errormsg) {
             <ListItem>Advanced</ListItem>
         </FormSectionNames>
         <FormItem name="Object">
-            <ModTime>1733398374598</ModTime>
+            <ModTime>1733406681956</ModTime>
             <parameter name="Required">true</parameter>
             <parameter name="description">Item to perform operations on</parameter>
             <parameter name="label">Item</parameter>
             <parameter name="script">fetchItems</parameter>
             <parameter name="scriptLabel">Update</parameter>
+            <parameter name="syntax">droplist</parameter>
         </FormItem>
         <FormItem name="Operation">
             <ModTime>1733312728283</ModTime>
@@ -3575,9 +3577,7 @@ function makeCall(uri, errormsg) {
         </FormItem>
         <FormSection name="Advanced">
             <FormSectionNames>
-                <ListItem>keepGlobalState</ListItem>
-                <ListItem>$GLOBAL.includeFiles</ListItem>
-                <ListItem>includePrologs</ListItem>
+                <ListItem>PathToObjects</ListItem>
                 <ListItem>$GLOBAL.debug</ListItem>
                 <ListItem>$GLOBAL.userComment</ListItem>
             </FormSectionNames>
@@ -3605,6 +3605,9 @@ var _GLOBAL = {
 	schema: null 
 } 
 
+//
+//						FUNCTIONS
+//
 // Update the dropdown with resource items
 function fetchItems() {
 	updateDropdown("Object", "Cannot fetch resource items")
@@ -3622,56 +3625,79 @@ function fetchSchema() {
 	return _GLOBAL.schema
 }
 
+// Parse returned endpoint URIs
+function parseURI(uri) {
+	var parts = system.splitString(uri.trim(), "/");
+	var itm = {name: parts[0].trim()};
+	
+	for (var i = 1; i < parts.length; i++) {
+		part = parts[i].trim();
+		if (part.startsWith("{") && part.endsWith("}")) { // Then this is the Lookup on uid uri
+			itm.uid = part;
+			if (i+1 < parts.length) { // The id is at the end of the path
+		}
+	}
+	
+	return itm
+}
+
 // Update dropdown based on REST call
 function updateDropdown(controlName, errorMsg) {
-	var jsObj
-	var combo = ""
-	var i
-	var p
-	var val
-	var label
-	var arr
-	
-	try {
-		fetchSchema();
-		if (!_GLOBAL.schema) throw "No schema returned!"
-	} catch (ex) {
-		form.alert("Cannot get API schema - " + ex);
-		throw "Cannot get API schema"
-	}
-
-//	form.getClass()
-	combo = form.getControl(controlName)
-	form.alert("Combo class: " + combo.getClass());
-	var methods = [];
-	for (var method in combo.getClass().getMethods()) methods.push(method + "\n");
-	form.alert(methods)
-	combo.removeAll()
-
-	if (!jsObj.items) {
-		combo.add(jsObj[propertyName])
-	} else {
-		arr = new java.util.ArrayList()
-		for (i = 0; i < jsObj.items.length; i++) {
-			p = jsObj.items[i]
-			label = p["label"]
-			if (typeof(label) == "undefined")
-				val = p[propertyName]
-			else
-				val = label + " |<<" + p[propertyName] + ">>|"
-//			form.alert(">> provider: " + p.uri)
-			arr.add(val)
-		}
+	var combo = "";
+	var itemPath = (form.getControl("PathToObjects").getText() || "").trim();
 		
-		arr = arr.toArray()
-		java.util.Arrays.sort(arr)
+	try {
+		if (!itemPath) throw "Item Path must be set";
+		
+		fetchSchema();
+		
+		if (!_GLOBAL.schema) throw "No schema returned!"
 
-		for (var a in arr) {
-			combo.add(a)
-		}	
+		combo.close()
+		combo = form.getControl(controlName);
+	
+		combo.removeAll(); // Empty drop-down
+	
+		var list = [];
+		for (var itm in _GLOBAL.schema[itemPath])  {
+			var itm = {name: _GLOBAL.schema[itemPath]};
+			if (typeof itm == "string" && itm.startsWith("./")) {
+				var itm = parsePath(itm);
+			}
+			combo.add(itm.name);
+		}
+		form.alert(list)
+	
+		if (!jsObj.items) {
+			combo.add(jsObj[propertyName])
+		} else {
+			arr = new java.util.ArrayList()
+			for (i = 0; i < jsObj.items.length; i++) {
+				p = jsObj.items[i]
+				label = p["label"]
+				if (typeof(label) == "undefined")
+					val = p[propertyName]
+				else
+					val = label + " |<<" + p[propertyName] + ">>|"
+	//			form.alert(">> provider: " + p.uri)
+				arr.add(val)
+			}
+			
+			arr = arr.toArray()
+			java.util.Arrays.sort(arr)
+	
+			for (var a in arr) {
+				combo.add(a)
+			}	
+		}
+	} catch (ex) {
+		var msg = "Cannot get API schema - " + ex;
+		form.alert(msg);
+		throw msg
 	}
 	
 	combo.select(0)
+	
 }
 
 // Make REST call
@@ -3948,6 +3974,8 @@ function write(fname, str) {
         <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
     </Form>
 </MetamergeConfig>]]></parameter>
+                <parameter name="Object"/>
+                <parameter name="PathToObjects">paths</parameter>
                 <parameter name="includeFiles"/>
             </Configuration>
             <Parser>
