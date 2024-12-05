@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 05 15:18:44 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 05 20:03:23 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733342843233</ModTime>
@@ -22,7 +22,7 @@
             <ContainerDF name="DataFlowContainer">
                 <ModTime>1733342843233</ModTime>
                 <Script name="RestifyLib">
-                    <InheritFrom>/Scripts/RestifyLib</InheritFrom>
+                    <InheritFrom>/Scripts/RESTIFY library class</InheritFrom>
                     <ModTime>1732710775141</ModTime>
                 </Script>
                 <Script name="SCHEMA class">
@@ -1087,7 +1087,7 @@ function fullStacktrace(e, delimArg) {
             <ContainerDF name="DataFlowContainer">
                 <ModTime>1732879848376</ModTime>
                 <Script name="RestifyLib">
-                    <InheritFrom>/Scripts/RestifyLib</InheritFrom>
+                    <InheritFrom>/Scripts/RESTIFY library class</InheritFrom>
                     <ModTime>1732710775141</ModTime>
                 </Script>
                 <Script name="Oauth stuff">
@@ -1350,7 +1350,7 @@ var API = function(schemaStr, format) {
             <ContainerDF name="DataFlowContainer">
                 <ModTime>1733408034353</ModTime>
                 <Script name="RestifyLib">
-                    <InheritFrom>/Scripts/RestifyLib</InheritFrom>
+                    <InheritFrom>/Scripts/RESTIFY library class</InheritFrom>
                     <ModTime>1732710775141</ModTime>
                 </Script>
                 <Script name="Oauth stuff">
@@ -1643,7 +1643,7 @@ var API = function(schemaStr, format) {
             <ContainerDF name="DataFlowContainer">
                 <ModTime>1733070377917</ModTime>
                 <Script name="RestifyLib">
-                    <InheritFrom>/Scripts/RestifyLib</InheritFrom>
+                    <InheritFrom>/Scripts/RESTIFY library class</InheritFrom>
                     <ModTime>1732710775141</ModTime>
                 </Script>
                 <Script name="Oauth stuff">
@@ -1966,6 +1966,427 @@ var ENDPOINTS = function(args) {
 		)
     }
 }]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    <AssemblyLine name="_eventScriptTest">
+            <ModTime>1733425249082</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="eventScript" state="Enabled"/>
+                    <Component name="Test it" state="Enabled"/>
+                    <Component name="Test" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1733425249082</ModTime>
+                <Script name="eventScript">
+                    <ModTime>1733415837946</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[//
+//						INITIALIZATION
+// 
+// Load library scripts used
+eval(system.getScriptText("RestifyLib"))
+eval(system.getScriptText("ENDPOINTS"));
+eval(system.getScriptText("SCHEMA"));
+
+// Some global variables, since buttons cannot pass
+// arguments to functions
+var _GLOBAL = {
+	schema: null 
+} 
+
+//
+//						FUNCTIONS
+//
+// Update the dropdown with resource items
+function fetchItems() {
+	updateDropdown("Object", "Cannot fetch resource items")
+}
+
+// Update the dropdown with operations for the selected item
+function fetchOperations() {
+	updateDropdown("Operation", "Cannot fetch operations for a resource item")
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	var schemaJSON = loadFileToString("_Restify/itim_swagger.json");
+	_GLOBAL.schema = fromJson(schemaJSON);
+	return _GLOBAL.schema
+}
+
+// Parse returned endpoint URIs
+function parseURI(uri) {
+	var parts = system.splitString(uri.trim(), "/");
+	var itm = {name: parts[0].trim()};
+	
+	for (var i = 1; i < parts.length; i++) {
+		part = parts[i].trim();
+		if (part.startsWith("{") && part.endsWith("}")) { // Then this is the Lookup on uid uri
+			itm.uid = part;
+			if (i > 1) { // The id is at the end of the path
+				itm.relInfo = parts[1]
+			} else
+			if (i+1 >= parts.length) {
+				itm.relInfo = parts[parts.length-1]
+			}
+		}
+	}
+	
+	task.logmsg(work.fromJSON(toJson(itm)));
+	
+	return itm
+}
+
+// Update dropdown based on REST call
+function updateDropdown(controlName, errorMsg) {
+	var combo = "";
+	var itemPath = (form.getControl("PathToObjects").getText() || "").trim();
+		
+	try {
+		if (!itemPath) throw "Item Path must be set";
+		
+		fetchSchema();
+		
+		if (!_GLOBAL.schema) throw "No schema returned!"
+
+		combo.close()
+		combo = form.getControl(controlName);
+	
+		combo.removeAll(); // Empty drop-down
+	
+		var list = [];
+		for (var itm in _GLOBAL.schema[itemPath])  {
+			var itm = {name: _GLOBAL.schema[itemPath]};
+			if (typeof itm == "string" && itm.startsWith("./")) {
+				var itm = parsePath(itm);
+			}
+			combo.add(itm.name);
+		}
+		form.alert(list)
+	
+		if (!jsObj.items) {
+			combo.add(jsObj[propertyName])
+		} else {
+			arr = new java.util.ArrayList()
+			for (i = 0; i < jsObj.items.length; i++) {
+				p = jsObj.items[i]
+				label = p["label"]
+				if (typeof(label) == "undefined")
+					val = p[propertyName]
+				else
+					val = label + " |<<" + p[propertyName] + ">>|"
+	//			form.alert(">> provider: " + p.uri)
+				arr.add(val)
+			}
+			
+			arr = arr.toArray()
+			java.util.Arrays.sort(arr)
+	
+			for (var a in arr) {
+				combo.add(a)
+			}	
+		}
+	} catch (ex) {
+		var msg = "Cannot get API schema - " + ex;
+		form.alert(msg);
+		throw msg
+	}
+	
+	combo.select(0)
+	
+}
+
+// Make REST call
+function makeCall(useURI, errorMsg, callType) {
+	var url
+	var user
+	var password
+	var httpEntry
+	var jsonStr
+	var jsObj
+	var p
+	var p2
+	var embeddedURI
+	var userAndPassword
+	
+	user = form.getControl("user").getText()
+	password = form.getControl("password").getText()
+	url = form.getControl("baseURL").getText()
+	
+	p = useURI.indexOf("|<<")
+	p2 = useURI.indexOf(">>|")
+	if (p > 0 && p2 > 0 && p2 > p) {
+		embeddedURI = useURI.substring(p+3, p2)
+		useURI = embeddedURI + useURI.substring(p2+3)
+	}	
+
+	if (useURI.startsWith("/providers//providers"))
+		useURI = useURI.substring(11)
+		
+//	p = url.indexOf("//")
+//	url = url.substring(0,p+2) + userAndPassword + url.substring(p+2)
+
+//	form.alert("baseURL: " + url)
+//	form.alert("useURI: " + useURI)
+//	form.alert("both combined: " + url + useURI)
+
+	http.setParam("url", url + useURI)
+	http.setParam("username", user)
+	http.setParam("password", password)
+	http.initialize(null)
+	httpEntry = system.newEntry();
+	httpEntry["http.content-type"] = "application/json"
+	httpEntry["http.method"] = "GET"
+	httpEntry["http.accept"] = "application/json"
+
+//	form.alert("@@@ making call to " + http.getParam("url") + " with: \n" + httpEntry.toString()) // @@@
+
+	httpEntry = http.queryReply(httpEntry)
+	
+//form.alert(httpEntry)
+	
+	if (httpEntry == null) 
+		throw "Communication error * " + errorMsg + " - url used: " url + useURI + " --> return http.body:\n" + jsonStr
+
+	jsonStr = httpEntry.getString("http.bodyAsString")
+	
+//	write("makeCall " + callType + ".txt", "url: " + url // @@@@
+//						+ "\nuser: " + user
+//						+ "\npassword: " + password
+//						+ "\npayload:\n" + httpEntry.toString())
+//	form.alert("@@@ " + callType + "\n" + jsonStr)
+	
+	if (jsonStr == null)
+		throw errorMsg + " (Nothing returned) - url used: " http.getParam("url") + " --> return http.body:\n" + jsonStr
+
+//	eval("json=" + jsonStr)
+	try {
+		jsObj = fromJson(jsonStr)
+	} catch (ex) {
+		throw errorMsg + " - Error parsing JSON received: " + ex + "   JSON: " + jsonStr
+	}
+
+	if (typeof(jsObj) == "undefined" || !jsObj || jsObj == null)
+		throw errorMsg + "(Could not parse) - url used: " http.getParam("url") + " --> return http.body:\n" + jsonStr
+
+	return jsObj
+}
+
+function fetchParams() {
+	var params = makeCall(form.getControl("dataset").getText() + "/parameters", 
+							"No Dataset parameters returned",
+							"getParams")
+	var formconfig = form.getFormConfig()
+	var fs
+	var p
+	var fic
+	
+	// create dataset section
+	if( formconfig.getSection("Dataset") == null ) {
+		throw "Connection form is missing the 'Dataset' section!"
+//		fs = new com.ibm.di.config.base.FormSectionImpl()
+//		fs.setName("Dataset")
+//		fs.setTitle("Provider Dataset")
+//		formconfig.addSection(fs)
+	}
+
+	// get fs as section handle
+	fs = formconfig.getSection("Dataset");
+
+	// remove all dataset section fields
+	for(str in fs.getNames()) {
+		formconfig.removeFormItem(str);
+	}
+
+	// remove all params from section dataset
+	fs.getNames().removeAllElements();
+
+	
+	// create a new param_* field and add it to Dataset section
+
+	for (var i = 0; i < params.items.length; i++)  {
+		if (params.items[i].hidden != "true") {
+			p = params.items[i]
+			fic = formconfig.newFormItem(p.id)
+			fic.setLabel(p.label)
+			fic.setSyntax(p.type)
+			fic.setToolTip(p.description)
+			fic.setRequired(p.required != "false")
+			
+			if ( ("!" + p["default"]) != "!undefined" )
+				fic.setDefaultValue(p["default"])
+			else
+				fic.setDefaultValue("")
+			
+			fs.getNames().add(fic.getShortName())
+		}
+	}		
+		
+	form.resetForm();
+	form.initialize();
+}
+
+// The API class is handy for requesting and parsing OpenAPI schema to a JS object for analysis
+var API = function(schemaStr, format) {
+	_WHERE = "ENDPOINTS class";	
+	this.name = "API";
+	
+	// Main init logic after method definitions
+
+    // The name says it all. Returns a JS Obj
+    this.parseOpenAPISchema = function(openApiSchema) {
+		// Not sure if this is necessary
+        openApiSchema = openApiSchema.trim();
+
+        // Load Jackson libraries
+        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
+        var objectMapper = new ObjectMapper();
+
+        // Check if YAML and if so, convert to Json
+        if ("YAML".equalsIgnoreCase(this.format)) {
+            // Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read
+            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
+            // Create instances of Yaml and ObjectMapper
+            var yaml = new Yaml();
+            // Parse YAML into a Java Map
+            var map = yaml.load(openApiSchema);
+
+            // Convert Java Map to JSON string
+            var jsonString = objectMapper.writeValueAsString(map)
+        } else {
+            jsonString = openApiSchema;
+        }
+
+        this.schemaObj = fromJson(jsonString);
+        return this.schemaObj
+    }
+
+    // Returns the child elements (JS Obj) of the specified path
+    // Root level if no argument or blank text passed
+    this.getChildren = function(path) { 
+        var children = {};
+        path = path.replaceAll("/",".").replaceAll("\\\\", ".");
+        if (path.startsWith(".")) path = path.substring(1);
+
+        for (var childName in this.schemaObj[path]) {
+            children[childName] = this.schemaObj[path][childName];
+        }
+
+        return children;
+    }
+    
+    // Main init logic
+    this.schemaStr = schemaStr;
+    this.format = format || "YAML";
+    this.apiObj = this.parseOpenAPISchema(schemaStr)
+}
+
+function loadFileToString(filepath) {
+	var sb = new java.lang.StringBuilder();
+	var file = system.openFileForInput(filepath);
+	var line;
+	while ((line = file.readLine()) != null) {
+		sb.append(line + "\n");
+	}
+	return sb.toString();
+}
+
+// ENDPOINTS class to parse the schema object
+var ENDPOINTS = function(args) {
+	_WHERE = "ENDPOINTS class";
+	this.name = "ENDPOINTS";
+
+	this.schema = args.openAPIschema || {};
+	this.api = args.api || null;
+	this.hm = new java.util.HashMap();
+	this.resources = {};
+	this.paths = {};
+	this.uriList = system.splitString("", "");	// Empty array
+	this.config = {};
+
+	
+	
+	// Main processing starts here
+	if (!this.api || this.schema == {}) {
+		throw "ENDPOINTS constructure requires the OpenAPI schema and instantiated API object"
+	}
+	
+	// Get the various URIs and parse into parts to analyze
+	for (var uri in this.schema) {
+		var arr = this.hm.get(uri);
+		if (arr == null) {
+			arr = [];
+			this.hm.put(uri.substring(1), arr)
+		}
+		arr.push(this.schema[uri])
+	}
+
+	// Set up a sorted array of the paths returned
+	this.uriList = this.hm.keySet().toArray();
+	java.util.Arrays.sort(this.uriList);
+	
+	// The next step is to create
+	
+	// Now to parse each to retrieve the first part of the base - the resource item type
+	for (var uri in this.uriList) {
+		var parts = system.splitString(uri, "/");
+		var type = parts[0].trim();
+		for (var i = 1; i < parts.length; i++) {
+			var bit = parts[i].trim();
+			// Check if it's an identifier
+			if (bit.startWith("{") && bit.endsWith("}")) {
+				
+			}
+		}
+	}
+	
+	
+	// check it
+	var keys = hm.keySet().toArray();
+	java.util.Arrays.sort(keys);
+	for (var key in keys) {
+		task.logmsg("-----> " + key)
+	}
+	
+	return this.hm
+}
+
+function write(fname, str) {
+	var bw = new java.io.BufferedWriter(new java.io.FileWriter("C:\\temp\\" + fname))
+//	for (var m in obj.getClass().getMethods()) {
+//		bw.write(m)
+//		bw.newLine()
+//	}
+
+	bw.write(str)
+	bw.newLine()	
+	bw.close()
+}]]></parameter>
+                </Script>
+                <Script name="Test it">
+                    <ModTime>1733415839952</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script">fetchItems()</parameter>
+                </Script>
+                <Script name="Test">
+                    <ModTime>1733425249082</ModTime>
+                    <parameter name="script"><![CDATA[ENDPOINTS = eval(system.getScriptText("SCHEMA class").replaceAll("\n", " "));
+i = 42]]></parameter>
                 </Script>
             </ContainerDF>
             <ThreadOptions/>
@@ -3509,6 +3930,352 @@ function makeCall(uri, errormsg) {
             <PoolInstance/>
         </Connector>
         <Connector name="TestScriptConnector">
+            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
+            <ModTime>1733424831813</ModTime>
+            <ConnectorMode>Iterator</ConnectorMode>
+            <ConnectorState>Enabled</ConnectorState>
+            <Configuration>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1733424831813</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="242" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 05 19:53:51 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+    <Form name="Form">
+        <ModTime>1733424831247</ModTime>
+        <FormItemNames>
+            <ListItem>$GLOBAL.script</ListItem>
+            <ListItem>keepGlobalState</ListItem>
+            <ListItem>$GLOBAL.includeFiles</ListItem>
+            <ListItem>includePrologs</ListItem>
+            <ListItem>$GLOBAL.debug</ListItem>
+            <ListItem>$GLOBAL.help</ListItem>
+            <ListItem>Object</ListItem>
+            <ListItem>Operation</ListItem>
+            <ListItem>PathToObjects</ListItem>
+        </FormItemNames>
+        <FormSectionNames>
+            <ListItem>General</ListItem>
+            <ListItem>Advanced</ListItem>
+        </FormSectionNames>
+        <FormItem name="Object">
+            <ModTime>1733422566012</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Item to perform operations on</parameter>
+            <parameter name="label">Item</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel">Update</parameter>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="Operation">
+            <ModTime>1733410717009</ModTime>
+            <parameter name="description">Operation to apply to the selected Object</parameter>
+            <parameter name="label">Operation</parameter>
+            <parameter name="script">fetchOperations</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="PathToObjects">
+            <ModTime>1733398344461</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">The openAPIschema is hierarchical, so at what level in the tree do resource items appear. Separate tree branches by pipe symbol (|)</parameter>
+            <parameter name="label">Path to Items</parameter>
+            <parameter name="script"/>
+            <parameter name="scriptLabel"/>
+        </FormItem>
+        <FormItem name="Show">
+            <ModTime>1733312883681</ModTime>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="dropdown"/>
+        <FormItem name="includePrologs">
+            <parameter name="description">pro_desc</parameter>
+            <parameter name="label">pro_label</parameter>
+            <parameter name="script">selectGlobalProlog</parameter>
+            <parameter name="scriptLabel">pro_script_label</parameter>
+            <parameter name="scripthelp">pro_script_help</parameter>
+            <parameter name="syntax">textarea</parameter>
+        </FormItem>
+        <FormItem name="keepGlobalState">
+            <parameter name="description">SCRIPT_CONN_KEEP_GLOBAL_STATE_DESC</parameter>
+            <parameter name="label">SCRIPT_CONN_KEEP_GLOBAL_STATE_LABEL</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormSection name="Advanced">
+            <FormSectionNames>
+                <ListItem>PathToObjects</ListItem>
+                <ListItem>$GLOBAL.debug</ListItem>
+                <ListItem>$GLOBAL.userComment</ListItem>
+            </FormSectionNames>
+            <parameter name="initiallyExpanded">false</parameter>
+            <parameter name="title">Advanced</parameter>
+        </FormSection>
+        <FormSection name="General">
+            <FormSectionNames>
+                <ListItem>$GLOBAL.script</ListItem>
+                <ListItem>Object</ListItem>
+                <ListItem>Operation</ListItem>
+            </FormSectionNames>
+        </FormSection>
+        <parameter name="formevents"><![CDATA[initialized = false;
+function initialize() {
+	if (initialized) return;
+	initialized = true;
+	
+	form.alert("Initializing");
+
+	// Load various JS 'Classes'
+	RESTIFY = eval(system.getScriptText("RESTIFY library class").replaceAll("\n", " "))
+	ENDPOINTS = eval(system.getScriptText("ENDPOINTS class").replaceAll("\n", " "));
+	SCHEMA = eval(system.getScriptText("SCHEMA class").replaceAll("\n", " "));
+	CFG = function() {
+		this.schema = null
+	}
+	
+	fetchSchema();
+}
+
+function alertObject(objName, obj) {
+	form.alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	form.alert(arr.toString())
+} 
+
+
+//
+//						FUNCTIONS
+//
+// Update the dropdown with resource items
+function fetchItems() {
+    var path = form.getControl("PathToObjects").getText();
+    initialize()
+    updateDropdown("Object",
+        path,
+        "Cannot fetch resource items")
+}
+
+// Update the dropdown with operations for the selected item
+function fetchOperations() {
+    var object = form.getControl("Object").getText();
+    initialize()
+    updateDropdown("Operation",
+        [form.getControl("PathToObjects"),
+            form.getControl("Object").getText()
+        ],
+        "Cannot fetch operations for a resource item")
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	
+alertObject("ENDPOINTS", ENDPOINTS);	
+alertObject("SCHEMA", SCHEMA);
+alertObject("RESTIFY", RESTIFY);
+alertObject("CFG", CFG);
+	
+    var schemaJSON = RESTIFY.loadFileToString("_Restify/itim_swagger.json");
+    CFG.schema = new SCHEMA(schemaJSON, "JSON");	 
+	return CFG.schema
+}
+
+// Parse returned endpoint URIs
+function parseURI(uri) {
+    var parts = system.splitString(uri.trim(), "/");
+    var itm = {
+        name: parts[0].trim(),
+        uri: uri
+    }; // Initialize this with name
+
+    for (var i = 1; i < parts.length; i++) {
+        part = parts[i].trim();
+        if (part.startsWith("{") && part.endsWith("}")) { // Then this is the Lookup on uid uri
+            itm.uid = part;
+            if (i > 1) { // The id is at the end of the path
+                itm.relInfo = parts[1]
+            } else
+            if (i + 1 >= parts.length) {
+                itm.relInfo = parts[parts.length - 1]
+            }
+        }
+    }
+
+    task.logmsg(work.fromJSON(toJson(itm)));
+
+    return itm
+}
+
+// Update dropdown based on REST call
+function updateDropdown(controlName, path, errorMsg) {
+    var combo = "";
+
+    if (!(path instanceof Array)) path = [path];
+
+    var itemPath = (form.getControl("PathToObjects").getText() || "").trim();
+
+    try {
+        if (!itemPath) throw "Item Path must be set";
+
+        var schema = CFG.schema;
+
+        if (!schema) throw "No schema returned!";
+
+        combo.removeAll(); // Empty drop-down
+
+        var subtree = schema[path[0]].getChildren(path);
+
+        form.alert(toJson(subtree));
+        for (var res in subtree) {
+            //form.alert(res)
+            combo.add(res)
+        }
+
+        combo.select(0);
+        return;
+
+        // ------------------ SHORTCIRCUIT	
+
+        if (!jsObj.items) {
+            combo.add(jsObj[propertyName])
+        } else {
+            arr = new java.util.ArrayList()
+            for (i = 0; i < jsObj.items.length; i++) {
+                p = jsObj.items[i]
+                label = p["label"]
+                if (typeof(label) == "undefined")
+                    val = p[propertyName]
+                else
+                    val = label + " |<<" + p[propertyName] + ">>|"
+                //			form.alert(">> provider: " + p.uri)
+                arr.add(val)
+            }
+
+            arr = arr.toArray()
+            java.util.Arrays.sort(arr)
+
+            for (var a in arr) {
+                combo.add(a)
+            }
+        }
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        form.alert(msg);
+        throw msg
+    }
+
+    combo.select(0)
+
+}
+
+function fetchParams() {
+    var params = makeCall(form.getControl("dataset").getText() + "/parameters",
+        "No Dataset parameters returned",
+        "getParams")
+    var formconfig = form.getFormConfig()
+    var fs
+    var p
+    var fic
+
+    // create dataset section
+    if (formconfig.getSection("Dataset") == null) {
+        throw "Connection form is missing the 'Dataset' section!"
+        //		fs = new com.ibm.di.config.base.FormSectionImpl()
+        //		fs.setName("Dataset")
+        //		fs.setTitle("Provider Dataset")
+        //		formconfig.addSection(fs)
+    }
+
+    // get fs as section handle
+    fs = formconfig.getSection("Dataset");
+
+    // remove all dataset section fields
+    for (str in fs.getNames()) {
+        formconfig.removeFormItem(str);
+    }
+
+    // remove all params from section dataset
+    fs.getNames().removeAllElements();
+
+
+    // create a new param_* field and add it to Dataset section
+
+    for (var i = 0; i < params.items.length; i++) {
+        if (params.items[i].hidden != "true") {
+            p = params.items[i]
+            fic = formconfig.newFormItem(p.id)
+            fic.setLabel(p.label)
+            fic.setSyntax(p.type)
+            fic.setToolTip(p.description)
+            fic.setRequired(p.required != "false")
+
+            if (("!" + p["default"]) != "!undefined")
+                fic.setDefaultValue(p["default"])
+            else
+                fic.setDefaultValue("")
+
+            fs.getNames().add(fic.getShortName())
+        }
+    }
+
+    form.resetForm();
+    form.initialize();
+}
+
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("C:\\temp\\" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]]]><![CDATA[></parameter>
+        <parameter name="formscript"/>
+        <parameter name="title">CONN_TITLE</parameter>
+        <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
+    </Form>
+</MetamergeConfig>]]></parameter>
+                <parameter name="Object"/>
+                <parameter name="Operation"/>
+                <parameter name="PathToObjects">paths</parameter>
+                <parameter name="includeFiles"/>
+            </Configuration>
+            <Parser>
+                <InheritFrom>[parent]</InheritFrom>
+            </Parser>
+            <AttributeMap name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <AttributeMap name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <DeltaSettings/>
+            <Schema name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+            </Schema>
+            <Schema name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+            </Schema>
+            <LinkCriteria>
+                <InheritFrom>[parent]</InheritFrom>
+            </LinkCriteria>
+            <Hooks>
+                <InheritFrom>[parent]</InheritFrom>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <Reconnect>
+                <InheritFrom>[parent]</InheritFrom>
+                <ReconnectRules/>
+            </Reconnect>
+            <Operations/>
+            <PoolDefinition>
+                <InheritFrom>[parent]</InheritFrom>
+            </PoolDefinition>
+            <PoolInstance/>
+        </Connector>
+    <Connector name="TestScriptConnector 20241205 1521">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
             <ModTime>1733408278454</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
@@ -8782,79 +9549,37 @@ function getOAuthAccessToken(args) {
 	return OAUTH.requestToken();
 }]]></parameter>
         </Script>
-    <Script name="RestifyLib">
-            <ModTime>1732715978023</ModTime>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[// 20241127 2024 Created
-
-function loadFileToByteArray(filepath) {
-	var file = new java.io.File(filepath);
-	var fis = new java.io.FileInputStream(file);
-	var bytes = java.util.Arrays.copyOf("".getBytes(), file.length());
-	fis.read(bytes); //read file into bytes[]
-	fis.close();
-	return bytes;
-}
-
-function loadFileToString(filepath) {
-	var sb = new java.lang.StringBuilder();
-	var file = system.openFileForInput(filepath);
-	var line;
-	while ((line = file.readLine()) != null) {
-		sb.append(line + "\n");
-	}
-	return sb.toString();
-}
-
-function loadFileToArray(filepath, delimiter) {
-	delimiter = delimiter || "\n";
-	
-	var sb = new java.lang.StringBuilder();
-	var file = system.openFileForInput(filepath);
-	var line;
-	while ((line = file.readLine()) != null) {
-		sb.append(line + "\n");
-	}
-	var str = sb.toString();
-	return system.splitString(str, delimiter)
-}
-
-function getCertificate (url) {
-	try {
-		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(url, 443);
-	} finally {}
-}]]></parameter>
-        </Script>
+    
     <Script name="SCHEMA class">
-            <ModTime>1733343565215</ModTime>
+            <ModTime>1733425236481</ModTime>
             <parameter name="enabled">true</parameter>
             <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[// The SCHEMA class is handy for requesting and parsing OpenAPI schema to a JS object for analysis
+            <parameter name="script"><![CDATA[/* The SCHEMA class is handy for requesting and parsing OpenAPI schema to a JS object for analysis */
 var SCHEMA = function(schemaStr, format) {
 	_WHERE = "SCHEMA class";	// Global variable available for error reporting
 	this.name = "SCHEMA";
 	
-	// Main init logic after method definitions
+	/* Main init logic after method definitions
 
-    // The name says it all. Returns a JS Obj
+       The name says it all. Returns a JS Obj */
+       
     this.parseOpenAPISchema = function(openApiSchema) {
-		// Not sure if this is necessary
         openApiSchema = openApiSchema.trim();
 
-        // Load Jackson libraries
+        /* Load Jackson libraries */
         var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
         var objectMapper = new ObjectMapper();
 
-        // Check if YAML and if so, convert to Json
+        /* Check if YAML and if so, convert to Json */
         if ("YAML".equalsIgnoreCase(this.format)) {
-            // Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read
+            /* Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read */
             var Yaml = Packages.org.yaml.snakeyaml.Yaml;
-            // Create instances of Yaml and ObjectMapper
+            /* Create instances of Yaml and ObjectMapper */
             var yaml = new Yaml();
-            // Parse YAML into a Java Map
+            /* Parse YAML into a Java Map */
             var map = yaml.load(openApiSchema);
 
-            // Convert Java Map to JSON string
+            /* Convert Java Map to JSON string */
             var jsonString = objectMapper.writeValueAsString(map)
         } else {
             jsonString = openApiSchema;
@@ -8864,8 +9589,8 @@ var SCHEMA = function(schemaStr, format) {
         return this.schemaObj
     }
 
-    // Returns the child elements (JS Obj) of the specified path
-    // Root level if no argument or blank text passed
+    /* Returns the child elements (JS Obj) of the specified path
+       Root level if no argument or blank text passed */
     this.getChildren = function(path) { 
         var children = {};
         var parent;
@@ -8892,7 +9617,7 @@ var SCHEMA = function(schemaStr, format) {
         return children;
     }
     
-    // Main init logic
+    /* Main init logic */
     this.schemaStr = schemaStr;
     this.format = format || "YAML";
     this.schemaObj = this.parseOpenAPISchema(schemaStr)
@@ -8958,6 +9683,51 @@ var ENDPOINTS = function(args) {
 	}
 	
 	return hm
+}]]></parameter>
+        </Script>
+    <Script name="RESTIFY library class">
+            <ModTime>1733415625214</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20241127 2024 Created
+
+var RESTIFY = function() {
+	this.loadFileToByteArray = function(filepath) {
+		var file = new java.io.File(filepath);
+		var fis = new java.io.FileInputStream(file);
+		var bytes = java.util.Arrays.copyOf("".getBytes(), file.length());
+		fis.read(bytes); //read file into bytes[]
+		fis.close();
+		return bytes;
+	}
+	
+	this.loadFileToString = function(filepath) {
+		var sb = new java.lang.StringBuilder();
+		var file = system.openFileForInput(filepath);
+		var line;
+		while ((line = file.readLine()) != null) {
+			sb.append(line + "\n");
+		}
+		return sb.toString();
+	}
+	
+	this.loadFileToArray = function(filepath, delimiter) {
+		delimiter = delimiter || "\n";
+		
+		var sb = new java.lang.StringBuilder();
+		var file = system.openFileForInput(filepath);
+		var line;
+		while ((line = file.readLine()) != null) {
+			sb.append(line + "\n");
+		}
+		var str = sb.toString();
+		return system.splitString(str, delimiter)
+	}
+	
+	this.getCertificate = function(url) {
+		try {
+			var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(url, 443);
+		} finally {}
+	}
 }]]></parameter>
         </Script>
     </Folder>
