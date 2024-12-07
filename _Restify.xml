@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sat Dec 07 20:22:28 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sat Dec 07 20:23:27 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733570226377</ModTime>
@@ -4566,780 +4566,18 @@ function write(fname, str) {
     
     
         
-        <Connector name="TestScriptConnector 20241206 1629">
-            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733498973705</ModTime>
-            <ConnectorMode>Iterator</ConnectorMode>
-            <ConnectorState>Enabled</ConnectorState>
-            <Configuration>
-                <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733498973705</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="345" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Dec 06 16:29:33 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
-    <Form name="Form">
-        <ModTime>1733498971119</ModTime>
-        <FormItemNames>
-            <ListItem>$GLOBAL.script</ListItem>
-            <ListItem>keepGlobalState</ListItem>
-            <ListItem>$GLOBAL.includeFiles</ListItem>
-            <ListItem>includePrologs</ListItem>
-            <ListItem>$GLOBAL.debug</ListItem>
-            <ListItem>$GLOBAL.help</ListItem>
-            <ListItem>Object</ListItem>
-            <ListItem>Operation</ListItem>
-            <ListItem>PathToObjects</ListItem>
-        </FormItemNames>
-        <FormSectionNames>
-            <ListItem>General</ListItem>
-            <ListItem>Advanced</ListItem>
-        </FormSectionNames>
-        <FormItem name="Object">
-            <ModTime>1733498971119</ModTime>
-            <parameter name="Required">true</parameter>
-            <parameter name="description">Item to perform operations on</parameter>
-            <parameter name="label">Item</parameter>
-            <parameter name="script">fetchItems</parameter>
-            <parameter name="scriptLabel">Update</parameter>
-            <parameter name="syntax">droplist</parameter>
-        </FormItem>
-        <FormItem name="Operation">
-            <ModTime>1733410717009</ModTime>
-            <parameter name="description">Operation to apply to the selected Object</parameter>
-            <parameter name="label">Operation</parameter>
-            <parameter name="script">fetchOperations</parameter>
-            <parameter name="scriptLabel">Fetch</parameter>
-            <parameter name="syntax">dropedit</parameter>
-        </FormItem>
-        <FormItem name="PathToObjects">
-            <ModTime>1733398344461</ModTime>
-            <parameter name="Required">true</parameter>
-            <parameter name="description">The openAPIschema is hierarchical, so at what level in the tree do resource items appear. Separate tree branches by pipe symbol (|)</parameter>
-            <parameter name="label">Path to Items</parameter>
-            <parameter name="script"/>
-            <parameter name="scriptLabel"/>
-        </FormItem>
-        <FormItem name="Show">
-            <ModTime>1733312883681</ModTime>
-            <parameter name="syntax">boolean</parameter>
-        </FormItem>
-        <FormItem name="dropdown"/>
-        <FormItem name="includePrologs">
-            <parameter name="description">pro_desc</parameter>
-            <parameter name="label">pro_label</parameter>
-            <parameter name="script">selectGlobalProlog</parameter>
-            <parameter name="scriptLabel">pro_script_label</parameter>
-            <parameter name="scripthelp">pro_script_help</parameter>
-            <parameter name="syntax">textarea</parameter>
-        </FormItem>
-        <FormItem name="keepGlobalState">
-            <parameter name="description">SCRIPT_CONN_KEEP_GLOBAL_STATE_DESC</parameter>
-            <parameter name="label">SCRIPT_CONN_KEEP_GLOBAL_STATE_LABEL</parameter>
-            <parameter name="syntax">boolean</parameter>
-        </FormItem>
-        <FormSection name="Advanced">
-            <FormSectionNames>
-                <ListItem>PathToObjects</ListItem>
-                <ListItem>$GLOBAL.debug</ListItem>
-                <ListItem>$GLOBAL.userComment</ListItem>
-            </FormSectionNames>
-            <parameter name="initiallyExpanded">false</parameter>
-            <parameter name="title">Advanced</parameter>
-        </FormSection>
-        <FormSection name="General">
-            <FormSectionNames>
-                <ListItem>$GLOBAL.script</ListItem>
-                <ListItem>Object</ListItem>
-                <ListItem>Operation</ListItem>
-            </FormSectionNames>
-        </FormSection>
-        <parameter name="formevents"><![CDATA[var debug = true;
-var schema = null;
-var initialized = false;
-var lib = null;
-
-//
-//						FUNCTIONS
-//
-
-function alert(msg) {
-	if (debug) form.alert(msg)
-}
-
-function alertObject(objName, obj) {
-	alert("alertObj(" + objName + ", " + toJson(obj));
-	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
-	for (var child in obj) {
-		arr.push("   " + child + "\n")
-	}
-	alert(arr.toString())
-} 
-
-function initialize() {
-	if (initialized) return;
-	initialized = true;
-	alert("Initializing...");
-	eval(system.getScriptText("RESTIFY library class"));
-	lib = new RESTIFY();
-	eval(system.getScriptText("SCHEMA class"));
-}
-z
-// Return the openAPI schema - @TEST hardcoded for now
-function parseSchema() {
-	alert("Fetching schema...")
-	if (schema) return schema;
-
-	alert("About to loadFileToString...");
-    var schemaJSON = lib.loadFileToString("_Restify/itim_swagger.json");
-    
-    alert("Creating SCHEMA object");
-    schema = new SCHEMA(schemaJSON, "JSON");
-    
-    alert("Got it!");
-	return schema
-}
-
-// Update the dropdown with resource items
-function fetchItems() {
-	alert("---> fetchItems");
-    var path = form.getControl("PathToObjects").getText();
-
-    initialize();
-    schema = parseSchema();
-
-    updateDropdown("Object",
-        path,
-        "Cannot fetch resource items")
-}
-
-// Update the dropdown with operations for the selected item
-function fetchOperations() {
-	alert("---> fetchOperations");
-    var object = form.getControl("Object").getText();
-
-    updateDropdown("Operation",
-        [form.getControl("PathToObjects"),
-            form.getControl("Object").getText()
-        ],
-        "Cannot fetch operations for a resource item")
-}
-
-// Update the dropdown with operations for the selected item
-function fetchSchema() {
-	alert("---> fetchSchema");
-	var object = form.getControl("Object").getText();
-    var operation = form.getControl("Operation").getText();
-}
-
-// Parse returned endpoint URIs
-function parseURI(uri) {
-    var parts = system.splitString(uri.trim(), "/");
-    var itm = {
-        name: parts[0].trim(),
-        uri: uri
-    }; // Initialize this with name
-
-    for (var i = 1; i < parts.length; i++) {
-        part = parts[i].trim();
-        if (part.startsWith("{") && part.endsWith("}")) { // Then this is the Lookup on uid uri
-            itm.uid = part;
-            if (i > 1) { // The id is at the end of the path
-                itm.relInfo = parts[1]
-            } else
-            if (i + 1 >= parts.length) {
-                itm.relInfo = parts[parts.length - 1]
-            }
-        }
-    }
-
-    task.logmsg(work.fromJSON(toJson(itm)));
-
-    return itm
-}
-
-// Update dropdown based on REST call
-function updateDropdown(controlName, path, errorMsg) {
-    var combo = "";
-
-    if (!(path instanceof Array)) path = [path];
-
-    var itemPath = (form.getControl("PathToObjects").getText() || "").trim();
-
-    try {
-        if (!itemPath) throw "Item Path must be set";
-
-        var schema = CFG.schema;
-
-        if (!schema) throw "No schema returned!";
-
-        combo.removeAll(); // Empty drop-down
-
-        var subtree = schema[path[0]].getChildren(path);
-
-        alert(toJson(subtree));
-        for (var res in subtree) {
-            //alert(res)
-            combo.add(res)
-        }
-
-        combo.select(0);
-        return;
-
-        // ------------------ SHORTCIRCUIT	
-
-        if (!jsObj.items) {
-            combo.add(jsObj[propertyName])
-        } else {
-            arr = new java.util.ArrayList()
-            for (i = 0; i < jsObj.items.length; i++) {
-                p = jsObj.items[i]
-                label = p["label"]
-                if (typeof(label) == "undefined")
-                    val = p[propertyName]
-                else
-                    val = label + " |<<" + p[propertyName] + ">>|"
-                //			alert(">> provider: " + p.uri)
-                arr.add(val)
-            }
-
-            arr = arr.toArray()
-            java.util.Arrays.sort(arr)
-
-            for (var a in arr) {
-                combo.add(a)
-            }
-        }
-    } catch (ex) {
-        var msg = "Cannot get API schema - " + ex;
-        form.alert(msg);
-        throw msg
-    }
-
-    combo.select(0)
-
-}
-
-function fetchParams() {
-    var params = makeCall(form.getControl("dataset").getText() + "/parameters",
-        "No Dataset parameters returned",
-        "getParams")
-    var formconfig = form.getFormConfig()
-    var fs
-    var p
-    var fic
-
-    // create dataset section
-    if (formconfig.getSection("Dataset") == null) {
-        throw "Connection form is missing the 'Dataset' section!"
-        //		fs = new com.ibm.di.config.base.FormSectionImpl()
-        //		fs.setName("Dataset")
-        //		fs.setTitle("Provider Dataset")
-        //		formconfig.addSection(fs)
-    }
-
-    // get fs as section handle
-    fs = formconfig.getSection("Dataset");
-
-    // remove all dataset section fields
-    for (str in fs.getNames()) {
-        formconfig.removeFormItem(str);
-    }
-
-    // remove all params from section dataset
-    fs.getNames().removeAllElements();
-
-
-    // create a new param_* field and add it to Dataset section
-
-    for (var i = 0; i < params.items.length; i++) {
-        if (params.items[i].hidden != "true") {
-            p = params.items[i]
-            fic = formconfig.newFormItem(p.id)
-            fic.setLabel(p.label)
-            fic.setSyntax(p.type)
-            fic.setToolTip(p.description)
-            fic.setRequired(p.required != "false")
-
-            if (("!" + p["default"]) != "!undefined")
-                fic.setDefaultValue(p["default"])
-            else
-                fic.setDefaultValue("")
-
-            fs.getNames().add(fic.getShortName())
-        }
-    }
-
-    form.resetForm();
-    form.initialize();
-}
-
-function write(fname, str) {
-    var bw = new java.io.BufferedWriter(new java.io.FileWriter("C:\\temp\\" + fname))
-    //	for (var m in obj.getClass().getMethods()) {
-    //		bw.write(m)
-    //		bw.newLine()
-    //	}
-
-    bw.write(str)
-    bw.newLine()
-    bw.close()
-}]]]]><![CDATA[></parameter>
-        <parameter name="formscript"/>
-        <parameter name="title">CONN_TITLE</parameter>
-        <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
-    </Form>
-</MetamergeConfig>]]></parameter>
-                <parameter name="Object"/>
-                <parameter name="Operation"/>
-                <parameter name="PathToObjects">paths</parameter>
-                <parameter name="includeFiles"/>
-            </Configuration>
-            <Parser>
-                <InheritFrom>[parent]</InheritFrom>
-            </Parser>
-            <AttributeMap name="Input">
-                <InheritFrom>[parent]</InheritFrom>
-            </AttributeMap>
-            <AttributeMap name="Output">
-                <InheritFrom>[parent]</InheritFrom>
-            </AttributeMap>
-            <DeltaSettings/>
-            <Schema name="Input">
-                <InheritFrom>[parent]</InheritFrom>
-            </Schema>
-            <Schema name="Output">
-                <InheritFrom>[parent]</InheritFrom>
-            </Schema>
-            <LinkCriteria>
-                <InheritFrom>[parent]</InheritFrom>
-            </LinkCriteria>
-            <Hooks>
-                <InheritFrom>[parent]</InheritFrom>
-            </Hooks>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <Reconnect>
-                <InheritFrom>[parent]</InheritFrom>
-                <ReconnectRules/>
-            </Reconnect>
-            <Operations/>
-            <PoolDefinition>
-                <InheritFrom>[parent]</InheritFrom>
-            </PoolDefinition>
-            <PoolInstance/>
-        </Connector>
-    <Connector name="TestScriptConnector 20241207 1904">
-            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733594618821</ModTime>
-            <ConnectorMode>Iterator</ConnectorMode>
-            <ConnectorState>Enabled</ConnectorState>
-            <Configuration>
-                <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733594618821</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="376" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sat Dec 07 19:03:38 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
-    <Form name="Form">
-        <ModTime>1733594617924</ModTime>
-        <FormItemNames>
-            <ListItem>$GLOBAL.script</ListItem>
-            <ListItem>keepGlobalState</ListItem>
-            <ListItem>$GLOBAL.includeFiles</ListItem>
-            <ListItem>includePrologs</ListItem>
-            <ListItem>$GLOBAL.debug</ListItem>
-            <ListItem>$GLOBAL.help</ListItem>
-            <ListItem>Operation</ListItem>
-            <ListItem>PathToObjects</ListItem>
-            <ListItem>Item</ListItem>
-        </FormItemNames>
-        <FormSectionNames>
-            <ListItem>General</ListItem>
-            <ListItem>Advanced</ListItem>
-        </FormSectionNames>
-        <FormItem name="Item">
-            <ModTime>1733572449668</ModTime>
-            <parameter name="description">The resource item to operation on</parameter>
-            <parameter name="label">Item</parameter>
-            <parameter name="script">fetchItems</parameter>
-            <parameter name="scriptLabel">Update</parameter>
-        </FormItem>
-        <FormItem name="Object">
-            <ModTime>1733572441046</ModTime>
-            <parameter name="Required">true</parameter>
-            <parameter name="description">Item to perform operations on</parameter>
-            <parameter name="label">	formdata.items = formdata.items || {};</parameter>
-            <parameter name="script">fetchItems</parameter>
-            <parameter name="scriptLabel"/>
-            <parameter name="syntax">droplist</parameter>
-        </FormItem>
-        <FormItem name="Operation">
-            <ModTime>1733410717009</ModTime>
-            <parameter name="description">Operation to apply to the selected Object</parameter>
-            <parameter name="label">Operation</parameter>
-            <parameter name="script">fetchOperations</parameter>
-            <parameter name="scriptLabel">Fetch</parameter>
-            <parameter name="syntax">dropedit</parameter>
-        </FormItem>
-        <FormItem name="PathToObjects">
-            <ModTime>1733398344461</ModTime>
-            <parameter name="Required">true</parameter>
-            <parameter name="description">The openAPIschema is hierarchical, so at what level in the tree do resource items appear. Separate tree branches by pipe symbol (|)</parameter>
-            <parameter name="label">Path to Items</parameter>
-            <parameter name="script"/>
-            <parameter name="scriptLabel"/>
-        </FormItem>
-        <FormItem name="Show">
-            <ModTime>1733312883681</ModTime>
-            <parameter name="syntax">boolean</parameter>
-        </FormItem>
-        <FormItem name="dropdown"/>
-        <FormItem name="includePrologs">
-            <parameter name="description">pro_desc</parameter>
-            <parameter name="label">pro_label</parameter>
-            <parameter name="script">selectGlobalProlog</parameter>
-            <parameter name="scriptLabel">pro_script_label</parameter>
-            <parameter name="scripthelp">pro_script_help</parameter>
-            <parameter name="syntax">textarea</parameter>
-        </FormItem>
-        <FormItem name="keepGlobalState">
-            <parameter name="description">SCRIPT_CONN_KEEP_GLOBAL_STATE_DESC</parameter>
-            <parameter name="label">SCRIPT_CONN_KEEP_GLOBAL_STATE_LABEL</parameter>
-            <parameter name="syntax">boolean</parameter>
-        </FormItem>
-        <FormSection name="Advanced">
-            <FormSectionNames>
-                <ListItem>PathToObjects</ListItem>
-                <ListItem>$GLOBAL.script</ListItem>
-                <ListItem>$GLOBAL.debug</ListItem>
-                <ListItem>$GLOBAL.userComment</ListItem>
-            </FormSectionNames>
-            <parameter name="initiallyExpanded">false</parameter>
-            <parameter name="title">Advanced</parameter>
-        </FormSection>
-        <FormSection name="General">
-            <FormSectionNames>
-                <ListItem>Item</ListItem>
-                <ListItem>Operation</ListItem>
-            </FormSectionNames>
-        </FormSection>
-        <parameter name="formevents"><![CDATA[//
-//						GLOBAL VARIABLES
-//
-var __debug = true;
-var __schema = null;
-var __formdata = null;
-var __initialized = false;
-var __lib = null;
-
-//
-//						FUNCTIONS
-//
-
-function alert(msg) {
-	if (__debug) form.alert(msg)
-}
-
-function alertObject(objName, obj) {
-	alert("alertObj(" + objName + ", " + toJson(obj));
-	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
-	for (var child in obj) {
-		arr.push("   " + child + "\n")
-	}
-	alert(arr.toString())
-} 
-
-function initialize() {
-	if (__initialized) return;
-	__initialized = true;
-	alert("Initializing...");
-	eval(system.getScriptText("RESTIFY library class"));
-	__lib = new RESTIFY();
-}
-z
-// Return the openAPI schema - @TEST hardcoded for now
-function parseSchema() {
-	alert("Fetching schema...")
-	if (__schema) return __schema;
-
-	alert("About to loadFileToString...");
-    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
-    
-    alert("Creating SCHEMA object");
-	eval(system.getScriptText("SCHEMA class"));    
-    __schema = new SCHEMA(schemaJSON, "JSON");
-	__formdata = parseFormData(__schema, "paths");
-    
-    alert("Got it!");
-	return __schema
-}
-
-// Update the dropdown with resource items
-function fetchItems() {
-	alert("---> fetchItems");
-    var path = form.getControl("PathToObjects").getText();
-
-    initialize();
-    parseSchema();
-
-    updateDropdown("Item",
-        [form.getControl("PathToObjects").getText],
-        "Cannot fetch operations for a resource item")
-
-}
-
-// Update the dropdown with operations for the selected item
-function fetchOperations() {
-	alert("---> fetchOperations");
-    var object = form.getControl("Object").getText();
-
-    initialize();
-    parseSchema();
-
-    updateDropdown("Operation",
-        [form.getControl("PathToObjects"),
-            form.getControl("Object").getText()],
-        "Cannot fetch operations for a resource item")
-}
-
-// Update the dropdown with operations for the selected item
-function fetchSchema() {
-	alert("---> fetchSchema");
-	var object = form.getControl("Object").getText();
-    var operation = form.getControl("Operation").getText();
-}
-
-// Parse returned endpoint URIs
-function parseURI(uri) {
-    var parts = system.splitString(uri.trim(), "/");
-    var itm = {
-        name: parts[0].trim(),
-        uri: uri
-    }; // Initialize this with name
-
-    for (var i = 1; i < parts.length; i++) {
-        part = parts[i].trim();
-        if (part.startsWith("{") && part.endsWith("}")) { // Then this is the Lookup on uid uri
-            itm.uid = part;
-            if (i > 1) { // The id is at the end of the path
-                itm.relInfo = parts[1]
-            } else
-            if (i + 1 >= parts.length) {
-                itm.relInfo = parts[parts.length - 1]
-            }
-        }
-    }
-
-    task.logmsg(work.fromJSON(toJson(itm)));
-
-    return itm
-}
-
-// Prepare the __formdata object to make updating dropdowns easier
-function parseFormData(schema, initialPath) {
-	__formdata = {};
-	
-	var items = schema.getChildren(initialPath);
-	for (var item in items) {
-		__formdata[item] = {};
-		
-		var operations = schema.getChildren([initialPath, item]);
-		for (var operation in operations) {
-			__formdata[item][operation] = {}
-			
-			var parameters = schema.getChildren([initialPath, item, operation])
-			for (var parameter in parameters) {
-				__formdata[item][operation][parameter] = {}
-			}
-		}
-	}
-	
-	return __formdata
-}
-
-
-// Update dropdown based on REST call
-function updateDropdown(controlName, path, errorMsg) {
-    var combo = "";
-
-    var itemPath = (form.getControl("PathToObjects").getText() || "").trim();
-    var item = (form.getControl("Item").getText() || "").trim();
-    var operation = (form.getControl("Operation").getText() || "").trim();
-
-    try {
-        if (!itemPath) throw "Item Path must be set";
-
-        if (!__schema) throw "No schema returned!";
-
-        combo.removeAll(); // Empty drop-down
-
-        var subtree = __formdata;
         
-        if (controlName == "Operation") {
-        	subtree = _formdata[item]
-        }
-		else if (controlName == "Operation") {
-        	subtree = _formdata[item][operation]
-        }
-
-        alert(toJson(subtree));
-        for (var res in subtree) {
-            //alert(res)
-            combo.add(res)
-        }
-
-        combo.select(0);
-        return;
-
-        // ------------------ SHORTCIRCUIT	
-
-        if (!jsObj.items) {
-            combo.add(jsObj[propertyName])
-        } else {
-            arr = new java.util.ArrayList()
-            for (i = 0; i < jsObj.items.length; i++) {
-                p = jsObj.items[i]
-                label = p["label"]
-                if (typeof(label) == "undefined")
-                    val = p[propertyName]
-                else
-                    val = label + " |<<" + p[propertyName] + ">>|"
-                //			alert(">> provider: " + p.uri)
-                arr.add(val)
-            }
-
-            arr = arr.toArray()
-            java.util.Arrays.sort(arr)
-
-            for (var a in arr) {
-                combo.add(a)
-            }
-        }
-    } catch (ex) {
-        var msg = "Cannot get API schema - " + ex;
-        form.alert(msg);
-        throw msg
-    }
-
-    combo.select(0)
-
-}
-
-function fetchParams() {
-    var params = makeCall(form.getControl("dataset").getText() + "/parameters",
-        "No Dataset parameters returned",
-        "getParams")
-    var formconfig = form.getFormConfig()
-    var fs
-    var p
-    var fic
-
-    // create dataset section
-    if (formconfig.getSection("Dataset") == null) {
-        throw "Connection form is missing the 'Dataset' section!"
-        //		fs = new com.ibm.di.config.base.FormSectionImpl()
-        //		fs.setName("Dataset")
-        //		fs.setTitle("Provider Dataset")
-        //		formconfig.addSection(fs)
-    }
-
-    // get fs as section handle
-    fs = formconfig.getSection("Dataset");
-
-    // remove all dataset section fields
-    for (str in fs.getNames()) {
-        formconfig.removeFormItem(str);
-    }
-
-    // remove all params from section dataset
-    fs.getNames().removeAllElements();
-
-
-    // create a new param_* field and add it to Dataset section
-
-    for (var i = 0; i < params.items.length; i++) {
-        if (params.items[i].hidden != "true") {
-            p = params.items[i]
-            fic = formconfig.newFormItem(p.id)
-            fic.setLabel(p.label)
-            fic.setSyntax(p.type)
-            fic.setToolTip(p.description)
-            fic.setRequired(p.required != "false")
-
-            if (("!" + p["default"]) != "!undefined")
-                fic.setDefaultValue(p["default"])
-            else
-                fic.setDefaultValue("")
-
-            fs.getNames().add(fic.getShortName())
-        }
-    }
-
-    form.resetForm();
-    form.initialize();
-}
-
-function write(fname, str) {
-    var bw = new java.io.BufferedWriter(new java.io.FileWriter("C:\\temp\\" + fname))
-    //	for (var m in obj.getClass().getMethods()) {
-    //		bw.write(m)
-    //		bw.newLine()
-    //	}
-
-    bw.write(str)
-    bw.newLine()
-    bw.close()
-}]]]]><![CDATA[></parameter>
-        <parameter name="formscript"/>
-        <parameter name="title">CONN_TITLE</parameter>
-        <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
-    </Form>
-</MetamergeConfig>]]></parameter>
-                <parameter name="Object"/>
-                <parameter name="Operation"/>
-                <parameter name="PathToObjects">paths</parameter>
-                <parameter name="includeFiles"/>
-            </Configuration>
-            <Parser>
-                <InheritFrom>[parent]</InheritFrom>
-            </Parser>
-            <AttributeMap name="Input">
-                <InheritFrom>[parent]</InheritFrom>
-            </AttributeMap>
-            <AttributeMap name="Output">
-                <InheritFrom>[parent]</InheritFrom>
-            </AttributeMap>
-            <DeltaSettings/>
-            <Schema name="Input">
-                <InheritFrom>[parent]</InheritFrom>
-            </Schema>
-            <Schema name="Output">
-                <InheritFrom>[parent]</InheritFrom>
-            </Schema>
-            <LinkCriteria>
-                <InheritFrom>[parent]</InheritFrom>
-            </LinkCriteria>
-            <Hooks>
-                <InheritFrom>[parent]</InheritFrom>
-            </Hooks>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <Reconnect>
-                <InheritFrom>[parent]</InheritFrom>
-                <ReconnectRules/>
-            </Reconnect>
-            <Operations/>
-            <PoolDefinition>
-                <InheritFrom>[parent]</InheritFrom>
-            </PoolDefinition>
-            <PoolInstance/>
-        </Connector>
-        <Connector name="TestScriptConnector 20241207 2011">
+    <Connector name="TestScriptConnector 20241207 2023 Form controls working!!">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733597450228</ModTime>
+            <ModTime>1733599348275</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733597450228</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="422" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sat Dec 07 19:50:50 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1733599348275</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="449" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sat Dec 07 20:22:28 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1733597449784</ModTime>
+        <ModTime>1733599308171</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -5425,7 +4663,7 @@ function write(fname, str) {
         <parameter name="formevents"><![CDATA[//
 //						GLOBAL VARIABLES
 //
-var __debug = true;
+var __debug = false;
 var __schema = null;
 var __initialized = false;
 var __lib = null;
@@ -5470,9 +4708,9 @@ function parseSchema() {
 	eval(system.getScriptText("SCHEMA class"));    
     __schema = new SCHEMA(schemaJSON, "JSON");
     
-    var toplvl = "";
-    for (var tl in toplvl) toplvl = (toplvl ? ", " + tl : tl);
-    alert("SCHEMA -> " + toplvl)
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
     
     //alert("Got it!");
 	return __schema
@@ -5485,31 +4723,26 @@ function fetchItems() {
 
     updateDropdown("Item",
         [form.getControl("PathToObjects").getText()],
-        "Cannot fetch operations for a resource item")
-
+        "Cannot fetch operations for a resource item");
+        
+	__selectedItem = form.getControl("Item").getText()
 }
 
-// Update the dropdown with operations for the selected item
+// Update the dropdown with opera tions for the selected item
 function fetchOperations() {
 	alert("---> fetchOperations");
-    var item = form.getControl("Items").getText();
+    var selectedItem = form.getControl("Item").getText();
 
     updateDropdown("Operation",
         [form.getControl("PathToObjects").getText(),
-            form.getControl("Item").getText()],
-        "Cannot fetch operations for a resource item")
+            selectedItem],
+        "Cannot fetch operations for a resource item: " + selectedItem)
+
+	__selectedObject = form.getControl("Item").getText()
 }
 
-// Update the dropdown with operations for the selected item
-function fetchSchema() {
-	alert("---> fetchSchema");
-	var item = form.getControl("Object").getText();
-    var operation = form.getControl("Operation").getText();
-}
-
-// Update dropdown based on REST call
+// Update dropdown based api
 function updateDropdown(controlName, path, errorMsg) {
-    var combo = form.getControl(controlName);
     try {
     	alert("updateDropdown("
     			+ controlName
@@ -5521,12 +4754,11 @@ function updateDropdown(controlName, path, errorMsg) {
 
         var subtree = __schema.getChildren(path);
         
-    	alert("subtree: \n"
-    			+ toJson(subtree));
+		combo = form.getControl(controlName);
 		combo.removeAll(); // Empty drop-down
     			
         for (var res in subtree) {
-            //alert(res)
+            //alert("   ..adding " + res);
             combo.add(res)
         }
         alert("drop-down updated!")
@@ -5537,9 +4769,9 @@ function updateDropdown(controlName, path, errorMsg) {
     }
 
     combo.select(0)
-
 }
 
+// For debugging from inside 
 function write(fname, str) {
     var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
     //	for (var m in obj.getClass().getMethods()) {
@@ -5556,9 +4788,9 @@ function write(fname, str) {
         <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
     </Form>
 </MetamergeConfig>]]></parameter>
-                <parameter name="Item">/entitlements/assignments/search</parameter>
+                <parameter name="Item">/people/{personId}</parameter>
                 <parameter name="Object"/>
-                <parameter name="Operation"/>
+                <parameter name="Operation">put</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="includeFiles"/>
             </Configuration>
