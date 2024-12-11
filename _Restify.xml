@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Wed Dec 11 14:44:44 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Wed Dec 11 21:49:47 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -308,1306 +308,9 @@ function fullStacktrace(e, delimArg) {
         
     
         
-    <AssemblyLine name="Reading schema 20241127 1304 before deleting pwds and secrets in Test">
-            <ModTime>1732709002352</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="Test it" state="Enabled"/>
-                    <Component name="Init and Event Scripts from OpenPages" state="Enabled"/>
-                    <Component name="Request Google API schema" state="Enabled"/>
-                    <Component name="GMailLib" state="Enabled"/>
-                    <Component name="Oauth stuff" state="Enabled"/>
-                    <Component name="Parse OpenAPI Schema" state="Enabled"/>
-                    <Component name="Test" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer"/>
-            <ContainerDF name="DataFlowContainer">
-                <ModTime>1732709002352</ModTime>
-                <Script name="Test it">
-                    <ModTime>1732109245808</ModTime>
-                    <parameter name="enabled">false</parameter>
-                    <parameter name="script"><![CDATA[var openApiJson = system.getScriptText("exampleGoogleSchemaJSON");
-//var openApiYAML = system.getScriptText("exampleOpenAPISchemaYAML");
-var s1 = parseOpenAPISchema(openApiJson);
-//var s2 = parseOpenAPISchema(openApiYAML);
-
-i = 42;]]></parameter>
-                </Script>
-                <Script name="Init and Event Scripts from OpenPages">
-                    <ModTime>1732122125992</ModTime>
-                    <parameter name="enabled">false</parameter>
-                    <parameter name="script"><![CDATA[/////////////////////////////////// Init Script
-var message = new Array();
-var message = new Array();
-message["Required parameter not set"] = "Required parameter not set";
-message["Response from"] = "Response from";
-message["Request to"] = "Request to";
-message["Error from"] = "Error from";
-message["You must restart the SDI server in order for the imported certificate to be trusted."] = "You must restart the SDI server in order for the imported certificate to be trusted.";
-message["Unable to parse JSON return from"] = "Unable to parse JSON return from";
-message["Invalid format for URL parameter"] = "Invalid format for URL parameter";
-
-if (typeof(system) == "undefined") {
-	var c = java.lang.Class.forName("com.ibm.di.function.UserFunctions");
-	system = new c;
-}	
-
-var http = system.getConnector("ibmdi.HTTPClient");
-var requestEntry = system.newEntry();
-var cookies = system.newEntry();
-var deBug = false;
-var authenticated = false;
-http.initialize(null);
-
-/////////////////////////////////// Event Script
-// 20140912 1248
-var params = {	url : "", 
-				root : "/grc/api",
-				username : "", 
-				password : "",
-				object : "",
-				query : "",
-				
-				refresh : function(connector) {
-					for (var pname in this) {
-						if (typeof this[pname] !== "function") {
-							var control = form.getControl(pname);
-							if (control !== null && control.getText() != null) {
-								this[pname] = control.getText();
-							}	
-						}	
-					}
-
-					this.root = "/grc/api";
-
-					if (!this.url.toLowerCase().endsWith(this.root.toLowerCase())) {
-						this.url = this.url + this.fixPath(this.root);
-					}	
-//					form.alert("this.url: " + this.url + "\nthis.root: " + this.root)
-				},
-				
-				apply : function(http) {
-					for (var pname in this) {
-						if (typeof this[pname] !== "function") {
-							http.setParam(pname, this[pname]);
-						}	
-					}
-				},
-
-				fixPath : function(path) {
-					if (!path.startsWith("/")) {
-						path = "/" + path;
-					}
-					return path;
-				}
-			}
-
-
-function getCertificate () {
-	form.setWaitCursor();
-	try {
-		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(url, 443);
-	} finally {
-		form.setNormalCursor();
-	}
-	form.alert(msg);
-}
-
-function getTypes() {
-	params.refresh();
-	params.apply(http);
-	
-	form.getClass();
-	var combo = form.getControl("object");
-	combo.removeAll();
-
-	var reply = makeRequest({"verb" : "GET", 
-							 "url" : "/types", 
-							 "ctype" : "application/json", 
-							 "where" : "getTypes"});
-
-	if (typeof reply.length !== "undefined") {						 
-		var arr = new java.util.ArrayList();
-
-		arr.add("file (word, excel, etc)");
-		for (var i = 0; i < reply.length; i++) {
-			arr.add(reply[i].name);
-		}
-			
-		arr = arr.toArray();
-		java.util.Arrays.sort(arr);
-	
-		for (var a in arr) {
-			combo.add(a);
-		}	
-		
-		combo.select(0);
-	}	
-}
-
-function makeRequest(args) {
-	var verb = args.verb;		// HTTP method, e.g. GET, POST, PUT, ...
-	var url = args.url;		// url for the request. May be partial (only the path & query string params)
-	var body = args.body;		// HTTP body to be passed for the request
-	var ctype = args.ctype;	// Content-Type of the HTTP body
-	var where = args.where;	// where this method is called from - for debugging purposes
-
-	// set default values for missing params/properties
-	if (verb == null) { verb = "GET"; } 
-	if (url == null) { url = ""; } 
-	if (ctype == null) { ctype = "application/json"; }
-	if (where == null) { where = ""; } 
-
-	// prepend the base url if not found in the url passed to the function
-	if (url.toLowerCase().indexOf(params.url.toLowerCase()) < 0) {
-		url = params.url + params.fixPath(url);
-	}
-	
-//	form.alert("url: " + url + "\n\n    params.url: " + params.url);
-	
-	requestEntry.removeAllAttributes();
-	
-	if (typeof body !== "undefined" && body !== null && body.trim().length > 0) {
-		requestEntry["http.body"] = body;
-	}
-	
-	// set Connector parameters
-	http.setParam("method", verb.toUpperCase());
-	http.setParam("url", url);
-
-	// prepare the request Entry (used for POST/PUT calls)
-	requestEntry["http.Content-Type"] = ctype;
-	requestEntry["http.Accept"] = "application/json";
-	requestEntry["http.Connection"] = "keep-alive";
-	requestEntry["http.remote_user"] = params.username;
-	requestEntry["http.remote_pass"] = params.password;
-
-// commented out for now
-//
-//	requestEntry["http.Accept-Encoding"] = "gzip, deflate";
-//	requestEntry["http.Accept-Language"] = "en-US,en;q=0.5";
-//	requestEntry["http.User-Agent"] = "IBM Security Directory Integrator";
-//	requestEntry["http.Authorization"] = "BASIC " + system.base64Encode(String(user + ":" + password).getBytes());
-	
-	// add any cookies received on previous calls
-	if (cookies.size() > 0) {
-//		requestEntry["X-CouchDB-WWW-Authenticate"] = "Cookie"; // TODO
-		requestEntry.merge(cookies);
-	}	
-
-	// if Detailed Log is enabled then write request details to the log
-	if (deBug) {
-		logDetails({"msg" : message["Request to"] + " OpenPages", 
-					"obj" : requestEntry, 
-					"url" : url, 
-					"verb" : verb, 
-					"ctype" : ctype, 
-					"where" : where});
-	}
-
-	var retry = 0;
-	var maxRetry = 2;
-	var retEntry = null;
-	
-	// this loop makes the actual request. If an SSL handshake error occurs, attempt to retrieve
-	// and import the client certificate and inform the user that TDI must be restarted.
-	//
-	do {
-		try {	
-			retEntry = http.queryReply(requestEntry);
-			
-//			form.alert(retEntry.toString())
-		} catch (ex) {
-			if (ex instanceof javax.net.ssl.SSLHandshakeException) {
-				if (retry == 0) {
-					getCertificate();
-				} else {	
-					throwException(message["You must restart the SDI server in order for the imported certificate to be trusted."])
-				}
-			} else {
-				throw ex;
-			}	
-		}
-		
-		retry++;
-	} while (retEntry === null && retry < maxRetry);
-	
-	// if Detailed Log is enabled, write reply details to the log
-	if (deBug) {
-		logDetails({"msg" : message["Response from"] + " OpenPages", 
-				    "entry" : retEntry});
-	}
-	
-	verifyResponse(retEntry);
-	
-	// parse the reply from OpenPages
-	var reply = parseReply(retEntry);
-	
-	return reply;
-}
-
-function throwException(msg) {
-	throw new java.lang.IllegalArgumentException(msg);
-}
-
-function logmsg(lvl, msg) {
-	if (typeof lvl === "undefined") { lvl = ""; } 
-	if (typeof msg === "undefined") {
-		msg = lvl;
-		lvl = "INFO";
-	}
-	
-	if (deBug) {
-		java.lang.System.out.println(msg);
-	}
-		
-	try {
-		connector.logmsg(lvl, msg);
-	} catch (ex) {
-		main.logmsg(lvl, msg);
-	}	
-}
-
-function getParam(pname, required) {
-	if (typeof required === "undefined") { required = true; }
-	var ctrl = form.getControl(pname);
-	if (ctrl == null && required) {
-		throwException(message["Required parameter not set"] + ": " + pname);
-	}
-	
-	pval = ctrl.getText();
-	
-	if (pval === null && required) {
-		throwException(message["Required parameter not set"] + ": " + pname);
-	} 
-	
-	return pval;
-}
-
-function parseReply(replyEntry) {
-	var body = replyEntry.getString("http.bodyAsString");
-	
-	try {
-//		if (deBug) logmsg("DEBUG", "body: " + body);
-		var jobj = fromJson(body);
-		
-		// save any cookies passed back	
-		var setCookie = replyEntry.getAttribute("http.Set-Cookie");
-		if (setCookie !== null) {
-			for (var i = 0; i < setCookie.size(); i++) {
-				var thisCookie = setCookie.getValue(i);
-				var p = thisCookie.indexOf("=");
-				if (p > 0) {
-					cookies["http." + thisCookie.substring(0,p)] = thisCookie.substring(p+1);
-				}
-			}	
-		}
-	} catch (ex) {
-		throwException(message["Unable to parse JSON return from"] + " OpenPages - " + ex);
-	}	
-	
-	return jobj;
-}
-
-function fixUrl(params) {
-	var url = params.url;
-	var dbtype = params.dbtype;
-	var protocolSpes = "http:";
-	var auth = "";
-	
-	if (url.startsWith("http")) {
-		var p = url.indexOf("/");
-		if (p > 0) {
-			protocolSpes = url.substring(0, p);
-			var p2 = url.indexOf("/", p+1);
-			if (p2 == (p+1)) {
-				url = url.substring(p2+1);
-			} else {
-				throwException(message["Invalid format for URL parameter"] + ": " + url);
-			}
-		}
-	}
-
-	if (!url.endsWith("/")) {
-		return protocolSpes + "//" + auth + url + "/";
-	} else {
-		return protocolSpes + "//" + auth + url;
-	}
-}
-
-function logDetails(params) {
-	var msg = params.msg;
-	var obj = params.obj; 
-	var url = params.url;
-	var verb = params.verb;
-	var ctype = params.ctype; 
-	var where = params.where;
-	
-	if (msg == null) {
-		msg = message["Unnamed entry"];
-	}
-
-	var s = new java.lang.StringBuffer();
-	
-	if (where != null) {
-		s.append("\n@@@------> (" + where + ") " + msg);
-	} else {
-		s.append("\n---------> " + msg);
-	}
-	
-	
-	if (verb != null) { s.append("   " + verb.toUpperCase()); } 
-	if (ctype != null) { s.append("   " + ctype); } 
-	if (url != null) { s.append("   " + url); } 
-	s.append("\n");
-
-	if (obj != null) {
-		if (obj instanceof com.ibm.di.entry.Entry) {	
-			var attNames = obj.getAttributeNames();
-			for (var a in attNames) {
-				if (a.indexOf("http.") >= 0 && 
-					!("http.bodyAsString".equalsIgnoreCase(a)
-						|| "http.bodyAsBytes".equalsIgnoreCase(a)) ) {
-					s += " " + a + ": " + obj[a] + "\n";
-				}
-			}	
-		} else {
-			s.append(obj.toString());
-		}
-	}	
-	form.alert(s.toString());
-}
-
-function verifyResponse(replyEntry) {
-	var respCode = replyEntry.getString("http.responseCode");
-	if (!respCode.startsWith("2")) {
-		throwException(message["Error from"] 
-						+ " OpenPage server - code: " + respCode
-						+ "  message: " + replyEntry.getString("http.responseMsg"));
-	}
-}
-
-function authenticate() {
-	var user = getParam("user");
-	var password = getParam("password");
-	var reply = makeRequest({verb : "POST", 
-							 url : "_session", 
-							 body : "name=" + user + "&password=" + password, 
-							 ctype : "application/x-www-form-urlencoded", 
-							 where : "authenticate",
-							 authenticating : true});
-	authenticated = true;
-}]]></parameter>
-                </Script>
-                <Script name="Request Google API schema">
-                    <ModTime>1732122116336</ModTime>
-                    <parameter name="enabled">false</parameter>
-                    <parameter name="script"><![CDATA[// Function to connect to Google API, request the schema, and parse it into a JavaScript object
-function fetchGoogleApiSchema(apiUrl, accessToken) {
-    try {
-        // Validate inputs
-        if (!apiUrl || !accessToken) {
-            throw new Error("API URL and Access Token are required.");
-        }
-
-        // Initialize the HTTP client connector
-        var httpClient = system.getConnector("ibmdi.HTTPClient");
-        httpClient.setParam("url", apiUrl);
-        httpClient.setParam("method", "GET");
-        httpClient.setParam("header.Authorization", "Bearer " + accessToken);
-        httpClient.setParam("responseFormat", "text"); // Expect a JSON response in text format
-
-        // Start the connector
-        httpClient.initialize();
-        
-        // Send the request
-        var response = httpClient.getNextEntry();
-        if (!response) {
-            throw new Error("No response received from the API.");
-        }
-
-        // Parse the JSON response into a JavaScript object
-        var schemaData = response.getString("responseBody");
-        var schemaObject = JSON.parse(schemaData); // Ensure JSON parsing for ECMAScript 3
-
-        // Log the schema for debugging
-        task.logmsg("Fetched Schema: " + schemaData);
-
-        // Return the JavaScript object
-        return schemaObject;
-
-    } catch (error) {
-        // Log and rethrow errors
-        task.logmsg("Error fetching API schema: " + error.message);
-        throw error;
-    } finally {
-        // Clean up the connector
-        if (httpClient) {
-            httpClient.cleanup();
-        }
-    }
-}]]></parameter>
-                </Script>
-                <Script name="GMailLib">
-                    <ModTime>1732461863551</ModTime>
-                    <parameter name="enabled">false</parameter>
-                    <parameter name="script"><![CDATA[// Function to connect to Google API, request the schema, and parse it into a JavaScript object
-function fetchGoogleApiSchema(apiUrl, accessToken) {
-    try {
-        // Validate inputs
-        if (!apiUrl || !accessToken) {
-            throw new javax.net.ssl.SSLException("API URL and Access Token are required.");
-        }
-
-    	// First, ensure we can establish HTTPS
-    	// rrtificate(apiUrl);
-    	
-        // Initialize the HTTP client connector
-        var httpClient = system.getConnector("ibmdi.HTTPClient");
-        httpClient.setParam("url", apiUrl);
-        httpClient.setParam("method", "GET");
-        httpClient.setParam("header.Authorization", "Bearer " + accessToken);
-        httpClient.setParam("responseFormat", "text"); // Expect a JSON response in text format
-
-        // Start the connector
-        httpClient.initialize(null);
-        
-        httpClient.selectEntries();
-        
-        // Send the request
-        var response = null;
-        while ((response = httpClient.getNextEntry()) != null) {
-	        // Parse the JSON response into a JavaScript object
-	        var schemaJson = response.getString("http.bodyAsString");
-	        var schemaObj = fromJson(schemaJson); // Ensure JSON parsing for ECMAScript 3
-	        logObj(schemaObj, 4);
-        }
-        
-        if (!response) {
-            throw new javax.net.ssl.SSLException("No response received from the API.");
-        }        
-
-        // Return the JavaScript object
-        return schemaObj;
-
-    } catch (error) {
-        // Log and rethrow errors
-        task.logmsg("ERROR", "Error fetching API schema: " + error.message);
-        throw error;
-    } finally {
-        // Clean up the connector
-        if (httpClient) {
-            httpClient.cleanup();
-        }
-    }
-}
-
-// Print schema
-function logObj(jsObj, depth) {
-	if (!depth) depth = 6;
-	
-	for (var propName in jsObj) {
-		task.logmsg("                         ".substring(0, (10-depth)*2) + propName);
-		if (depth > 1) logObj(jsObj[propName], depth-1)
-	}
-}
-
-// Ensure we have the cert and comms are secure
-function getCertificate (url) {
-	try {
-		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(url, 443);
-	} finally {
-		throw new javax.net.ssl.SSLException("A Certificate has been received and installed. Restart TDI.")
-	}
-	task.logmsg(msg);
-}]]></parameter>
-                </Script>
-                <Script name="Oauth stuff">
-                    <ModTime>1732654260088</ModTime>
-                    <parameter name="script"><![CDATA[var OAUTH = null; // Will be instantiated below
-
-// OAUTH is an object (as all js functions are) and is instantiated using this function (another object).
-function OAuth2(params) {
-	//
-	// -- Token request parameters
-	//
-	this.params = params;
-	this.debug = params.debug || false;
-
-	//
-	// -- Returns form-urlencoded string of an object
-	//
-	this.urlEncode = function (obj) {
-		var arr = [];
-		for(var f in obj) {
-			arr.push(f + "=" + obj[f]);
-		}
-		return arr.join("&");
-	}
-
-	// 
-	// -- Returns an initialized HTTP Client Connector
-	//
-	this.setupHTTPClient = function(params) {
-		if (!this.httpClient) {
-			this.httpClient = system.loadConnector("ibmdi.HTTPClient");
-			for (var paramName in params) {
-				this.httpClient.setParam(paramName, params[paramName])
-			}
-			this.httpClient.initialize(null);
-		}
-		return this.httpClient
-	}
-	
-	//
- 	// -- Returns the access token if we have an access token that hasn't expired
- 	//
-	this.getToken = function() {
-		return this.response ? this.response.access_token : null;
-	}
-	
-	//
-	// -- Sends a request to get a new access token
-	// -- @return String Access token
-	// -- @throws Exception
-	//
-	this.requestToken = function () {
-
-        // -- If we already have a valid token return that
-        if(this.getToken() != null) {
-			if(this.debug) {
-                task.logmsg("OAuth: returning current token");
-            }
-            return this.getToken();
-        }
-
-		//
-		// -- Create request entry object
-		//
-		var request = system.newEntry();
-		request["http.body"] = this.urlEncode(this.params);
-		request["http.method"] = "POST";
-		request["http.url"] = this.url;
-		request["http.content-type"] = "application/x-www-form-urlencoded";
-//		request["grant_type"] = this.params["grant_type"];
-		request["grant_type"] = "client_credentials";
-		request["client_id"] = this.params["oauth.client_id"];
-		request["client_secret"] = this.params["oauth.client_secret"];
-//		request["scope"] = this.params["oauth.grant_type"];
-		request["scope"] = "gmail.readonly";
-
-		if(this.debug) {
-			task.logmsg("Request AccessToken: url=" + this.url);
-			task.logmsg(request.toJSON());
-		}	
-		
-		//
-		// -- Send token request
-		//
-		this.setupHTTPClient(this.params);
-		var response = this.httpClient.queryReply(request);
-		if(this.debug) {
-            task.logmsg("Request Access Token Response");
-            task.logmsg("" + response);
-        }
-		if(response && response["http.bodyAsString"] != null) {
-			var json = response["http.bodyAsString"].getValue();
-			this.response = fromJson(json);
-			if(this.response.error) {
-				var err = "Error: " + this.response.error + ": " + this.response.error_description;
-				this.response = null;
-				throw err;
-			}
-		}
-		return this.getToken();
-	}
-};
-
-// Check presence of arguments
-function checkArgs(args, argNamesCSV) {
-	var argName;
-	var newArgs = {};
-
-	// First make sure all args are passed to params
-	for (var argName in args) params[argName] = args[argName];	
-
-	// Now check if values are specified or not
-	var argNames = system.splitString(argNamesCSV, ",");
-	for (argName in argNames) {
-		if (argName != "debug") {
-			newArgs[argName] = typeof(args[argName]) != "undefined" ? args[argName] : "* " + argName + " not specified *"
-		}	
-	}
-	newArgs.debug = args.debug || false;
-	return newArgs
-}
-
-// Returns the OAuth access token
-function getOAuthAccessToken(args) {
-	// If this is the first time called, set up the OAuth2 object
-	if(OAUTH == null) {
-		// Verify arguments - set default value for debugging purpose
-		args = checkArgs(args, "oauth.url,oauth.client_id,username,password,oauth.client_secret");
-		
-		type = args["oauth.grant_type"];
-		if(type != "password") {
-			args.grant_type = "client_credentials";
-		}
-		if(args.debug) {
-			task.logmsg("Create OAuth2 request");
-			task.logmsg(work.fromJSON(toJson(args)));
-		}
-		OAUTH = new OAuth2(args);
-	}
-	return OAUTH.requestToken();
-}
-
-// Returns a delimited string with the full stacktrace for the passed Exception e
-function fullStacktrace(e, delimArg) {
-	var delim = delimArg || "\n";
-	var starry = []; 
-	// Log the full stack trace
-	var stackTrace = e.getStackTrace(); // Get the stack trace as an array
-	for (var i = 0; i < stackTrace.length; i++) {
-		starry.push(stackTrace[i].toString())
-	}
-	return starry.join(delim)
-}]]></parameter>
-                </Script>
-                <Script name="Parse OpenAPI Schema">
-                    <ModTime>1732654279764</ModTime>
-                    <parameter name="enabled">true</parameter>
-                    <parameter name="script"><![CDATA[function parseOpenAPISchema(openApiSchema) {
-    openApiSchema = openApiSchema.trim();
-	// Load Jackson libraries
-    var ObjectMapper = Packages.com.fasterxml.jackson.databind.ObjectMapper;
-    var objectMapper = new ObjectMapper();
-
-    // Check if YAML and if so, convert to Json
-    if (openApiSchema.startsWith("openapi: \"")) {
-        // Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read
-        var Yaml = Packages.org.yaml.snakeyaml.Yaml;
-        // Create instances of Yaml and ObjectMapper
-        var yaml = new Yaml();
-        // Parse YAML into a Java Map
-        var map = yaml.load(openApiSchema);
-
-        // Convert Java Map to JSON string
-        var jsonString = objectMapper.writeValueAsString(map)
-    } else {
-        jsonString = openApiSchema;
-    }
-
-    return fromJson(jsonString)
-}]]></parameter>
-                </Script>
-                <Script name="Test">
-                    <ModTime>1732709002352</ModTime>
-                    <parameter name="script"><![CDATA[try {
-/*	
-	var params = {
-		debug: true
-	};
-	
-	params["oauth.url"] = "https://accounts.google.com/o/oauth2/v2/auth";
-//	params["oauth.grant_type"] = "client_credentials";
-	params["oauth.client_id"] = "983363903312-pbi3gclqthujko88r0l20i0ar0qn7ou0.apps.googleusercontent.com";
-	params["oauth.client_secret"] = "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";
-//	params["username"] = "eddiehartman@gmail.com";
-//	params["password"] = "Bentemirakami23a!";
-	
-//	getOAuthAccessToken(params);
-*/
-	
-	var itimSwagger = system.openFileForInput("Restify/itim.swagger.txt");
-	var api = parseOpenAPISchema(itimSwagger)
-	
-	
-} catch (e) {
-    // Check if the caught object is a Java Exception
-    if (e instanceof java.lang.Exception) {
-        // Log the exception message
-        task.logmsg("An exception occurred: " + e 
-//        	+ "\n-------\n" + fullStacktrace(e));
-        )
-        
-    } else {
-        // Log a generic error for non-Java exceptions
-        task.logmsg("An unknown error occurred: " + e 
-//        	+ "\n-------\n" + fullStacktrace(e));
-		)
-    }
-}]]></parameter>
-                </Script>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
-    <AssemblyLine name="Reading schema 20241129 1319 almost there - 302 return">
-            <ModTime>1732879848376</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="RestifyLib" state="Enabled"/>
-                    <Component name="Oauth stuff" state="Enabled"/>
-                    <Component name="Parse OpenAPI Schema" state="Enabled"/>
-                    <Component name="Test" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer"/>
-            <ContainerDF name="DataFlowContainer">
-                <ModTime>1732879848376</ModTime>
-                <Script name="RestifyLib">
-                    <InheritFrom>/Scripts/RESTIFY library class</InheritFrom>
-                    <ModTime>1732710775141</ModTime>
-                </Script>
-                <Script name="Oauth stuff">
-                    <ModTime>1732879848376</ModTime>
-                    <parameter name="script"><![CDATA[var OAUTH = null; // Will be instantiated below
-
-// OAUTH is an object (as all js functions are) and is instantiated using this function (another object).
-function OAuth2(params) {
-	//
-	// -- Token request parameters
-	//
-	this.params = params;
-	this.debug = params.debug || false;
-	this.url = params.url || "* url not specified *";
-
-	//
-	// -- Returns form-urlencoded string of an object
-	//
-	this.urlEncode = function (obj) {
-		var arr = [];
-		for(var f in obj) {
-			arr.push(f + "=" + obj[f]);
-		}
-		return arr.join("&");
-	}
-
-	// 
-	// -- Returns an initialized HTTP Client Connector
-	//
-	this.setupHTTPClient = function(params) {
-		if (!this.httpClient) {
-			this.httpClient = system.loadConnector("ibmdi.HTTPClient");
-			for (var paramName in params) {
-				this.httpClient.setParam(paramName, params[paramName])
-			}
-			this.httpClient.initialize(null);
-		}
-		return this.httpClient
-	}
-	
-	//
- 	// -- Returns the access token if we have an access token that hasn't expired
- 	//
-	this.getToken = function() {
-		return this.response ? this.response.access_token : null;
-	}
-	
-	//
-	// -- Sends a request to get a new access token
-	// -- @return String Access token
-	// -- @throws Exception
-	//
-	this.requestToken = function () {
-
-        // -- If we already have a valid token return that
-        if(this.getToken() != null) {
-			if(this.debug) {
-                task.logmsg("OAuth: returning current token");
-            }
-            return this.getToken();
-        }
-
-		//
-		// -- Create request entry object
-		//
-		var request = system.newEntry();
-		request["url"] = this.url;
-		request["http.body"] = this.urlEncode(this.params);
-		request["http.method"] = "POST";
-		request["http.content-type"] = "application/x-www-form-urlencoded";
-		request["grant_type"] = this.params["grant_type"];
-//		request["grant_type"] = "client_credentials";
-		request["scope"] = this.params["scope"];
-//		request["scope"] = "gmail.readonly";
-		request["redirect_uri"] = this.params["redirect_uri"] | "url:itef:wg:oauth:2.0:oob";
-		request["client_id"] = this.params["client_id"];
-		request["client_secret"] = this.params["client_secret"];
-
-		if(this.debug) {
-			task.logmsg("Request AccessToken: url=" + this.url);
-			task.logmsg(request.toJSON());
-		}	
-		
-		//
-		// -- Send token request
-		//
-		this.setupHTTPClient(this.params);
-		var response = this.httpClient.queryReply(request);
-		
-		// Log and check response for errors
-		if(this.debug) {
-            task.logmsg("Request Access Token Response");
-            task.logmsg("" + response);
-        }
-		if(response && response["http.bodyAsString"] != null) {
-			var json = response["http.bodyAsString"].getValue();
-			this.response = fromJson(json);
-			if(this.response.error) {
-				var err = "Error: " + this.response.error + ": " + this.response.error_description;
-				this.response = null;
-				throw err;
-			}
-		}
-		return this.getToken();
-	}
-};
-
-// Returns the OAuth access token
-function getOAuthAccessToken(args) {
-	// If this is the first time called, set up the OAuth2 object
-	if(OAUTH == null) {
-		type = args["grant_type"];
-		if(type != "password") {
-			args.grant_type = "client_credentials";
-		}
-		if(args.debug) {
-			task.logmsg("Create OAuth2 request");
-			task.logmsg(work.fromJSON(toJson(args)));
-		}
-		OAUTH = new OAuth2(args);
-	}
-	return OAUTH.requestToken();
-}
-
-// Returns a delimited string with the full stacktrace for the passed Exception e
-function fullStacktrace(e, delimArg) {
-	var delim = delimArg || "\n";
-	var starry = []; 
-	// Log the full stack trace
-	var stackTrace = e.getStackTrace(); // Get the stack trace as an array
-	for (var i = 0; i < stackTrace.length; i++) {
-		starry.push(stackTrace[i].toString())
-	}
-	return starry.join(delim)
-}]]></parameter>
-                </Script>
-                <Script name="Parse OpenAPI Schema">
-                    <ModTime>1732713296286</ModTime>
-                    <parameter name="enabled">true</parameter>
-                    <parameter name="script"><![CDATA[// The API class is handy for handling OpenAPI schema
-var API = function(schemaStr, format) {
-	
-	// Main init logic after method definitions
-
-    // The name says it all. Returns a JS Obj
-    this.parseOpenAPISchema = function(openApiSchema) {
-		// Not sure if this is necessary
-        openApiSchema = openApiSchema.trim();
-
-        // Load Jackson libraries
-        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
-        var objectMapper = new ObjectMapper();
-
-        // Check if YAML and if so, convert to Json
-        if ("YAML".equalsIgnoreCase(this.format)) {
-            // Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read
-            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
-            // Create instances of Yaml and ObjectMapper
-            var yaml = new Yaml();
-            // Parse YAML into a Java Map
-            var map = yaml.load(openApiSchema);
-
-            // Convert Java Map to JSON string
-            var jsonString = objectMapper.writeValueAsString(map)
-        } else {
-            jsonString = openApiSchema;
-        }
-
-        return fromJson(jsonString)
-    }
-
-    // Returns the child elements (JS Obj) of the specified path
-    // Root level if no argument or blank text passed
-    this.getChildren = function(path) { 
-        var children = {};
-        path = path.replaceAll("/",".").replaceAll("\\", ".");
-        if (path.startsWith(".")) path = path.substring(0, path.length-1);
-
-        for (var childName in this.schemaObj[path]) {
-            children[childName] = this.schemaObj[path][childName];
-        }
-
-        return children;
-    }
     
-    // Main init logic
-    this.schemaStr = schemaStr;
-    this.format = format || "YAML";
-    this.apiObj = this.parseOpenAPISchema(schemaStr)
-}]]></parameter>
-                </Script>
-                <Script name="Test">
-                    <ModTime>1732879474425</ModTime>
-                    <parameter name="script"><![CDATA[try {
-
-	var params = {
-		debug: true
-	};
-	
-	params["url"] = "https://accounts.google.com/o/oauth2/v2/auth";
-	params["grant_type"] = "client_credentials";
-	params["client_id"] = "983363903312-pbi3gclqthujko88r0l20i0ar0qn7ou0.apps.googleusercontent.com";
-	params["client_secret"] = "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";
-	params["scope"] = "gmail.readonly";
-	params["redirect_uri"] = "url:itef:wg:oauth:2.0:oob";
-	
-	getCertificate(params["url"]);
-	
-	getOAuthAccessToken(params);
-
-
-
-	
-	var itimSwagger = loadFileToString("Restify/itim.swagger.txt", "YAML");
-	var api = new API(itimSwagger);
-	
-	var resourceItems = api.getChildren("/paths")
-	
-	
-} catch (e) {
-    // Check if the caught object is a Java Exception
-    if (e instanceof java.lang.Exception) {
-        // Log the exception message
-        task.logmsg("An exception occurred: " + e 
-//        	+ "\n-------\n" + fullStacktrace(e));
-        )
-        
-    } else {
-        // Log a generic error for non-Java exceptions
-        task.logmsg("An unknown error occurred: " + e 
-//        	+ "\n-------\n" + fullStacktrace(e));
-		)
-    }
-}]]></parameter>
-                </Script>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
-    <AssemblyLine name="Reading schema 20241201 1319">
-            <ModTime>1733408034353</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="RestifyLib" state="Enabled"/>
-                    <Component name="Oauth stuff" state="Enabled"/>
-                    <Component name="Parse OpenAPI Schema" state="Enabled"/>
-                    <Component name="Test" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer"/>
-            <ContainerDF name="DataFlowContainer">
-                <ModTime>1733408034353</ModTime>
-                <Script name="RestifyLib">
-                    <InheritFrom>/Scripts/RESTIFY library class</InheritFrom>
-                    <ModTime>1732710775141</ModTime>
-                </Script>
-                <Script name="Oauth stuff">
-                    <ModTime>1733055492511</ModTime>
-                    <parameter name="script"><![CDATA[var OAUTH = null; // Will be instantiated below
-
-// OAUTH is an object (as all js functions are) and is instantiated using this function (another object).
-function OAuth2(params) {
-	//
-	// -- Token this.request parameters
-	//
-	this.params = params;
-	this.debug = params.debug || false;
-	this.url = params.url || "* url not specified *";
-
-	//
-	// -- Returns form-urlencoded string of an object
-	//
-	this.urlEncode = function(obj) {
-		var arr = [];
-		for (var f in obj) {
-			arr.push(f + "=" + obj[f]);
-		}
-		return arr.join("&");
-	}
-
-	// 
-	// -- Returns an initialized HTTP Client Connector
-	//
-	this.setupHTTPClient = function(params) {
-		if (!this.httpClient) {
-			this.httpClient = system.loadConnector("ibmdi.HTTPClient");
-			for (var paramName in params) {
-				this.httpClient.setParam(paramName, params[paramName])
-			}
-			this.httpClient.initialize(null);
-		}
-		return this.httpClient
-	}
-
-	//
-	// -- Returns the access token if we have an access token that hasn't expired
-	//
-	this.getToken = function() {
-		return this.response ? this.response.access_token : null;
-	}
-
-	//
-	// -- Sends a this.request to get a new access token
-	// -- @return String Access token
-	// -- @throws Exception
-	//
-	this.requestToken = function() {
-
-		// -- If we already have a valid token return that
-		if (this.getToken() != null) {
-			if (this.debug) {
-				task.logmsg("OAuth: returning current token");
-			}
-			return this.getToken();
-		}
-
-		//
-		// -- Create this.request entry object
-		//
-		this.request = system.newEntry();
-		this.request["url"] = this.url;
-		this.request["http.body"] = this.urlEncode(this.params);
-		this.request["http.method"] = "POST";
-		this.request["http.content-type"] = "application/x-www-form-urlencoded";
-		this.request["grant_type"] = this.params["grant_type"];
-		//		this.request["grant_type"] = "client_credentials";
-		this.request["scope"] = this.params["scope"];
-		//		this.request["scope"] = "gmail.readonly";
-		this.request["redirect_uri"] = this.params["redirect_uri"] | "url:itef:wg:oauth:2.0:oob";
-		this.request["client_id"] = this.params["client_id"];
-		this.request["client_secret"] = this.params["client_secret"];
-
-		if (this.debug) {
-			task.logmsg("Requesting AccessToken: url=" + this.url);
-			task.logmsg(this.request.toJSON());
-		}
-
-		do {
-			//
-			// -- Send token this.request
-			//
-			this.setupHTTPClient(this.params);
-			var response = this.httpClient.queryReply(this.request);
-			var httpCode = response.getString("http.responseCode");
-
-			// Log and check response for errors
-			if (this.debug) {
-				task.logmsg("this.request Access Token Response");
-				task.logmsg("" + this.response);
-			}
-			if (response && response["http.bodyAsString"] != null) {
-				var json = response["http.bodyAsString"].getValue();
-
-				// Try to parse it
-				try {
-					this.response = fromJson(json);
-	 				// See if it's an error
-					if (this.response.error) {
-						var err = "Error: " + this.response.error + ": " + this.response.error_description;
-						this.response = null;
-						throw err;
-					}					
-				} catch (parsingException) {
-					// I guess it's not JSON
-					this.response = {error: "Return is NOT JSON!"}
-				}
-			}
-
-			// Check for redirect
-			if (httpCode == 302) {
-				var location = response.getString("http.Location");
-				task.logmsg("Redirecting to: " + location);
-				this.httpClient.setParam("url", location);
-				this.httpClient.terminate();
-				this.httpClient.initialize(null);
-			}
-		} while (httpCode == 302 && location.toLowerCase().indexOf("error") < 0)
-
-		// Return the token	
-		return this.getToken();
-
-	};
-}
-
-// Return the OAUTH object itself
-function getOAUTH() {
-	return OAUTH
-}
-
-// Returns the OAuth access token
-function getOAuthAccessToken(args) {
-	// If this is the first time called, set up the OAuth2 object
-	if (OAUTH == null) {
-		type = args["grant_type"];
-		if (type != "password") {
-			args.grant_type = "client_credentials";
-		}
-		if (args.debug) {
-			task.logmsg("Create OAuth2 this.request");
-			task.logmsg(work.fromJSON(toJson(args)));
-		}
-		OAUTH = new OAuth2(args);
-	}
-	return OAUTH.requestToken();
-}
-
-// Returns a delimited string with the full stacktrace for the passed Exception e
-function fullStacktrace(e, delimArg) {
-	var delim = delimArg || "\n";
-	var starry = [];
-	// Log the full stack trace
-	var stackTrace = e.getStackTrace(); // Get the stack trace as an array
-	for (var i = 0; i < stackTrace.length; i++) {
-		starry.push(stackTrace[i].toString())
-	}
-	return starry.join(delim)
-}]]></parameter>
-                </Script>
-                <Script name="Parse OpenAPI Schema">
-                    <ModTime>1732713296286</ModTime>
-                    <parameter name="enabled">true</parameter>
-                    <parameter name="script"><![CDATA[// The API class is handy for handling OpenAPI schema
-var API = function(schemaStr, format) {
-	
-	// Main init logic after method definitions
-
-    // The name says it all. Returns a JS Obj
-    this.parseOpenAPISchema = function(openApiSchema) {
-		// Not sure if this is necessary
-        openApiSchema = openApiSchema.trim();
-
-        // Load Jackson libraries
-        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
-        var objectMapper = new ObjectMapper();
-
-        // Check if YAML and if so, convert to Json
-        if ("YAML".equalsIgnoreCase(this.format)) {
-            // Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read
-            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
-            // Create instances of Yaml and ObjectMapper
-            var yaml = new Yaml();
-            // Parse YAML into a Java Map
-            var map = yaml.load(openApiSchema);
-
-            // Convert Java Map to JSON string
-            var jsonString = objectMapper.writeValueAsString(map)
-        } else {
-            jsonString = openApiSchema;
-        }
-
-        return fromJson(jsonString)
-    }
-
-    // Returns the child elements (JS Obj) of the specified path
-    // Root level if no argument or blank text passed
-    this.getChildren = function(path) { 
-        var children = {};
-        path = path.replaceAll("/",".").replaceAll("\\", ".");
-        if (path.startsWith(".")) path = path.substring(0, path.length-1);
-
-        for (var childName in this.schemaObj[path]) {
-            children[childName] = this.schemaObj[path][childName];
-        }
-
-        return children;
-    }
     
-    // Main init logic
-    this.schemaStr = schemaStr;
-    this.format = format || "YAML";
-    this.apiObj = this.parseOpenAPISchema(schemaStr)
-}]]></parameter>
-                </Script>
-                <Script name="Test">
-                    <ModTime>1733408034353</ModTime>
-                    <parameter name="script"><![CDATA[try {
-
-	var params = {
-		debug: true
-	};
-	
-	params["url"] = "https://accounts.google.com/o/oauth2/v2/auth";
-	params["grant_type"] = "client_credentials";
-	params["client_id"] = "983363903312-pbi3gclqthujko88r0l20i0ar0qn7ou0.apps.googleusercontent.com";
-	params["client_secret"] = "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";
-	params["scope"] = "gmail.readonly";
-	params["redirect_uri"] = "url:itef:wg:oauth:2.0:oob";
-	
-	getCertificate(params["url"]);
-	
-	getOAuthAccessToken(params);
-
-
-
-	
-	var itimSwagger = loadFileToString("Restify/itim.swagger.txt", "YAML");
-	var api = new API(itimSwagger);
-	
-	var resourceItems = api.getChildren("paths")
-	for (var ri in resourceItems) task.logmsg(ri)
-	
-	
-} catch (e) {
-    // Check if the caught object is a Java Exception
-    if (e instanceof java.lang.Exception) {
-        // Log the exception message
-        task.logmsg("An exception occurred: " + e 
-//        	+ "\n-------\n" + fullStacktrace(e));
-        )
-        
-    } else {
-        // Log a generic error for non-Java exceptions
-        task.logmsg("An unknown error occurred: " + e 
-//        	+ "\n-------\n" + fullStacktrace(e));
-		)
-    }
-}]]></parameter>
-                </Script>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
+    
     <AssemblyLine name="Reading schema 20241201 1900">
             <ModTime>1733070377917</ModTime>
             <Settings/>
@@ -1962,32 +665,30 @@ var ENDPOINTS = function(args) {
         </AssemblyLine>
     
     <AssemblyLine name="_test">
-            <ModTime>1733922073169</ModTime>
+            <ModTime>1733943770452</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
             <SandboxConfig/>
             <SimulationConfig>
                 <SimulationStates>
-                    <Component name="functions and __global variables" state="Enabled"/>
-                    <Component name="test it" state="Enabled"/>
                     <Component name="RestClientConnector" state="Enabled"/>
                 </SimulationStates>
                 <ProxySettings/>
             </SimulationConfig>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer">
-                <ModTime>1733922073169</ModTime>
+                <ModTime>1733943770452</ModTime>
                 <Connector name="RestClientConnector">
                     <InheritFrom>/Connectors/RestClientConnector</InheritFrom>
-                    <ModTime>1733922073169</ModTime>
+                    <ModTime>1733943770452</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1733922004923</ModTime>
-                        <parameter name="Item"/>
-                        <parameter name="Operation"/>
+                        <ModTime>1733922612712</ModTime>
+                        <parameter name="Item">/people</parameter>
+                        <parameter name="Operation">post</parameter>
                     </Configuration>
                     <Parser>
                         <InheritFrom>[parent]</InheritFrom>
@@ -2012,9 +713,19 @@ var ENDPOINTS = function(args) {
                     </DeltaSettings>
                     <Schema name="Input">
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1733943770452</ModTime>
+                        <SchemaItem>
+                            <Name>counter</Name>
+                            <Syntax>java.lang.Integer</Syntax>
+                        </SchemaItem>
                     </Schema>
                     <Schema name="Output">
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1733943770452</ModTime>
+                        <SchemaItem>
+                            <Name>counter</Name>
+                            <Syntax>java.lang.Integer</Syntax>
+                        </SchemaItem>
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
@@ -2037,137 +748,6 @@ var ENDPOINTS = function(args) {
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
                 <ModTime>1733656945983</ModTime>
-                <Script name="functions and __global variables">
-                    <ModTime>1733598679662</ModTime>
-                    <parameter name="enabled">true</parameter>
-                    <parameter name="script"><![CDATA[//
-//						GLOBAL VARIABLES
-//
-var __debug = true;
-var __schema = null;
-var __initialized = false;
-var __lib = null;
-
-//
-//							FUNCTIONS
-//
-
-function alert(msg) {
-	if (__debug) task.logmsg(msg)
-}
-
-function alertObject(objName, obj) {
-	alert("alertObj(" + objName + ", " + toJson(obj));
-	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
-	for (var child in obj) {
-		arr.push("   " + child + "\n")
-	}
-	alert(arr.toString())
-} 
-
-function initialize() {
-	if (__initialized) return;
-	__initialized = true;
-	
-	//alert("Initializing...");
-	eval(system.getScriptText("RESTIFY library class"));
-	__lib = new RESTIFY();
-	
-	parseSchema();
-}
-
-// Return the openAPI schema - @TEST hardcoded for now
-function parseSchema() {
-	//alert("Fetching schema...")
-	if (__schema) return __schema;
-
-	//alert("About to loadFileToString...");
-    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
-    
-    //alert("Creating SCHEMA object");
-	eval(system.getScriptText("SCHEMA class"));    
-    __schema = new SCHEMA(schemaJSON, "JSON");
-    
-    var toplvl = "";
-    for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
-    alert("SCHEMA -> " + toplvl)
-    
-    //alert("Got it!");
-	return __schema
-}
-
-// Update the dropdown with resource items
-function fetchItems() {
-	//alert("---> fetchItems");
-    var path = "paths"; //form.getControl("PathToObjects").getText();
-
-    updateDropdown("Item",
-        ["paths" /*form.getControl("PathToObjects").getText()*/],
-        "Cannot fetch operations for a resource item")
-
-}
-
-// Update the dropdown with opera tions for the selected item
-function fetchOperations() {
-	alert("---> fetchOperations");
-    var selectedItem = ""; // form.getControl("Items").getText();
-
-    updateDropdown("Operation",
-        ["paths",
-            selectedItem],
-        "Cannot fetch operations for a resource item")
-}
-
-// Update dropdown based api
-function updateDropdown(controlName, path, errorMsg) {
-    try {
-    	alert("updateDropdown("
-    			+ controlName
-    			+ ", " + path + ", errmsg)");
-
-	    initialize();
-		
-        if (!path) throw "Item Path must be set";
-
-        var subtree = __schema.getChildren(path);
-        
-    	alertObject("Subtree", subtree);
-
-		//combo.removeAll(); // Empty drop-down
-    			
-        for (var res in subtree) {
-            alert("   ..adding " + res);
-            //combo.add(res)
-            if (path = "paths") __selectedItem = res;
-        }
-        alert("drop-down updated!")
-    } catch (ex) {
-        var msg = "Cannot get API schema - " + ex;
-        alert(msg);
-        throw msg
-    }
-
-    //combo.select(0)
-
-}
-
-// For debugging from inside 
-function write(fname, str) {
-    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
-    //	for (var m in obj.getClass().getMethods()) {
-    //		bw.write(m)
-    //		bw.newLine()
-    //	}
-
-    bw.write(str)
-    bw.newLine()
-    bw.close()
-}]]></parameter>
-                </Script>
-                <Script name="test it">
-                    <ModTime>1733656945983</ModTime>
-                    <parameter name="script"/>
-                </Script>
             </ContainerDF>
             <ThreadOptions/>
             <Operations/>
@@ -4828,6 +3408,340 @@ function write(fname, str) {
         </Connector>
     <Connector name="RestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
+            <ModTime>1733944734046</ModTime>
+            <ConnectorMode>Iterator</ConnectorMode>
+            <ConnectorState>Enabled</ConnectorState>
+            <Configuration>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1733944734046</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="475" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Dec 11 20:18:54 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+    <Form name="Form">
+        <ModTime>1733944707720</ModTime>
+        <FormItemNames>
+            <ListItem>$GLOBAL.script</ListItem>
+            <ListItem>keepGlobalState</ListItem>
+            <ListItem>$GLOBAL.includeFiles</ListItem>
+            <ListItem>includePrologs</ListItem>
+            <ListItem>$GLOBAL.debug</ListItem>
+            <ListItem>$GLOBAL.help</ListItem>
+            <ListItem>Operation</ListItem>
+            <ListItem>PathToObjects</ListItem>
+            <ListItem>Item</ListItem>
+        </FormItemNames>
+        <FormSectionNames>
+            <ListItem>General</ListItem>
+            <ListItem>Advanced</ListItem>
+        </FormSectionNames>
+        <FormItem name="Item">
+            <ModTime>1733944516255</ModTime>
+            <parameter name="description">The resource item to operation on</parameter>
+            <parameter name="label">Item</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="script2">clearDropdowns</parameter>
+            <parameter name="scriptLabel">Update</parameter>
+            <parameter name="scriptLabel2">Clear</parameter>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="Object">
+            <ModTime>1733572441046</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Item to perform operations on</parameter>
+            <parameter name="label">	formdata.items = formdata.items || {};</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel"/>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="Operation">
+            <ModTime>1733750352248</ModTime>
+            <parameter name="description">Operation to apply to the selected Object</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchOperations</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="PathToObjects">
+            <ModTime>1733398344461</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">The openAPIschema is hierarchical, so at what level in the tree do resource items appear. Separate tree branches by pipe symbol (|)</parameter>
+            <parameter name="label">Path to Items</parameter>
+            <parameter name="script"/>
+            <parameter name="scriptLabel"/>
+        </FormItem>
+        <FormItem name="Show">
+            <ModTime>1733312883681</ModTime>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="dropdown"/>
+        <FormItem name="includePrologs">
+            <parameter name="description">pro_desc</parameter>
+            <parameter name="label">pro_label</parameter>
+            <parameter name="script">selectGlobalProlog</parameter>
+            <parameter name="scriptLabel">pro_script_label</parameter>
+            <parameter name="scripthelp">pro_script_help</parameter>
+            <parameter name="syntax">textarea</parameter>
+        </FormItem>
+        <FormItem name="keepGlobalState">
+            <parameter name="description">SCRIPT_CONN_KEEP_GLOBAL_STATE_DESC</parameter>
+            <parameter name="label">SCRIPT_CONN_KEEP_GLOBAL_STATE_LABEL</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormSection name="Advanced">
+            <FormSectionNames>
+                <ListItem>PathToObjects</ListItem>
+                <ListItem>$GLOBAL.script</ListItem>
+                <ListItem>$GLOBAL.debug</ListItem>
+                <ListItem>$GLOBAL.userComment</ListItem>
+            </FormSectionNames>
+            <parameter name="initiallyExpanded">false</parameter>
+            <parameter name="title">Advanced</parameter>
+        </FormSection>
+        <FormSection name="General">
+            <FormSectionNames>
+                <ListItem>Item</ListItem>
+                <ListItem>Operation</ListItem>
+            </FormSectionNames>
+        </FormSection>
+        <parameter name="formevents"><![CDATA[//
+//						GLOBAL VARIABLES
+//
+var __debug = false;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function alert(msg) {
+	if (__debug) form.alert(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+	
+	parseSchema();
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+    
+    //alert("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));    
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with resource items
+function fetchItems() {
+	//alert("---> fetchItems");
+    var path = form.getControl("PathToObjects").getText();
+
+    updateDropdown("Item",
+        [form.getControl("PathToObjects").getText()],
+        "Cannot fetch operations for a resource item");
+        
+	__selectedItem = form.getControl("Item").getText();
+	
+	fetchOperations()
+}
+
+// Update the dropdown with opera tions for the selected item
+function fetchOperations() {
+	alert("---> fetchOperations");
+    var selectedItem = form.getControl("Item").getText();
+
+    updateDropdown("Operation",
+        [form.getControl("PathToObjects").getText(),
+            selectedItem],
+        "Cannot fetch operations for a resource item: " + selectedItem)
+
+	__selectedObject = form.getControl("Item").getText()
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) throw "Item Path must be set";
+
+        var subtree = __schema.getChildren(path);
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+    			
+        for (var res in subtree) {
+            //alert("   ..adding " + res);
+            combo.add(res)
+        }
+        alert("drop-down updated!")
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+
+    combo.select(0)
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("Item").removeAll();
+	form.getControl("Operation").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]]]><![CDATA[></parameter>
+        <parameter name="formscript"/>
+        <parameter name="title">CONN_TITLE</parameter>
+        <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
+    </Form>
+</MetamergeConfig>]]></parameter>
+                <parameter name="Item">/itim/arc/v1.0/activity/risk/bulk/upload</parameter>
+                <parameter name="Object"/>
+                <parameter name="Operation">post</parameter>
+                <parameter name="PathToObjects">paths</parameter>
+                <parameter name="includeFiles"/>
+                <parameter name="script"><![CDATA[// Sample connector
+// Place initialization code before function declarations
+//
+var counter = 0;
+
+
+
+function initialize() {
+	parseSchema();
+}
+
+function selectEntries()
+{
+	counter = 0;
+}
+
+function getNextEntry ()
+{
+	if (counter > 100) {
+		result.setStatus (0);
+		result.setMessage ("End of input");
+		return;
+	}
+
+	entry.setAttribute ("counter", counter);
+	counter++;
+}
+
+function putEntry ()
+{
+}
+
+function modEntry ()
+{
+}
+
+function deleteEntry ()
+{
+}
+
+function findEntry ()
+{
+}
+
+function querySchema ()
+{
+	var e = new com.ibm.di.entry.Entry();
+	e.addAttributeValue("name","counter");
+	e.addAttributeValue("syntax","Number");
+	list.add(e);
+	result.setStatus (1);
+}
+]]></parameter>
+            </Configuration>
+            <Parser>
+                <InheritFrom>[parent]</InheritFrom>
+            </Parser>
+            <AttributeMap name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <AttributeMap name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <DeltaSettings>
+                <WhenToCommit>After every database operation</WhenToCommit>
+                <RowLocking>SERIALIZABLE</RowLocking>
+                <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+            </DeltaSettings>
+            <Schema name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+            </Schema>
+            <Schema name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+            </Schema>
+            <LinkCriteria>
+                <InheritFrom>[parent]</InheritFrom>
+            </LinkCriteria>
+            <Hooks>
+                <InheritFrom>[parent]</InheritFrom>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <Reconnect>
+                <InheritFrom>[parent]</InheritFrom>
+                <ReconnectRules/>
+            </Reconnect>
+            <Operations/>
+            <PoolDefinition>
+                <InheritFrom>[parent]</InheritFrom>
+                <Enabled>false</Enabled>
+                <MinPoolSize>0</MinPoolSize>
+                <MaxPoolSize>0</MaxPoolSize>
+                <PurgeInterval>0</PurgeInterval>
+                <InitializeAttempts>1</InitializeAttempts>
+                <InitializeSleepInterval>0</InitializeSleepInterval>
+            </PoolDefinition>
+            <PoolInstance/>
+        </Connector>
+    <Connector name="RestClientConnector 20241211 1944">
+            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
             <ModTime>1733923951382</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
@@ -5093,6 +4007,340 @@ function write(fname, str) {
             <Operations/>
             <PoolDefinition>
                 <InheritFrom>[parent]</InheritFrom>
+            </PoolDefinition>
+            <PoolInstance/>
+        </Connector>
+        <Connector name="RestClientConnector 20241211 2019 Form Actually Working">
+            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
+            <ModTime>1733944734046</ModTime>
+            <ConnectorMode>Iterator</ConnectorMode>
+            <ConnectorState>Enabled</ConnectorState>
+            <Configuration>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1733944734046</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="475" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Dec 11 20:18:54 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+    <Form name="Form">
+        <ModTime>1733944707720</ModTime>
+        <FormItemNames>
+            <ListItem>$GLOBAL.script</ListItem>
+            <ListItem>keepGlobalState</ListItem>
+            <ListItem>$GLOBAL.includeFiles</ListItem>
+            <ListItem>includePrologs</ListItem>
+            <ListItem>$GLOBAL.debug</ListItem>
+            <ListItem>$GLOBAL.help</ListItem>
+            <ListItem>Operation</ListItem>
+            <ListItem>PathToObjects</ListItem>
+            <ListItem>Item</ListItem>
+        </FormItemNames>
+        <FormSectionNames>
+            <ListItem>General</ListItem>
+            <ListItem>Advanced</ListItem>
+        </FormSectionNames>
+        <FormItem name="Item">
+            <ModTime>1733944516255</ModTime>
+            <parameter name="description">The resource item to operation on</parameter>
+            <parameter name="label">Item</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="script2">clearDropdowns</parameter>
+            <parameter name="scriptLabel">Update</parameter>
+            <parameter name="scriptLabel2">Clear</parameter>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="Object">
+            <ModTime>1733572441046</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Item to perform operations on</parameter>
+            <parameter name="label">	formdata.items = formdata.items || {};</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel"/>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="Operation">
+            <ModTime>1733750352248</ModTime>
+            <parameter name="description">Operation to apply to the selected Object</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchOperations</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="PathToObjects">
+            <ModTime>1733398344461</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">The openAPIschema is hierarchical, so at what level in the tree do resource items appear. Separate tree branches by pipe symbol (|)</parameter>
+            <parameter name="label">Path to Items</parameter>
+            <parameter name="script"/>
+            <parameter name="scriptLabel"/>
+        </FormItem>
+        <FormItem name="Show">
+            <ModTime>1733312883681</ModTime>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="dropdown"/>
+        <FormItem name="includePrologs">
+            <parameter name="description">pro_desc</parameter>
+            <parameter name="label">pro_label</parameter>
+            <parameter name="script">selectGlobalProlog</parameter>
+            <parameter name="scriptLabel">pro_script_label</parameter>
+            <parameter name="scripthelp">pro_script_help</parameter>
+            <parameter name="syntax">textarea</parameter>
+        </FormItem>
+        <FormItem name="keepGlobalState">
+            <parameter name="description">SCRIPT_CONN_KEEP_GLOBAL_STATE_DESC</parameter>
+            <parameter name="label">SCRIPT_CONN_KEEP_GLOBAL_STATE_LABEL</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormSection name="Advanced">
+            <FormSectionNames>
+                <ListItem>PathToObjects</ListItem>
+                <ListItem>$GLOBAL.script</ListItem>
+                <ListItem>$GLOBAL.debug</ListItem>
+                <ListItem>$GLOBAL.userComment</ListItem>
+            </FormSectionNames>
+            <parameter name="initiallyExpanded">false</parameter>
+            <parameter name="title">Advanced</parameter>
+        </FormSection>
+        <FormSection name="General">
+            <FormSectionNames>
+                <ListItem>Item</ListItem>
+                <ListItem>Operation</ListItem>
+            </FormSectionNames>
+        </FormSection>
+        <parameter name="formevents"><![CDATA[//
+//						GLOBAL VARIABLES
+//
+var __debug = false;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function alert(msg) {
+	if (__debug) form.alert(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+	
+	parseSchema();
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+    
+    //alert("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));    
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with resource items
+function fetchItems() {
+	//alert("---> fetchItems");
+    var path = form.getControl("PathToObjects").getText();
+
+    updateDropdown("Item",
+        [form.getControl("PathToObjects").getText()],
+        "Cannot fetch operations for a resource item");
+        
+	__selectedItem = form.getControl("Item").getText();
+	
+	fetchOperations()
+}
+
+// Update the dropdown with opera tions for the selected item
+function fetchOperations() {
+	alert("---> fetchOperations");
+    var selectedItem = form.getControl("Item").getText();
+
+    updateDropdown("Operation",
+        [form.getControl("PathToObjects").getText(),
+            selectedItem],
+        "Cannot fetch operations for a resource item: " + selectedItem)
+
+	__selectedObject = form.getControl("Item").getText()
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) throw "Item Path must be set";
+
+        var subtree = __schema.getChildren(path);
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+    			
+        for (var res in subtree) {
+            //alert("   ..adding " + res);
+            combo.add(res)
+        }
+        alert("drop-down updated!")
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+
+    combo.select(0)
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("Item").removeAll();
+	form.getControl("Operation").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]]]><![CDATA[></parameter>
+        <parameter name="formscript"/>
+        <parameter name="title">CONN_TITLE</parameter>
+        <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
+    </Form>
+</MetamergeConfig>]]></parameter>
+                <parameter name="Item">/itim/arc/v1.0/activity/risk/bulk/upload</parameter>
+                <parameter name="Object"/>
+                <parameter name="Operation">post</parameter>
+                <parameter name="PathToObjects">paths</parameter>
+                <parameter name="includeFiles"/>
+                <parameter name="script"><![CDATA[// Sample connector
+// Place initialization code before function declarations
+//
+var counter = 0;
+
+
+
+function initialize() {
+	parseSchema();
+}
+
+function selectEntries()
+{
+	counter = 0;
+}
+
+function getNextEntry ()
+{
+	if (counter > 100) {
+		result.setStatus (0);
+		result.setMessage ("End of input");
+		return;
+	}
+
+	entry.setAttribute ("counter", counter);
+	counter++;
+}
+
+function putEntry ()
+{
+}
+
+function modEntry ()
+{
+}
+
+function deleteEntry ()
+{
+}
+
+function findEntry ()
+{
+}
+
+function querySchema ()
+{
+	var e = new com.ibm.di.entry.Entry();
+	e.addAttributeValue("name","counter");
+	e.addAttributeValue("syntax","Number");
+	list.add(e);
+	result.setStatus (1);
+}
+]]></parameter>
+            </Configuration>
+            <Parser>
+                <InheritFrom>[parent]</InheritFrom>
+            </Parser>
+            <AttributeMap name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <AttributeMap name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <DeltaSettings>
+                <WhenToCommit>After every database operation</WhenToCommit>
+                <RowLocking>SERIALIZABLE</RowLocking>
+                <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+            </DeltaSettings>
+            <Schema name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+            </Schema>
+            <Schema name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+            </Schema>
+            <LinkCriteria>
+                <InheritFrom>[parent]</InheritFrom>
+            </LinkCriteria>
+            <Hooks>
+                <InheritFrom>[parent]</InheritFrom>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <Reconnect>
+                <InheritFrom>[parent]</InheritFrom>
+                <ReconnectRules/>
+            </Reconnect>
+            <Operations/>
+            <PoolDefinition>
+                <InheritFrom>[parent]</InheritFrom>
+                <Enabled>false</Enabled>
+                <MinPoolSize>0</MinPoolSize>
+                <MaxPoolSize>0</MaxPoolSize>
+                <PurgeInterval>0</PurgeInterval>
+                <InitializeAttempts>1</InitializeAttempts>
+                <InitializeSleepInterval>0</InitializeSleepInterval>
             </PoolDefinition>
             <PoolInstance/>
         </Connector>
@@ -23279,6 +22527,51 @@ function fullStacktrace(e, delimArg) {
     }
 }]]></parameter>
         </Script>
+    <Script name="RestConnectorLib">
+            <ModTime>1733943549646</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[//
+//						GLOBAL VARIABLES
+//
+var __debug = false;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+
+//
+//							FUNCTIONS
+//
+function initializeAndParse() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+	
+	parseSchema();
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+    
+    //alert("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));    
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}]]></parameter>
+        </Script>
     </Folder>
     <JavaLibraries/>
     <JavaProperties/>
@@ -23341,21 +22634,6 @@ function fullStacktrace(e, delimArg) {
                     <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
                     <parameter name="collection">@SUBSTITUTE{config.$directory}/_Restify.properties</parameter>
                     <parameter name="collectionType">Java-Properties</parameter>
-                </RawConnector>
-                <Key>key</Key>
-                <Value>value</Value>
-                <ReadOnly>false</ReadOnly>
-                <InitialLoad>true</InitialLoad>
-                <CacheTimeout>0</CacheTimeout>
-            </PropertyStore>
-            <PropertyStore name="_Restify">
-                <ModTime>1733657110929</ModTime>
-                <Parser/>
-                <RawConnector>
-                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
-                    <parameter name="collection">@SUBSTITUTE{config.$directory}/_Restify.properties</parameter>
-                    <parameter name="collectionType">_Restify</parameter>
-                    <parameter name="keyAlias"/>
                 </RawConnector>
                 <Key>key</Key>
                 <Value>value</Value>
