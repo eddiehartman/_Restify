@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 12 15:37:54 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 12 21:26:14 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -1605,13 +1605,14 @@ function write(fname, str) {
             </InitParams>
         </AssemblyLine>
     <AssemblyLine name="_testParse">
-            <ModTime>1734008048703</ModTime>
+            <ModTime>1734033902051</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
             <SandboxConfig/>
             <SimulationConfig>
                 <SimulationStates>
+                    <Component name="SpoofLib" state="Enabled"/>
                     <Component name="Functions" state="Enabled"/>
                     <Component name="Test it" state="Enabled"/>
                 </SimulationStates>
@@ -1620,9 +1621,9 @@ function write(fname, str) {
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1734008048703</ModTime>
-                <Script name="Functions">
-                    <ModTime>1734008048703</ModTime>
+                <ModTime>1734033902051</ModTime>
+                <Script name="SpoofLib">
+                    <ModTime>1734033870399</ModTime>
                     <parameter name="script"><![CDATA[connector = {
 	getParam: function(pname) {
 		switch (pname) {
@@ -1634,9 +1635,11 @@ function write(fname, str) {
 
 list = new java.util.ArrayList();
 
-entry = system.newEntry();
-
-//
+entry = system.newEntry();]]></parameter>
+                </Script>
+                <Script name="Functions">
+                    <ModTime>1734033902051</ModTime>
+                    <parameter name="script"><![CDATA[//
 //						GLOBAL VARIABLES
 //
 var __debug = true;
@@ -1656,7 +1659,7 @@ function initialize() {
 function selectEntries()
 {
 	var item = connector.getParam("Item");
-	var action = connector.getParam("Operation");
+	var action = connector.getParam("Action");
 	log("getNextEntry - " + action + " on " + item);
 	
 	__arguments = __schema.getChildren(["paths", item, action, "parameters"]);
@@ -1701,7 +1704,7 @@ function findEntry ()
 function querySchema ()
 {
 	var item = connector.getParam("Item");
-	var action = connector.getParam("Operation");
+	var action = connector.getParam("Action");
 	var parameters = __schema.getChildren(["paths",
 								item,
 								action,
@@ -1710,8 +1713,10 @@ function querySchema ()
 	for (var i in parameters) {
 		var param = parameters[i];
 		var e = new com.ibm.di.entry.Entry();
-		e.addAttributeValue("name",param.name);
-		e.addAttributeValue("syntax",param.schema.type);
+		e.name = param.name;
+		e.syntax = "MUST/" + param.schema.type;
+		e.required = true;
+		e.mandatory = true;
 		list.add(e)
 	}
 	result.setStatus (1);
@@ -1723,7 +1728,7 @@ function querySchema ()
 
 function log(msg) {
 	if (__debug) {
-		task.logmsg(msg);
+		main.logmsg(msg);
 		java.lang.System.out.println(msg)
 	}
 }
@@ -3332,17 +3337,18 @@ function makeCall(uri, errormsg) {
     
         
         
-    <Connector name="TestScriptConnector 20241207 2023 Form controls working!!">
+    
+    <Connector name="RestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733599348275</ModTime>
+            <ModTime>1734034855285</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733599348275</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="449" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sat Dec 07 20:22:28 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1734034844624</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="499" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 12 21:20:44 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1733599308171</ModTime>
+        <ModTime>1734034764881</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -3350,21 +3356,31 @@ function makeCall(uri, errormsg) {
             <ListItem>includePrologs</ListItem>
             <ListItem>$GLOBAL.debug</ListItem>
             <ListItem>$GLOBAL.help</ListItem>
-            <ListItem>Operation</ListItem>
             <ListItem>PathToObjects</ListItem>
             <ListItem>Item</ListItem>
+            <ListItem>Action</ListItem>
         </FormItemNames>
         <FormSectionNames>
             <ListItem>General</ListItem>
             <ListItem>Advanced</ListItem>
         </FormSectionNames>
+        <FormItem name="Action">
+            <ModTime>1734034452243</ModTime>
+            <parameter name="description">Operation to apply to the selected Item</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchActions</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
         <FormItem name="Item">
-            <ModTime>1733595218600</ModTime>
+            <ModTime>1734034457745</ModTime>
             <parameter name="description">The resource item to operation on</parameter>
             <parameter name="label">Item</parameter>
             <parameter name="script">fetchItems</parameter>
-            <parameter name="scriptLabel">Update</parameter>
-            <parameter name="syntax">droplist</parameter>
+            <parameter name="script2">clearDropdowns</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="scriptLabel2">Clear</parameter>
+            <parameter name="syntax">dropedit</parameter>
         </FormItem>
         <FormItem name="Object">
             <ModTime>1733572441046</ModTime>
@@ -3376,9 +3392,9 @@ function makeCall(uri, errormsg) {
             <parameter name="syntax">droplist</parameter>
         </FormItem>
         <FormItem name="Operation">
-            <ModTime>1733410717009</ModTime>
+            <ModTime>1733750352248</ModTime>
             <parameter name="description">Operation to apply to the selected Object</parameter>
-            <parameter name="label">Operation</parameter>
+            <parameter name="label">Action</parameter>
             <parameter name="script">fetchOperations</parameter>
             <parameter name="scriptLabel">Fetch</parameter>
             <parameter name="syntax">dropedit</parameter>
@@ -3422,7 +3438,7 @@ function makeCall(uri, errormsg) {
         <FormSection name="General">
             <FormSectionNames>
                 <ListItem>Item</ListItem>
-                <ListItem>Operation</ListItem>
+                <ListItem>Action</ListItem>
             </FormSectionNames>
         </FormSection>
         <parameter name="formevents"><![CDATA[//
@@ -3488,20 +3504,22 @@ function fetchItems() {
 
     updateDropdown("Item",
         [form.getControl("PathToObjects").getText()],
-        "Cannot fetch operations for a resource item");
+        "Cannot fetch actions for a resource item");
         
-	__selectedItem = form.getControl("Item").getText()
+	__selectedItem = form.getControl("Item").getText();
+	
+	fetchActions()
 }
 
 // Update the dropdown with opera tions for the selected item
-function fetchOperations() {
-	alert("---> fetchOperations");
+function fetchActions() {
+	//alert("---> fetchActions");
     var selectedItem = form.getControl("Item").getText();
 
-    updateDropdown("Operation",
+    updateDropdown("Action",
         [form.getControl("PathToObjects").getText(),
             selectedItem],
-        "Cannot fetch operations for a resource item: " + selectedItem)
+        "Cannot fetch actions for a resource item: " + selectedItem)
 
 	__selectedObject = form.getControl("Item").getText()
 }
@@ -3519,6 +3537,12 @@ function updateDropdown(controlName, path, errorMsg) {
 
         var subtree = __schema.getChildren(path);
         
+        if (subtree == null) {
+        	path.shift();
+        	form.alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
 		combo = form.getControl(controlName);
 		combo.removeAll(); // Empty drop-down
     			
@@ -3534,6 +3558,12 @@ function updateDropdown(controlName, path, errorMsg) {
     }
 
     combo.select(0)
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("Item").removeAll();
+	form.getControl("Action").removeAll()	
 }
 
 // For debugging from inside 
@@ -3553,11 +3583,145 @@ function write(fname, str) {
         <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
     </Form>
 </MetamergeConfig>]]></parameter>
-                <parameter name="Item">/people/{personId}</parameter>
+                <parameter name="Action">patch</parameter>
+                <parameter name="Item">/itim/arc/v2.0/risks/{id}</parameter>
                 <parameter name="Object"/>
-                <parameter name="Operation">put</parameter>
+                <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="includeFiles"/>
+                <parameter name="script"><![CDATA[//
+//						GLOBAL VARIABLES
+//
+var __debug = true;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+var counter = 0;
+
+//
+//							FUNCTIONS
+//
+
+function initialize() {
+	initializeAndParseSchema();
+}
+
+function selectEntries()
+{
+	var item = connector.getParam("Item");
+	var action = connector.getParam("Action");
+	log("getNextEntry - " + action + " on " + item);
+	
+	__arguments = __schema.getChildren(["paths", item, action, "parameters"]);
+	for (var i in __arguments) {
+		arg = __arguments[i];
+		log("---> " + i + ": " + toJson(arg))
+	}
+
+	counter = 0;
+}
+
+function getNextEntry ()
+{
+	if (counter > 0) {
+		result.setStatus(0);
+		return
+	}
+
+	entry.setAttribute ("counter", counter);
+	result.setStatus(1);
+	counter++;
+	
+	return entry;
+}
+
+function putEntry ()
+{
+}
+
+function modEntry ()
+{
+}
+
+function deleteEntry ()
+{
+}
+
+function findEntry ()
+{
+}
+
+function querySchema ()
+{
+	var item = connector.getParam("Item");
+	var action = connector.getParam("Action");
+	var parameters = __schema.getChildren(["paths",
+								item,
+								action,
+								"parameters"]);
+	
+	for (var i in parameters) {
+		var param = parameters[i];
+		var e = new com.ibm.di.entry.Entry();
+		e.name = param.name;
+		e.syntax = "MUST/" + param.schema.type;
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+	result.setStatus (1);
+	
+	return list
+}
+
+// --------------- library with f.ex. OpenAPI parsing
+
+function log(msg) {
+	if (__debug) {
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	log("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	log(arr.toString())
+} 
+
+function initializeAndParseSchema() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//log("Initializing...");
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+	
+	parseSchema();
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	if (__schema) return __schema;
+
+	log("Fetching schema...")
+    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+    
+    //log("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));    
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //log("SCHEMA -> " + toplvl)
+    
+    //log("Got it!");
+	return __schema
+}
+]]></parameter>
             </Configuration>
             <Parser>
                 <InheritFrom>[parent]</InheritFrom>
@@ -3568,12 +3732,34 @@ function write(fname, str) {
             <AttributeMap name="Output">
                 <InheritFrom>[parent]</InheritFrom>
             </AttributeMap>
-            <DeltaSettings/>
+            <DeltaSettings>
+                <WhenToCommit>After every database operation</WhenToCommit>
+                <RowLocking>SERIALIZABLE</RowLocking>
+                <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+            </DeltaSettings>
             <Schema name="Input">
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734034855285</ModTime>
+                <SchemaItem>
+                    <Name>id</Name>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>x-admin-invocation</Name>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>x-forwarded-host</Name>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
             </Schema>
             <Schema name="Output">
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1733951356587</ModTime>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                </SchemaItem>
             </Schema>
             <LinkCriteria>
                 <InheritFrom>[parent]</InheritFrom>
@@ -3590,20 +3776,29 @@ function write(fname, str) {
             <Operations/>
             <PoolDefinition>
                 <InheritFrom>[parent]</InheritFrom>
+                <Enabled>false</Enabled>
+                <MinPoolSize>0</MinPoolSize>
+                <MaxPoolSize>0</MaxPoolSize>
+                <PurgeInterval>0</PurgeInterval>
+                <InitializeAttempts>1</InitializeAttempts>
+                <InitializeSleepInterval>0</InitializeSleepInterval>
             </PoolDefinition>
             <PoolInstance/>
         </Connector>
-    <Connector name="RestClientConnector">
+    
+        
+    
+    <Connector name="RestClientConnector 20241212 2112 a fix to querySchema">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1734009250742</ModTime>
+            <ModTime>1734034197801</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1734009250742</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="481" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 12 14:14:10 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1734034197801</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="490" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 12 21:09:57 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1734008891379</ModTime>
+        <ModTime>1734034140216</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -3620,15 +3815,15 @@ function write(fname, str) {
             <ListItem>Advanced</ListItem>
         </FormSectionNames>
         <FormItem name="Action">
-            <ModTime>1734008891379</ModTime>
+            <ModTime>1734034140216</ModTime>
             <parameter name="description">Operation to apply to the selected Item</parameter>
             <parameter name="label">Action</parameter>
-            <parameter name="script">fetchOperations</parameter>
+            <parameter name="script">fetchActions</parameter>
             <parameter name="scriptLabel">Fetch</parameter>
             <parameter name="syntax">droplist</parameter>
         </FormItem>
         <FormItem name="Item">
-            <ModTime>1734008875577</ModTime>
+            <ModTime>1734034140216</ModTime>
             <parameter name="description">The resource item to operation on</parameter>
             <parameter name="label">Item</parameter>
             <parameter name="script">fetchItems</parameter>
@@ -3759,22 +3954,22 @@ function fetchItems() {
 
     updateDropdown("Item",
         [form.getControl("PathToObjects").getText()],
-        "Cannot fetch operations for a resource item");
+        "Cannot fetch actions for a resource item");
         
 	__selectedItem = form.getControl("Item").getText();
 	
-	fetchOperations()
+	fetchActions()
 }
 
 // Update the dropdown with opera tions for the selected item
-function fetchOperations() {
-	alert("---> fetchOperations");
+function fetchActions() {
+	//alert("---> fetchActions");
     var selectedItem = form.getControl("Item").getText();
 
     updateDropdown("Action",
         [form.getControl("PathToObjects").getText(),
             selectedItem],
-        "Cannot fetch operations for a resource item: " + selectedItem)
+        "Cannot fetch actions for a resource item: " + selectedItem)
 
 	__selectedObject = form.getControl("Item").getText()
 }
@@ -3913,7 +4108,7 @@ function querySchema ()
 		var param = parameters[i];
 		var e = new com.ibm.di.entry.Entry();
 		e.name = param.name;
-		e.syntax = param.schema.type;
+		e.syntax = "MUST/" + param.schema.type;
 		e.required = true;
 		e.mandatory = true;
 		list.add(e)
@@ -4022,19 +4217,177 @@ function parseSchema() {
             </PoolDefinition>
             <PoolInstance/>
         </Connector>
-    
-        
-    <Connector name="RestClientConnector 20241212 1354 just before changing from tested script">
-            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733951742687</ModTime>
+        <Connector name="Buffalo">
+            <InheritFrom>system:/Connectors/ibmdi.LDAP</InheritFrom>
+            <ModTime>1734035053705</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733951742687</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="475" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Dec 11 20:18:54 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1734035046608</ModTime>
+                <parameter name="ldapSearchBase">o=University at Buffalo,c=US</parameter>
+                <parameter name="ldapUrl">ldap://ldap.buffalo.edu:389</parameter>
+            </Configuration>
+            <Parser>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734034914898</ModTime>
+            </Parser>
+            <AttributeMap name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734034914898</ModTime>
+            </AttributeMap>
+            <AttributeMap name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734034914898</ModTime>
+            </AttributeMap>
+            <DeltaSettings>
+                <ModTime>1734034973555</ModTime>
+                <WhenToCommit>After every database operation</WhenToCommit>
+                <RowLocking>SERIALIZABLE</RowLocking>
+                <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+            </DeltaSettings>
+            <Schema name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734035053705</ModTime>
+                <SchemaItem>
+                    <Name>UBpronouns</Name>
+                    <NativeSyntax>MAY/Directory String/Preferred pronouns</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>affiliationcode</Name>
+                    <NativeSyntax>MAY/Directory String/Affiliation code</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>degrees</Name>
+                    <NativeSyntax>MAY/Directory String/Degrees</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>department</Name>
+                    <NativeSyntax>MAY/Directory String/Department</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>displayName</Name>
+                    <NativeSyntax>MAY/Directory String/RFC2798: preferred name to be used when displaying entries</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>email</Name>
+                    <NativeSyntax>MAY/IA5 String{128}/RFC3280: legacy attribute for email addresses in DNs</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>isonumber</Name>
+                    <NativeSyntax>MAY/Directory String/ISO number</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>mail</Name>
+                    <NativeSyntax>MAY/IA5 String{256}/RFC1274: RFC822 Mailbox</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>organizationalStatus</Name>
+                    <NativeSyntax>MAY/Directory String{256}/RFC1274: organizational status</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>pcn</Name>
+                    <NativeSyntax>MAY/Directory String/Preferred Common Name</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>pgivenName</Name>
+                    <NativeSyntax>MAY/Directory String/Preferred Given Name</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>phoneNumber</Name>
+                    <NativeSyntax>MAY/Directory String/Telephone Numbers</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>pmn</Name>
+                    <NativeSyntax>MAY/Directory String/Preferred Middle Name</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>pphysicaldeliveryofficename</Name>
+                    <NativeSyntax>MAY/Directory String/Physical Delivery Office Name</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>ppostaladdress</Name>
+                    <NativeSyntax>MAY/Directory String/Postal Address</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>ptelephonenumber</Name>
+                    <NativeSyntax>MAY/Directory String/Telephone Number</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>ptitle</Name>
+                    <NativeSyntax>MAY/Directory String/Title</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>serialNumber</Name>
+                    <NativeSyntax>MAY/Printable String{64}/RFC2256: serial number of the entity</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>socialMedia</Name>
+                    <NativeSyntax>MAY/Directory String/Social Media</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>ubHash</Name>
+                    <NativeSyntax>MAY/Directory String/Entry Hash</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>ubLegalName</Name>
+                    <NativeSyntax>MAY/Directory String/UB Legal Common Name</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>uid</Name>
+                    <NativeSyntax>MUST/Directory String{256}/RFC4519: user identifier</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>universityid</Name>
+                    <NativeSyntax>MAY/Directory String/University ID</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>url</Name>
+                    <NativeSyntax>MAY/Directory String/URL</NativeSyntax>
+                </SchemaItem>
+            </Schema>
+            <Schema name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734034914898</ModTime>
+            </Schema>
+            <LinkCriteria>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734034914898</ModTime>
+            </LinkCriteria>
+            <Hooks>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734034914898</ModTime>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <Reconnect>
+                <InheritFrom>[parent]</InheritFrom>
+                <ReconnectRules/>
+            </Reconnect>
+            <Operations/>
+            <PoolDefinition>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734034973841</ModTime>
+                <Enabled>false</Enabled>
+                <MinPoolSize>0</MinPoolSize>
+                <MaxPoolSize>0</MaxPoolSize>
+                <PurgeInterval>0</PurgeInterval>
+                <InitializeAttempts>1</InitializeAttempts>
+                <InitializeSleepInterval>0</InitializeSleepInterval>
+            </PoolDefinition>
+            <PoolInstance/>
+        </Connector>
+        <Connector name="RestClientConnector 20241212 2125 querySchema done">
+            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
+            <ModTime>1734034855285</ModTime>
+            <ConnectorMode>Iterator</ConnectorMode>
+            <ConnectorState>Enabled</ConnectorState>
+            <Configuration>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1734034844624</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="499" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 12 21:20:44 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1733944707720</ModTime>
+        <ModTime>1734034764881</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -4042,23 +4395,31 @@ function parseSchema() {
             <ListItem>includePrologs</ListItem>
             <ListItem>$GLOBAL.debug</ListItem>
             <ListItem>$GLOBAL.help</ListItem>
-            <ListItem>Operation</ListItem>
             <ListItem>PathToObjects</ListItem>
             <ListItem>Item</ListItem>
+            <ListItem>Action</ListItem>
         </FormItemNames>
         <FormSectionNames>
             <ListItem>General</ListItem>
             <ListItem>Advanced</ListItem>
         </FormSectionNames>
+        <FormItem name="Action">
+            <ModTime>1734034452243</ModTime>
+            <parameter name="description">Operation to apply to the selected Item</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchActions</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
         <FormItem name="Item">
-            <ModTime>1733944516255</ModTime>
+            <ModTime>1734034457745</ModTime>
             <parameter name="description">The resource item to operation on</parameter>
             <parameter name="label">Item</parameter>
             <parameter name="script">fetchItems</parameter>
             <parameter name="script2">clearDropdowns</parameter>
-            <parameter name="scriptLabel">Update</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
             <parameter name="scriptLabel2">Clear</parameter>
-            <parameter name="syntax">droplist</parameter>
+            <parameter name="syntax">dropedit</parameter>
         </FormItem>
         <FormItem name="Object">
             <ModTime>1733572441046</ModTime>
@@ -4116,7 +4477,7 @@ function parseSchema() {
         <FormSection name="General">
             <FormSectionNames>
                 <ListItem>Item</ListItem>
-                <ListItem>Operation</ListItem>
+                <ListItem>Action</ListItem>
             </FormSectionNames>
         </FormSection>
         <parameter name="formevents"><![CDATA[//
@@ -4182,22 +4543,22 @@ function fetchItems() {
 
     updateDropdown("Item",
         [form.getControl("PathToObjects").getText()],
-        "Cannot fetch operations for a resource item");
+        "Cannot fetch actions for a resource item");
         
 	__selectedItem = form.getControl("Item").getText();
 	
-	fetchOperations()
+	fetchActions()
 }
 
 // Update the dropdown with opera tions for the selected item
-function fetchOperations() {
-	alert("---> fetchOperations");
+function fetchActions() {
+	//alert("---> fetchActions");
     var selectedItem = form.getControl("Item").getText();
 
-    updateDropdown("Operation",
+    updateDropdown("Action",
         [form.getControl("PathToObjects").getText(),
             selectedItem],
-        "Cannot fetch operations for a resource item: " + selectedItem)
+        "Cannot fetch actions for a resource item: " + selectedItem)
 
 	__selectedObject = form.getControl("Item").getText()
 }
@@ -4214,6 +4575,12 @@ function updateDropdown(controlName, path, errorMsg) {
         if (!path) throw "Item Path must be set";
 
         var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	form.alert("Invalid item path: " + path.toString());
+        	return
+        }
         
 		combo = form.getControl(controlName);
 		combo.removeAll(); // Empty drop-down
@@ -4235,7 +4602,7 @@ function updateDropdown(controlName, path, errorMsg) {
 // Empty out both Item and Object dropdowns
 function clearDropdowns() {
 	form.getControl("Item").removeAll();
-	form.getControl("Operation").removeAll()	
+	form.getControl("Action").removeAll()	
 }
 
 // For debugging from inside 
@@ -4255,9 +4622,10 @@ function write(fname, str) {
         <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
     </Form>
 </MetamergeConfig>]]></parameter>
-                <parameter name="Item">/itim/arc/v1.0/activity/risk/bulk/upload</parameter>
+                <parameter name="Action">patch</parameter>
+                <parameter name="Item">/itim/arc/v2.0/risks/{id}</parameter>
                 <parameter name="Object"/>
-                <parameter name="Operation">post</parameter>
+                <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="includeFiles"/>
                 <parameter name="script"><![CDATA[//
@@ -4280,12 +4648,13 @@ function initialize() {
 function selectEntries()
 {
 	var item = connector.getParam("Item");
-	var action = connector.getParam("Operation");
+	var action = connector.getParam("Action");
 	log("getNextEntry - " + action + " on " + item);
 	
-	__arguments = __schema.getChildren([item, action]);
-	for (arg in __arguments) {
-		log("---> " + arg + ": " + toJson(__arguments[arg]))
+	__arguments = __schema.getChildren(["paths", item, action, "parameters"]);
+	for (var i in __arguments) {
+		arg = __arguments[i];
+		log("---> " + i + ": " + toJson(arg))
 	}
 
 	counter = 0;
@@ -4301,6 +4670,8 @@ function getNextEntry ()
 	entry.setAttribute ("counter", counter);
 	result.setStatus(1);
 	counter++;
+	
+	return entry;
 }
 
 function putEntry ()
@@ -4321,11 +4692,25 @@ function findEntry ()
 
 function querySchema ()
 {
-	var e = new com.ibm.di.entry.Entry();
-	e.addAttributeValue("name","counter");
-	e.addAttributeValue("syntax","Number");
-	list.add(e);
+	var item = connector.getParam("Item");
+	var action = connector.getParam("Action");
+	var parameters = __schema.getChildren(["paths",
+								item,
+								action,
+								"parameters"]);
+	
+	for (var i in parameters) {
+		var param = parameters[i];
+		var e = new com.ibm.di.entry.Entry();
+		e.name = param.name;
+		e.syntax = "MUST/" + param.schema.type;
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
 	result.setStatus (1);
+	
+	return list
 }
 
 // --------------- library with f.ex. OpenAPI parsing
@@ -4393,11 +4778,18 @@ function parseSchema() {
             </DeltaSettings>
             <Schema name="Input">
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733951491815</ModTime>
+                <ModTime>1734034855285</ModTime>
                 <SchemaItem>
-                    <Name>counter</Name>
-                    <Syntax>java.lang.Integer</Syntax>
-                    <NativeSyntax>Number</NativeSyntax>
+                    <Name>id</Name>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>x-admin-invocation</Name>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>x-forwarded-host</Name>
+                    <NativeSyntax>MUST/string</NativeSyntax>
                 </SchemaItem>
             </Schema>
             <Schema name="Output">
