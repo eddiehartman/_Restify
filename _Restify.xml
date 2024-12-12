@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Wed Dec 11 21:49:47 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 12 13:55:20 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -1596,6 +1596,193 @@ function write(fname, str) {
                 <Script name="test it">
                     <ModTime>1733656945983</ModTime>
                     <parameter name="script"/>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    <AssemblyLine name="_testParse">
+            <ModTime>1734008048703</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="Functions" state="Enabled"/>
+                    <Component name="Test it" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1734008048703</ModTime>
+                <Script name="Functions">
+                    <ModTime>1734008048703</ModTime>
+                    <parameter name="script"><![CDATA[connector = {
+	getParam: function(pname) {
+		switch (pname) {
+			case "Item": return "/itim/arc/v1.0/activity/risk/bulk/upload";
+			case "Operation": return "post"		
+		}
+	}
+}
+
+list = new java.util.ArrayList();
+
+entry = system.newEntry();
+
+//
+//						GLOBAL VARIABLES
+//
+var __debug = true;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+var counter = 0;
+
+//
+//							FUNCTIONS
+//
+
+function initialize() {
+	initializeAndParseSchema();
+}
+
+function selectEntries()
+{
+	var item = connector.getParam("Item");
+	var action = connector.getParam("Operation");
+	log("getNextEntry - " + action + " on " + item);
+	
+	__arguments = __schema.getChildren(["paths", item, action, "parameters"]);
+	for (var i in __arguments) {
+		arg = __arguments[i];
+		log("---> " + i + ": " + toJson(arg))
+	}
+
+	counter = 0;
+}
+
+function getNextEntry ()
+{
+	if (counter > 0) {
+		result.setStatus(0);
+		return
+	}
+
+	entry.setAttribute ("counter", counter);
+	result.setStatus(1);
+	counter++;
+	
+	return entry;
+}
+
+function putEntry ()
+{
+}
+
+function modEntry ()
+{
+}
+
+function deleteEntry ()
+{
+}
+
+function findEntry ()
+{
+}
+
+function querySchema ()
+{
+	var item = connector.getParam("Item");
+	var action = connector.getParam("Operation");
+	var parameters = __schema.getChildren(["paths",
+								item,
+								action,
+								"parameters"]);
+	
+	for (var i in parameters) {
+		var param = parameters[i];
+		var e = new com.ibm.di.entry.Entry();
+		e.addAttributeValue("name",param.name);
+		e.addAttributeValue("syntax",param.schema.type);
+		list.add(e)
+	}
+	result.setStatus (1);
+	
+	return list
+}
+
+// --------------- library with f.ex. OpenAPI parsing
+
+function log(msg) {
+	if (__debug) {
+		task.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	log("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	log(arr.toString())
+} 
+
+function initializeAndParseSchema() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//log("Initializing...");
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+	
+	parseSchema();
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	if (__schema) return __schema;
+
+	log("Fetching schema...")
+    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+    
+    //log("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));    
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //log("SCHEMA -> " + toplvl)
+    
+    //log("Got it!");
+	return __schema
+}]]></parameter>
+                </Script>
+                <Script name="Test it">
+                    <ModTime>1734007977851</ModTime>
+                    <parameter name="script"><![CDATA[initialize();
+selectEntries();
+l = querySchema();
+cnt = 0;
+do {
+	a = l.get(cnt);
+	task.logmsg(a.name + " - " + a.syntax);
+	cnt++;
+} while (cnt < l.size());
+
+e = getNextEntry();
+task.logmsg("---ENTRY---\n" + e);
+
+i = 42;]]></parameter>
                 </Script>
             </ContainerDF>
             <ThreadOptions/>
@@ -3408,12 +3595,12 @@ function write(fname, str) {
         </Connector>
     <Connector name="RestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733944734046</ModTime>
+            <ModTime>1733951742687</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733944734046</ModTime>
+                <ModTime>1733951742687</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="475" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Dec 11 20:18:54 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1733944707720</ModTime>
@@ -3642,31 +3829,46 @@ function write(fname, str) {
                 <parameter name="Operation">post</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="includeFiles"/>
-                <parameter name="script"><![CDATA[// Sample connector
-// Place initialization code before function declarations
+                <parameter name="script"><![CDATA[//
+//						GLOBAL VARIABLES
 //
+var __debug = true;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
 var counter = 0;
 
-
+//
+//							FUNCTIONS
+//
 
 function initialize() {
-	parseSchema();
+	initializeAndParseSchema();
 }
 
 function selectEntries()
 {
+	var item = connector.getParam("Item");
+	var action = connector.getParam("Operation");
+	log("getNextEntry - " + action + " on " + item);
+	
+	__arguments = __schema.getChildren([item, action]);
+	for (arg in __arguments) {
+		log("---> " + arg + ": " + toJson(__arguments[arg]))
+	}
+
 	counter = 0;
 }
 
 function getNextEntry ()
 {
-	if (counter > 100) {
-		result.setStatus (0);
-		result.setMessage ("End of input");
-		return;
+	if (counter > 0) {
+		result.setStatus(0);
+		return
 	}
 
 	entry.setAttribute ("counter", counter);
+	result.setStatus(1);
 	counter++;
 }
 
@@ -3694,6 +3896,54 @@ function querySchema ()
 	list.add(e);
 	result.setStatus (1);
 }
+
+// --------------- library with f.ex. OpenAPI parsing
+
+function log(msg) {
+	if (__debug) {
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	log("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	log(arr.toString())
+} 
+
+function initializeAndParseSchema() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//log("Initializing...");
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+	
+	parseSchema();
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	if (__schema) return __schema;
+
+	log("Fetching schema...")
+    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+    
+    //log("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));    
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //log("SCHEMA -> " + toplvl)
+    
+    //log("Got it!");
+	return __schema
+}
 ]]></parameter>
             </Configuration>
             <Parser>
@@ -3712,9 +3962,20 @@ function querySchema ()
             </DeltaSettings>
             <Schema name="Input">
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1733951491815</ModTime>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                    <NativeSyntax>Number</NativeSyntax>
+                </SchemaItem>
             </Schema>
             <Schema name="Output">
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1733951356587</ModTime>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                </SchemaItem>
             </Schema>
             <LinkCriteria>
                 <InheritFrom>[parent]</InheritFrom>
@@ -3740,284 +4001,16 @@ function querySchema ()
             </PoolDefinition>
             <PoolInstance/>
         </Connector>
-    <Connector name="RestClientConnector 20241211 1944">
+    
+        
+    <Connector name="RestClientConnector 20241212 1354 just before changing from tested script">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733923951382</ModTime>
+            <ModTime>1733951742687</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733923951382</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="462" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Dec 11 14:32:31 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
-    <Form name="Form">
-        <ModTime>1733923948891</ModTime>
-        <FormItemNames>
-            <ListItem>$GLOBAL.script</ListItem>
-            <ListItem>keepGlobalState</ListItem>
-            <ListItem>$GLOBAL.includeFiles</ListItem>
-            <ListItem>includePrologs</ListItem>
-            <ListItem>$GLOBAL.debug</ListItem>
-            <ListItem>$GLOBAL.help</ListItem>
-            <ListItem>Operation</ListItem>
-            <ListItem>PathToObjects</ListItem>
-            <ListItem>Item</ListItem>
-        </FormItemNames>
-        <FormSectionNames>
-            <ListItem>General</ListItem>
-            <ListItem>Advanced</ListItem>
-        </FormSectionNames>
-        <FormItem name="Item">
-            <ModTime>1733921970504</ModTime>
-            <parameter name="description">The resource item to operation on</parameter>
-            <parameter name="label">Item</parameter>
-            <parameter name="script">fetchItems</parameter>
-            <parameter name="script2">clearDropdowns</parameter>
-            <parameter name="scriptLabel">Update</parameter>
-            <parameter name="scriptLabel2">Clear</parameter>
-            <parameter name="syntax">droplist</parameter>
-        </FormItem>
-        <FormItem name="Object">
-            <ModTime>1733572441046</ModTime>
-            <parameter name="Required">true</parameter>
-            <parameter name="description">Item to perform operations on</parameter>
-            <parameter name="label">	formdata.items = formdata.items || {};</parameter>
-            <parameter name="script">fetchItems</parameter>
-            <parameter name="scriptLabel"/>
-            <parameter name="syntax">droplist</parameter>
-        </FormItem>
-        <FormItem name="Operation">
-            <ModTime>1733750352248</ModTime>
-            <parameter name="description">Operation to apply to the selected Object</parameter>
-            <parameter name="label">Action</parameter>
-            <parameter name="script">fetchOperations</parameter>
-            <parameter name="scriptLabel">Fetch</parameter>
-            <parameter name="syntax">dropedit</parameter>
-        </FormItem>
-        <FormItem name="PathToObjects">
-            <ModTime>1733398344461</ModTime>
-            <parameter name="Required">true</parameter>
-            <parameter name="description">The openAPIschema is hierarchical, so at what level in the tree do resource items appear. Separate tree branches by pipe symbol (|)</parameter>
-            <parameter name="label">Path to Items</parameter>
-            <parameter name="script"/>
-            <parameter name="scriptLabel"/>
-        </FormItem>
-        <FormItem name="Show">
-            <ModTime>1733312883681</ModTime>
-            <parameter name="syntax">boolean</parameter>
-        </FormItem>
-        <FormItem name="dropdown"/>
-        <FormItem name="includePrologs">
-            <parameter name="description">pro_desc</parameter>
-            <parameter name="label">pro_label</parameter>
-            <parameter name="script">selectGlobalProlog</parameter>
-            <parameter name="scriptLabel">pro_script_label</parameter>
-            <parameter name="scripthelp">pro_script_help</parameter>
-            <parameter name="syntax">textarea</parameter>
-        </FormItem>
-        <FormItem name="keepGlobalState">
-            <parameter name="description">SCRIPT_CONN_KEEP_GLOBAL_STATE_DESC</parameter>
-            <parameter name="label">SCRIPT_CONN_KEEP_GLOBAL_STATE_LABEL</parameter>
-            <parameter name="syntax">boolean</parameter>
-        </FormItem>
-        <FormSection name="Advanced">
-            <FormSectionNames>
-                <ListItem>PathToObjects</ListItem>
-                <ListItem>$GLOBAL.script</ListItem>
-                <ListItem>$GLOBAL.debug</ListItem>
-                <ListItem>$GLOBAL.userComment</ListItem>
-            </FormSectionNames>
-            <parameter name="initiallyExpanded">false</parameter>
-            <parameter name="title">Advanced</parameter>
-        </FormSection>
-        <FormSection name="General">
-            <FormSectionNames>
-                <ListItem>Item</ListItem>
-                <ListItem>Operation</ListItem>
-            </FormSectionNames>
-        </FormSection>
-        <parameter name="formevents"><![CDATA[//
-//						GLOBAL VARIABLES
-//
-var __debug = false;
-var __schema = null;
-var __initialized = false;
-var __lib = null;
-
-//
-//							FUNCTIONS
-//
-
-function alert(msg) {
-	if (__debug) form.alert(msg)
-}
-
-function alertObject(objName, obj) {
-	alert("alertObj(" + objName + ", " + toJson(obj));
-	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
-	for (var child in obj) {
-		arr.push("   " + child + "\n")
-	}
-	alert(arr.toString())
-} 
-
-function initialize() {
-	if (__initialized) return;
-	__initialized = true;
-	
-	//alert("Initializing...");
-	eval(system.getScriptText("RESTIFY library class"));
-	__lib = new RESTIFY();
-	
-	parseSchema();
-}
-
-// Return the openAPI schema - @TEST hardcoded for now
-function parseSchema() {
-	//alert("Fetching schema...")
-	if (__schema) return __schema;
-
-	//alert("About to loadFileToString...");
-    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
-    
-    //alert("Creating SCHEMA object");
-	eval(system.getScriptText("SCHEMA class"));    
-    __schema = new SCHEMA(schemaJSON, "JSON");
-    
-    //var toplvl = "";
-    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
-    //alert("SCHEMA -> " + toplvl)
-    
-    //alert("Got it!");
-	return __schema
-}
-
-// Update the dropdown with resource items
-function fetchItems() {
-	//alert("---> fetchItems");
-    var path = form.getControl("PathToObjects").getText();
-
-    updateDropdown("Item",
-        [form.getControl("PathToObjects").getText()],
-        "Cannot fetch operations for a resource item");
-        
-	fetchOperations(form.getControl("Item").getText());
-}
-
-function clearDropdowns() {
-	var combo = form.getControl("Item");
-	combo.removeAll();
-	combo = form.getControl("Operation");
-	combo.removeAll();
-}
-
-// Update the dropdown with opera tions for the selected item
-function fetchOperations(argSelectedItem) {
-	alert("---> fetchOperations");
-    var selectedItem = argSelectedItem || form.getControl("Item").getText();
-
-    updateDropdown("Operation",
-        [form.getControl("PathToObjects").getText(),
-            selectedItem],
-        "Cannot fetch operations for a resource item: " + selectedItem)
-
-	__selectedObject = form.getControl("Item").getText()
-}
-
-// Update dropdown based api
-function updateDropdown(controlName, path, errorMsg) {
-    try {
-    	alert("updateDropdown("
-    			+ controlName
-    			+ ", " + path + ", errmsg)");
-
-	    initialize();
-		
-        if (!path) throw "Item Path must be set";
-
-        var subtree = __schema.getChildren(path);
-        
-		combo = form.getControl(controlName);
-		combo.removeAll(); // Empty drop-down
-    			
-        for (var res in subtree) {
-            //alert("   ..adding " + res);
-            combo.add(res)
-        }
-        alert("drop-down updated!")
-    } catch (ex) {
-        var msg = "Cannot get API schema - " + ex;
-        alert(msg);
-        throw msg
-    }
-
-    combo.select(0)
-}
-
-// For debugging from inside 
-function write(fname, str) {
-    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
-    //	for (var m in obj.getClass().getMethods()) {
-    //		bw.write(m)
-    //		bw.newLine()
-    //	}
-
-    bw.write(str)
-    bw.newLine()
-    bw.close()
-}]]]]><![CDATA[></parameter>
-        <parameter name="formscript"/>
-        <parameter name="title">CONN_TITLE</parameter>
-        <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
-    </Form>
-</MetamergeConfig>]]></parameter>
-                <parameter name="Item"/>
-                <parameter name="Object"/>
-                <parameter name="Operation"/>
-                <parameter name="PathToObjects">paths</parameter>
-                <parameter name="includeFiles"/>
-            </Configuration>
-            <Parser>
-                <InheritFrom>[parent]</InheritFrom>
-            </Parser>
-            <AttributeMap name="Input">
-                <InheritFrom>[parent]</InheritFrom>
-            </AttributeMap>
-            <AttributeMap name="Output">
-                <InheritFrom>[parent]</InheritFrom>
-            </AttributeMap>
-            <DeltaSettings/>
-            <Schema name="Input">
-                <InheritFrom>[parent]</InheritFrom>
-            </Schema>
-            <Schema name="Output">
-                <InheritFrom>[parent]</InheritFrom>
-            </Schema>
-            <LinkCriteria>
-                <InheritFrom>[parent]</InheritFrom>
-            </LinkCriteria>
-            <Hooks>
-                <InheritFrom>[parent]</InheritFrom>
-            </Hooks>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <Reconnect>
-                <InheritFrom>[parent]</InheritFrom>
-                <ReconnectRules/>
-            </Reconnect>
-            <Operations/>
-            <PoolDefinition>
-                <InheritFrom>[parent]</InheritFrom>
-            </PoolDefinition>
-            <PoolInstance/>
-        </Connector>
-        <Connector name="RestClientConnector 20241211 2019 Form Actually Working">
-            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733944734046</ModTime>
-            <ConnectorMode>Iterator</ConnectorMode>
-            <ConnectorState>Enabled</ConnectorState>
-            <Configuration>
-                <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733944734046</ModTime>
+                <ModTime>1733951742687</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="475" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Dec 11 20:18:54 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1733944707720</ModTime>
@@ -4246,31 +4239,46 @@ function write(fname, str) {
                 <parameter name="Operation">post</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="includeFiles"/>
-                <parameter name="script"><![CDATA[// Sample connector
-// Place initialization code before function declarations
+                <parameter name="script"><![CDATA[//
+//						GLOBAL VARIABLES
 //
+var __debug = true;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
 var counter = 0;
 
-
+//
+//							FUNCTIONS
+//
 
 function initialize() {
-	parseSchema();
+	initializeAndParseSchema();
 }
 
 function selectEntries()
 {
+	var item = connector.getParam("Item");
+	var action = connector.getParam("Operation");
+	log("getNextEntry - " + action + " on " + item);
+	
+	__arguments = __schema.getChildren([item, action]);
+	for (arg in __arguments) {
+		log("---> " + arg + ": " + toJson(__arguments[arg]))
+	}
+
 	counter = 0;
 }
 
 function getNextEntry ()
 {
-	if (counter > 100) {
-		result.setStatus (0);
-		result.setMessage ("End of input");
-		return;
+	if (counter > 0) {
+		result.setStatus(0);
+		return
 	}
 
 	entry.setAttribute ("counter", counter);
+	result.setStatus(1);
 	counter++;
 }
 
@@ -4298,6 +4306,54 @@ function querySchema ()
 	list.add(e);
 	result.setStatus (1);
 }
+
+// --------------- library with f.ex. OpenAPI parsing
+
+function log(msg) {
+	if (__debug) {
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	log("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	log(arr.toString())
+} 
+
+function initializeAndParseSchema() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//log("Initializing...");
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+	
+	parseSchema();
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	if (__schema) return __schema;
+
+	log("Fetching schema...")
+    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+    
+    //log("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));    
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //log("SCHEMA -> " + toplvl)
+    
+    //log("Got it!");
+	return __schema
+}
 ]]></parameter>
             </Configuration>
             <Parser>
@@ -4316,9 +4372,20 @@ function querySchema ()
             </DeltaSettings>
             <Schema name="Input">
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1733951491815</ModTime>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                    <NativeSyntax>Number</NativeSyntax>
+                </SchemaItem>
             </Schema>
             <Schema name="Output">
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1733951356587</ModTime>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                </SchemaItem>
             </Schema>
             <LinkCriteria>
                 <InheritFrom>[parent]</InheritFrom>
@@ -9210,7 +9277,7 @@ function write(fname, str) {
         </Script>
     
     <Script name="SCHEMA class">
-            <ModTime>1733598483953</ModTime>
+            <ModTime>1733951981024</ModTime>
             <parameter name="enabled">true</parameter>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[function SCHEMA(schemaStr, format) {
@@ -9252,8 +9319,8 @@ function write(fname, str) {
     /* Returns the child elements (JS Obj) of the specified path
        Root level if no argument or blank text passed */
     this.getChildren = function(path) { 
-        var children = {};
-        var parent;
+        //var children = {};
+        var subtree;
         
         if (!path) {
         	path = []
@@ -9263,18 +9330,18 @@ function write(fname, str) {
         	path = [path]	
         }
         
-        parent = this.schemaObj[path[0]];
-        for (var i = 1; i < path.length && parent; i++) {
-        	parent = parent[path[i]];
+        subtree = this.schemaObj[path[0]];
+        for (var i = 1; i < path.length && subtree; i++) {
+			subtree = subtree[path[i]]
         }
-
-		if (parent) {
-			for (var child in parent) {
-				children[child] = parent[child]
+/*
+		if (subtree) {
+			for (var child in subtree) {
+				children[child] = subtree[child]
 			}
 		}
-
-        return children;
+*/
+        return subtree;
     }
     
     /* Main init logic */
