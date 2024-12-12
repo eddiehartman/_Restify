@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 12 13:55:20 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Dec 12 15:37:54 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -3595,15 +3595,15 @@ function write(fname, str) {
         </Connector>
     <Connector name="RestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1733951742687</ModTime>
+            <ModTime>1734009250742</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733951742687</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="475" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Dec 11 20:18:54 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1734009250742</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="481" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Dec 12 14:14:10 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1733944707720</ModTime>
+        <ModTime>1734008891379</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -3611,21 +3611,29 @@ function write(fname, str) {
             <ListItem>includePrologs</ListItem>
             <ListItem>$GLOBAL.debug</ListItem>
             <ListItem>$GLOBAL.help</ListItem>
-            <ListItem>Operation</ListItem>
             <ListItem>PathToObjects</ListItem>
             <ListItem>Item</ListItem>
+            <ListItem>Action</ListItem>
         </FormItemNames>
         <FormSectionNames>
             <ListItem>General</ListItem>
             <ListItem>Advanced</ListItem>
         </FormSectionNames>
+        <FormItem name="Action">
+            <ModTime>1734008891379</ModTime>
+            <parameter name="description">Operation to apply to the selected Item</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchOperations</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
         <FormItem name="Item">
-            <ModTime>1733944516255</ModTime>
+            <ModTime>1734008875577</ModTime>
             <parameter name="description">The resource item to operation on</parameter>
             <parameter name="label">Item</parameter>
             <parameter name="script">fetchItems</parameter>
             <parameter name="script2">clearDropdowns</parameter>
-            <parameter name="scriptLabel">Update</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
             <parameter name="scriptLabel2">Clear</parameter>
             <parameter name="syntax">droplist</parameter>
         </FormItem>
@@ -3685,7 +3693,7 @@ function write(fname, str) {
         <FormSection name="General">
             <FormSectionNames>
                 <ListItem>Item</ListItem>
-                <ListItem>Operation</ListItem>
+                <ListItem>Action</ListItem>
             </FormSectionNames>
         </FormSection>
         <parameter name="formevents"><![CDATA[//
@@ -3763,7 +3771,7 @@ function fetchOperations() {
 	alert("---> fetchOperations");
     var selectedItem = form.getControl("Item").getText();
 
-    updateDropdown("Operation",
+    updateDropdown("Action",
         [form.getControl("PathToObjects").getText(),
             selectedItem],
         "Cannot fetch operations for a resource item: " + selectedItem)
@@ -3804,7 +3812,7 @@ function updateDropdown(controlName, path, errorMsg) {
 // Empty out both Item and Object dropdowns
 function clearDropdowns() {
 	form.getControl("Item").removeAll();
-	form.getControl("Operation").removeAll()	
+	form.getControl("Action").removeAll()	
 }
 
 // For debugging from inside 
@@ -3824,9 +3832,10 @@ function write(fname, str) {
         <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
     </Form>
 </MetamergeConfig>]]></parameter>
-                <parameter name="Item">/itim/arc/v1.0/activity/risk/bulk/upload</parameter>
+                <parameter name="Action"/>
+                <parameter name="Item"/>
                 <parameter name="Object"/>
-                <parameter name="Operation">post</parameter>
+                <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="includeFiles"/>
                 <parameter name="script"><![CDATA[//
@@ -3849,12 +3858,13 @@ function initialize() {
 function selectEntries()
 {
 	var item = connector.getParam("Item");
-	var action = connector.getParam("Operation");
+	var action = connector.getParam("Action");
 	log("getNextEntry - " + action + " on " + item);
 	
-	__arguments = __schema.getChildren([item, action]);
-	for (arg in __arguments) {
-		log("---> " + arg + ": " + toJson(__arguments[arg]))
+	__arguments = __schema.getChildren(["paths", item, action, "parameters"]);
+	for (var i in __arguments) {
+		arg = __arguments[i];
+		log("---> " + i + ": " + toJson(arg))
 	}
 
 	counter = 0;
@@ -3870,6 +3880,8 @@ function getNextEntry ()
 	entry.setAttribute ("counter", counter);
 	result.setStatus(1);
 	counter++;
+	
+	return entry;
 }
 
 function putEntry ()
@@ -3890,11 +3902,25 @@ function findEntry ()
 
 function querySchema ()
 {
-	var e = new com.ibm.di.entry.Entry();
-	e.addAttributeValue("name","counter");
-	e.addAttributeValue("syntax","Number");
-	list.add(e);
+	var item = connector.getParam("Item");
+	var action = connector.getParam("Action");
+	var parameters = __schema.getChildren(["paths",
+								item,
+								action,
+								"parameters"]);
+	
+	for (var i in parameters) {
+		var param = parameters[i];
+		var e = new com.ibm.di.entry.Entry();
+		e.name = param.name;
+		e.syntax = param.schema.type;
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
 	result.setStatus (1);
+	
+	return list
 }
 
 // --------------- library with f.ex. OpenAPI parsing
@@ -3962,12 +3988,7 @@ function parseSchema() {
             </DeltaSettings>
             <Schema name="Input">
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1733951491815</ModTime>
-                <SchemaItem>
-                    <Name>counter</Name>
-                    <Syntax>java.lang.Integer</Syntax>
-                    <NativeSyntax>Number</NativeSyntax>
-                </SchemaItem>
+                <ModTime>1734008360125</ModTime>
             </Schema>
             <Schema name="Output">
                 <InheritFrom>[parent]</InheritFrom>
