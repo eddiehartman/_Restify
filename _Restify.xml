@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Fri Jan 03 20:27:38 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Fri Jan 03 20:39:21 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -3697,7 +3697,7 @@ i = 42]]></parameter>
             </InitParams>
         </AssemblyLine>
     <AssemblyLine name="__testService">
-            <ModTime>1735931738303</ModTime>
+            <ModTime>1735933132751</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -3769,10 +3769,10 @@ i = 42]]></parameter>
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1735931699150</ModTime>
+                <ModTime>1735933132751</ModTime>
                 <Script name="Script lib">
-                    <ModTime>1735931699150</ModTime>
-                    <parameter name="script"><![CDATA[authReturn = {
+                    <ModTime>1735933132751</ModTime>
+                    <parameter name="script"><![CDATA[var authReturn = {
   csrftoken: "token-xyz",
   sessionId: "session-xyz",
   user: {
@@ -3805,10 +3805,13 @@ function bodyHas(req, props) {
 }
 
 function handleAuth(req) {
+	if (getString(req, "http.method") != "POST") {
+		fail("You must POST an auth request, instead of " + getString(req, "http.method"))
+	} else
 	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
 		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
 	} else
-	if (getString(req, "http.Authorization").toLowerCase().indexOf("bearer") < 0) {
+	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyzzy") < 0) {
 		fail("Authorization code is wrong: " + request.getString("http.authorization"))
 	} else
 	if (!bodyHas(req, {username: "edbird", password: "R0kz"})) {
@@ -3820,8 +3823,21 @@ function handleAuth(req) {
 }
 
 function handleGetAccounts(req) {
-	
-}]]></parameter>
+	if (getString(req, "http.method") != "GET") {
+		fail("You must GET person accounts, instead of " + getString(req, "http.method"))
+	} else
+	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
+		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
+	} else
+	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyzzy") < 0) {
+		fail("Authorization code is wrong: " + request.getString("http.authorization"))
+	} else
+	if (getString(req, "http.X-CRF-TOKEN").toLowerCase().indexOf("xyzzy") < 0) {
+		fail("Access token is wrong: " + request.getString("http.X-CRF-TOKEN"))
+	}
+
+	req["http.body"] = system.getScriptText("__testService_getReturn");
+	req["http.responseCode"] = 200}]]></parameter>
                 </Script>
                 <Script name="Handle call">
                     <ModTime>1735930175223</ModTime>
@@ -4723,6 +4739,170 @@ function handleAuth(req) {
 function handleGetAccounts(req) {
 	
 }]]></parameter>
+                </Script>
+                <Script name="Handle call">
+                    <ModTime>1735930175223</ModTime>
+                    <parameter name="script"><![CDATA[// Dump the work entry
+task.dumpEntry(work);
+
+base = work.getString("http.base");
+
+if (base.endsWith("/auth")) {
+	handleAuth(work)
+} else
+if (base.endsWith("/accounts")) {
+	handleGetAccounts(work)
+}]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+        <AssemblyLine name="__testService 20250103 2039">
+            <ModTime>1735933132751</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="Script lib" state="Enabled"/>
+                    <Component name="Handle call" state="Enabled"/>
+                    <Component name="HTTPServerConnector" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1735931738303</ModTime>
+                <Connector name="HTTPServerConnector">
+                    <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
+                    <ModTime>1735931738303</ModTime>
+                    <ConnectorMode>Server</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="tcpPort">8080</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1735931738303</ModTime>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings/>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1735933132751</ModTime>
+                <Script name="Script lib">
+                    <ModTime>1735933132751</ModTime>
+                    <parameter name="script"><![CDATA[var authReturn = {
+  csrftoken: "token-xyz",
+  sessionId: "session-xyz",
+  user: {
+    id: "12345",
+    name: "Edbird"
+  }	
+}
+
+function getString(e, attname) {
+	return e.getString(attname) || "*" + attname + " not specified*"
+}
+
+function bodyHas(req, props) {
+	var body = req.getString("http.bodyAsString");
+	try {
+		var creds = fromJson(body);		
+	} catch (ex) {
+		task.logmsg("ERROR", "Cannot parse http.body - " + e + ": " + body);
+		return false
+	}
+
+	for (var p in props) {
+		if (!req[p] == props[p]) {
+			task.logmsg("ERROR", "Credentials " + p + " does not match: " + req[p]);
+			return false	
+		}
+	}
+	
+	return true
+}
+
+function handleAuth(req) {
+	if (getString(req, "http.method") != "POST") {
+		fail("You must POST an auth request, instead of " + getString(req, "http.method"))
+	} else
+	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
+		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
+	} else
+	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyzzy") < 0) {
+		fail("Authorization code is wrong: " + request.getString("http.authorization"))
+	} else
+	if (!bodyHas(req, {username: "edbird", password: "R0kz"})) {
+		fail("Username/password invalid: " + getString("http.bodyAsString"))
+	}
+
+	req["http.body"] = toJson(authReturn);
+	req["http.responseCode"] = 200
+}
+
+function handleGetAccounts(req) {
+	if (getString(req, "http.method") != "GET") {
+		fail("You must GET person accounts, instead of " + getString(req, "http.method"))
+	} else
+	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
+		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
+	} else
+	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyzzy") < 0) {
+		fail("Authorization code is wrong: " + request.getString("http.authorization"))
+	} else
+	if (getString(req, "http.X-CRF-TOKEN").toLowerCase().indexOf("xyzzy") < 0) {
+		fail("Access token is wrong: " + request.getString("http.X-CRF-TOKEN"))
+	}
+
+	req["http.body"] = system.getScriptText("__testService_getReturn");
+	req["http.responseCode"] = 200}]]></parameter>
                 </Script>
                 <Script name="Handle call">
                     <ModTime>1735930175223</ModTime>
@@ -27742,6 +27922,40 @@ function parseSchema() {
     this.format = format || "YAML";
     this.schemaObj = this.parseOpenAPIschema(schemaStr)
 }]]></parameter>
+        </Script>
+    <Script name="__testService_getReturn">
+            <ModTime>1735932935073</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[[
+  {
+    "_embedded": {
+      "erservice": {
+        "_links": {
+          "statusDetails": {
+            "href": "/itim/rest/services/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMixvdT1zZXJ2aWNlcyxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PW9yZyxkYz1jb20/statusdetails",
+            "title": "statusDetails"
+          },
+          "self": {
+            "href": "/itim/rest/services/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMixvdT1zZXJ2aWNlcyxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PW9yZyxkYz1jb20",
+            "title": "ITIM Service"
+          }
+        },
+        "_attributes": {
+          "erservicename": "ITIM Service"
+        }
+      }
+    },
+    "_links": {
+      "self": {
+        "href": "/itim/rest/accounts/ZXJ1aWQ9YXNtaXRoLG91PXN5c3RlbVVzZXIsb3U9aXRpbSxvdT1vcmcsZGM9Y29t",
+        "title": "asmith"
+      }
+    },
+    "_attributes": {
+      "eruid": "asmith"
+    }
+  }
+]]]></parameter>
         </Script>
     </Folder>
     <JavaLibraries/>
