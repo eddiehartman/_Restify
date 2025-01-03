@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sat Dec 28 20:54:49 CET 2024" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Fri Jan 03 20:16:30 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -669,7 +669,7 @@ var ENDPOINTS = function(args) {
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1735415527976</ModTime>
+            <ModTime>1735930133350</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -688,17 +688,23 @@ var ENDPOINTS = function(args) {
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1735415527976</ModTime>
+                <ModTime>1735930133350</ModTime>
                 <Script name="SpoofLib">
-                    <ModTime>1735414918587</ModTime>
+                    <ModTime>1735930133350</ModTime>
                     <parameter name="script"><![CDATA[connector = {
 	getParam: function(pname) {
 		switch (pname.toLowerCase()) {
-			case "item": return "/itim/arc/v1.0/activity/risk/bulk/upload";
-			case "action": return "post"		
+			case "auth": return "BEARER xyzzy";
+			case "item": return "/people/{personId}/accounts";
+			case "action": return "get";
+			case "url": return "http://localhost:8080";
+			case "user": return "edbird";
+			case "password": return "R0kz";
+			case "debug": return true;
 		}
 	}
 }
+
 /*
 combo = {
 	text: "",
@@ -1045,23 +1051,118 @@ fetchItems();
 i = 42;]]></parameter>
                 </Script>
                 <Script name="Connector Script">
-                    <ModTime>1735415527976</ModTime>
+                    <ModTime>1735582603642</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[//
 //						GLOBAL VARIABLES
 //
-var __debug = false;
+var __debug = connector.getParam("debug");
 var __schema = null;
 var __initialized = false;
 var __lib = null;
-var counter = 0;
+var __baseUrl = connector.getParam("url");
+var __requestEntry = system.newEntry();
+var __http = system.getConnector("ibmdi.HTTPClient");
+
+var __counter = 0;
 
 //
 //							FUNCTIONS
 //
 
-function initialize() {
-	initializeAndParseSchema();
+function getCertificate () {
+	var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
+}
+
+// Function to make HTTP requests. The first lines of code show you the parameters you can send
+function makeRequest(params) {
+	var verb = params.verb || "POST";
+	var url = params.url || connector.getParam("url");
+	var body = params.body || null;
+	var ctype = params.ctype || "application/json";
+	var where = params.where || "";
+	var headers = params.headers || {};
+
+	// Prepend the host (baseURL) if not already there
+	if (url.toLowerCase().indexOf(__baseUrl.toLowerCase()) < 0) {
+		url = __baseUrl + url;
+	}
+	
+	__requestEntry.removeAllAttributes();
+	
+	if (typeof body !== "undefined" && body !== null && body.trim().length > 0) {
+		method = "POST";
+		__requestEntry["http.body"] = body;
+	}
+	
+	__http.setParam("method", verb.toUpperCase());
+	__http.setParam("url", connector.getParam("url"));
+	__http.setParam("username", connector.getParam("user"));
+	__http.setParam("password", connector.getParam("password"));
+
+	__requestEntry["http.Content-Type"] = ctype;
+	
+	__http.terminate();
+	
+	__http.initialize(null);
+	
+	if (__debug) {
+		logDetails({"msg" : "Request to itim", 
+					"obj" : __requestEntry, 
+					"url" : url, 
+					"verb" : verb, 
+					"ctype" : ctype, 
+					"where" : where});
+	}
+
+	do {
+		var retry = false;
+		try {	
+			var retEntry = __http.queryReply(__requestEntry);
+		} catch (ex) {
+			if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+				if (ex.toString().indexOf("Certificate chaining error") >= 0) {
+					throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+				}
+				getCertificate();
+				retry = true;
+			} else {
+				throw ex;
+			}	
+		}
+	} while (retry);
+	
+	if (__debug) {
+		logDetails({"msg" : "Response from itim", 
+					"obj" : retEntry,
+				    "entry" : retEntry});
+	}
+	
+	var reply = parseReply(retEntry);
+	
+	return reply;
+}
+
+function logmsg(lvl, msg) {
+	if (typeof(lvl) == "undefined") {
+		msg = ""
+		lvl = "INFO"
+	} else
+	if (typeof(msg) == "undefined") {
+		msg = lvl
+		lvl = "INFO"
+	}
+	
+	if (lvl.toLowerCase().startsWith("console")) {
+		java.lang.System.out.println(msg)
+		lvl = "INFO"
+		msg = "(CONSOLE) " + msg
+	}	
+	task.logmsg(lvl, msg)
+}
+
+function throwException(msg) {
+	throw new java.lang.IllegalArgumentException(msg);
 }
 
 function fixQueryParam(qp, value) {
@@ -1095,6 +1196,95 @@ function craftQueryString(args) {
 	return queryParams.join("&")
 }
 
+function parseReply(replyEntry) {
+	if (replyEntry === null) { return; } 
+	
+	var status = replyEntry.getString("http.responseCode");
+	
+	if (!status.startsWith("2")) {
+		throwException("Error response from ServiceNow. Response code: " 
+							+ status
+							+ "    Message: " + replyEntry.getString("http.responseMsg"));
+	}
+	
+	var body = replyEntry.getString("http.bodyAsString");
+
+	try {
+		var reply = fromJson(body);
+	} catch (ex) {
+		throwException("Error parsing return payload from itim: " + ex.toString()
+						+ "\n*** dump of reply ***\n" 
+						+ replyEntry)
+	}
+		
+	return reply;
+}
+
+
+function fixUrl(url) {
+	if (!url.endsWith("/")) {
+		return url + "/";
+	} else {
+		return url;
+	}
+}
+
+function resetConnector() {
+	initialized = false;
+	list = null;
+	listCnt = 0;
+}
+
+function logDetails(params) {
+	var msg = params.msg;
+	var obj = params.obj; 
+	var url = params.url;
+	var verb = params.verb;
+	var ctype = params.ctype; 
+	var where = params.where;
+	
+	if (msg == null) {
+		msg = "*unknown entry*";
+	}
+
+	var s = new java.lang.StringBuffer();
+	
+	if (where != null) {
+		s.append("\n@@@------> (" + where + ") " + msg);
+	} else {
+		s.append("\n---------> " + msg);
+	}
+	
+	
+	if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+	if (ctype != null) { s.append("   " + ctype); } 
+	if (url != null) { s.append("   " + url); } 
+	s.append("\n");
+
+	if (obj != null) {
+		if (obj instanceof com.ibm.di.entry.Entry) {	
+			var attNames = obj.getAttributeNames();
+			for (var a in attNames) {
+				if (a.indexOf("http.") >= 0 && 
+					!("http.bodyAsString".equalsIgnoreCase(a)
+						|| "http.bodyAsBytes".equalsIgnoreCase(a)) ) {
+					s += " " + a + ": " + obj[a] + "\n";
+				}
+			}	
+		} else {
+			s.append(obj.toString());
+		}
+	}	
+	logmsg(s.toString());
+}
+
+//
+// -------  Standard Connector functions 
+//
+function initialize() {
+	initializeAndParseSchema();
+}
+
 function selectEntries() {
 
 }
@@ -1110,19 +1300,23 @@ function queryReply() {
 		action: action,
 		entry: entry
 	});
+	
+	makeRequest({
+		
+	});
 
-	task.logmsg("<" + action + "> " + item + "?" + queryString)	
+	logmsg("<" + action + "> " + item + "?" + queryString)	
 }
 
 function getNextEntry() {
-	if (counter > 0) {
+	if (__counter > 0) {
 		result.setStatus(0);
 		return
 	}
 
-	entry.setAttribute("counter", counter);
+	entry.setAttribute("__counter", __counter);
 	result.setStatus(1);
-	counter++;
+	__counter++;
 
 	return entry;
 }
@@ -1163,7 +1357,7 @@ function querySchema() {
 
 // --------------- library with f.ex. OpenAPI parsing
 
-function log(msg) {
+function debugMsg(msg) {
 	if (__debug) {
 		main.logmsg(msg);
 		java.lang.System.out.println(msg)
@@ -1171,41 +1365,44 @@ function log(msg) {
 }
 
 function alertObject(objName, obj) {
-	log("alertObj(" + objName + ", " + toJson(obj));
+	debugMsg("alertObj(" + objName + ", " + toJson(obj));
 	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
 	for (var child in obj) {
 		arr.push("   " + child + "\n")
 	}
-	log(arr.toString())
+	debugMsg(arr.toString())
 }
 
 function initializeAndParseSchema() {
+	resetConnector()	
+
 	if (__initialized) return;
 	__initialized = true;
 
-	//log("Initializing...");
+	//debugMsg("Initializing...");
+
 	eval(system.getScriptText("RESTIFY library class"));
 	__lib = new RESTIFY();
 
-	parseSchema();
+	parseSchema()	
 }
 
 // Return the openAPI schema - @TEST hardcoded for now
 function parseSchema() {
 	if (__schema) return __schema;
 
-	log("Fetching schema...")
+	debugMsg("Fetching schema...")
 	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
 
-	//log("Creating SCHEMA object");
+	//debugMsg("Creating SCHEMA object");
 	eval(system.getScriptText("SCHEMA class"));
 	__schema = new SCHEMA(schemaJSON, "JSON");
 
 	//var toplvl = "";
 	//for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
-	//log("SCHEMA -> " + toplvl)
+	//debugMsg("SCHEMA -> " + toplvl)
 
-	//log("Got it!");
+	//debugMsg("Got it!");
 	return __schema
 }]]></parameter>
                 </Script>
@@ -3491,6 +3688,1055 @@ queryReply();
 l = querySchema();
 
 i = 42]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    <AssemblyLine name="__testService">
+            <ModTime>1735931738303</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="Script lib" state="Enabled"/>
+                    <Component name="Handle call" state="Enabled"/>
+                    <Component name="HTTPServerConnector" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1735931738303</ModTime>
+                <Connector name="HTTPServerConnector">
+                    <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
+                    <ModTime>1735931738303</ModTime>
+                    <ConnectorMode>Server</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="tcpPort">8080</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1735931738303</ModTime>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings/>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1735931699150</ModTime>
+                <Script name="Script lib">
+                    <ModTime>1735931699150</ModTime>
+                    <parameter name="script"><![CDATA[authReturn = {
+  csrftoken: "token-xyz",
+  sessionId: "session-xyz",
+  user: {
+    id: "12345",
+    name: "Edbird"
+  }	
+}
+
+function getString(e, attname) {
+	return e.getString(attname) || "*" + attname + " not specified*"
+}
+
+function bodyHas(req, props) {
+	var body = req.getString("http.bodyAsString");
+	try {
+		var creds = fromJson(body);		
+	} catch (ex) {
+		task.logmsg("ERROR", "Cannot parse http.body - " + e + ": " + body);
+		return false
+	}
+
+	for (var p in props) {
+		if (!req[p] == props[p]) {
+			task.logmsg("ERROR", "Credentials " + p + " does not match: " + req[p]);
+			return false	
+		}
+	}
+	
+	return true
+}
+
+function handleAuth(req) {
+	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
+		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
+	} else
+	if (getString(req, "http.Authorization").toLowerCase().indexOf("bearer") < 0) {
+		fail("Authorization code is wrong: " + request.getString("http.authorization"))
+	} else
+	if (!bodyHas(req, {username: "edbird", password: "R0kz"})) {
+		fail("Username/password invalid: " + getString("http.bodyAsString"))
+	}
+
+	req["http.body"] = toJson(authReturn);
+	req["http.responseCode"] = 200
+}
+
+function handleGetAccounts(req) {
+	
+}]]></parameter>
+                </Script>
+                <Script name="Handle call">
+                    <ModTime>1735930175223</ModTime>
+                    <parameter name="script"><![CDATA[// Dump the work entry
+task.dumpEntry(work);
+
+base = work.getString("http.base");
+
+if (base.endsWith("/auth")) {
+	handleAuth(work)
+} else
+if (base.endsWith("/accounts")) {
+	handleGetAccounts(work)
+}]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+        <AssemblyLine name="_testScriptConnectorCode 20241230 1919">
+            <ModTime>1735582603642</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="SpoofLib" state="Enabled"/>
+                    <Component name="Form Event Script SAVE FOR NOW" state="Enabled"/>
+                    <Component name="Connector Form Event Script" state="Enabled"/>
+                    <Component name="Test Form Event Script" state="Enabled"/>
+                    <Component name="Connector Script" state="Enabled"/>
+                    <Component name="Test Connector Script" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1735582603642</ModTime>
+                <Script name="SpoofLib">
+                    <ModTime>1735582585846</ModTime>
+                    <parameter name="script"><![CDATA[connector = {
+	getParam: function(pname) {
+		switch (pname.toLowerCase()) {
+			case "item": return "/itim/arc/v1.0/activity/risk/bulk/upload";
+			case "action": return "post";
+			case "url": return "http://localhost:8080";
+			case "user": return "edbird";
+			case "password": return "R0kz";
+			case "debug": return true;
+		}
+	}
+}
+
+/*
+combo = {
+	text: "",
+	getText: function() { return txt },
+	removeAll: function() {},
+	add: function() {},
+	select: function() {}
+}	
+*/
+COMBO = function(value) {
+	this.value = string = value;
+	this.getText = function() {return this.value};
+	this.add = function() {};
+	this.select = function() {};
+	this.removeAll = function() {}
+}
+
+form = {
+	getControl: function(name) {
+		switch (name) {
+			case "Item": return new COMBO("/people");
+			case "Action": return new COMBO("post");			
+		}
+	},
+	
+	alert: function(msg) {
+		task.logmsg(msg)
+	}
+}
+
+list = new java.util.ArrayList();
+
+entry = system.newEntry();
+
+entry["x-forwarded-host"] = "xfwdhost_value";
+entry["x-admin-invocation"] = "xadmininvoc_value";]]></parameter>
+                </Script>
+                <Script name="Form Event Script SAVE FOR NOW">
+                    <ModTime>1734095059603</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[//
+//						GLOBAL VARIABLES
+//
+var __debug = true;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function alert(msg) {
+	if (__debug) form.alert(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+	
+	parseSchema();
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+    
+    //alert("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));    
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with resource items
+function fetchItems() {
+	//alert("---> fetchItems");
+    //var path = form.getControl("PathToObjects").getText();
+    path = "paths";
+
+    updateDropdown("Item",
+        [path],
+        "Cannot fetch actions for a resource item");
+        
+	__selectedItem = form.getControl("Item").getText() || "";
+	
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected item
+function fetchActions() {
+    var selectedItem = form.getControl("Item").getText() || "";
+	alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("Action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for a resource item: " + selectedItem)
+
+	__selectedObject = form.getControl("Item").getText() || ""
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+/**/
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+/**/
+	    initialize();
+		
+        if (!path) {
+        	form.alert("updateDropdown() - path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	form.alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arr = system.splitString("","");
+        for (var propName in subtree) {
+        	arr.push(propName);
+        }
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+        alert("drop-down updated!")
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+
+    combo.select(0)
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("Item").removeAll();
+	form.getControl("Action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]></parameter>
+                </Script>
+                <Script name="Connector Form Event Script">
+                    <ModTime>1734968608855</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[//
+//						GLOBAL VARIABLES
+//
+var __debug = true;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function alert(msg) {
+	if (__debug) form.alert(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+	
+	parseSchema();
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+    
+    //alert("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));    
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with resource items
+function fetchItems() {
+	//alert("---> fetchItems");
+    //var path = form.getControl("PathToObjects").getText();
+    path = "paths";
+
+    updateDropdown("Item",
+        [path],
+        "Cannot fetch actions for a resource item");
+        
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected item
+function fetchActions() {
+    var selectedItem = form.getControl("Item").getText() || "";
+	alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("Action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for a resource item: " + selectedItem)
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) {
+        	form.alert("updateDropdown() - path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	form.alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arrList = java.util.ArrayList();
+        for (var propName in subtree) {
+        	arrList.add(propName);
+        }
+        var arr = arrList.toArray();
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+
+        alert("drop-down updated!");
+
+        combo.select(0)
+
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("Item").removeAll();
+	form.getControl("Action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]></parameter>
+                </Script>
+                <Script name="Test Form Event Script">
+                    <ModTime>1734968613370</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[initialize();
+fetchItems();
+
+i = 42;]]></parameter>
+                </Script>
+                <Script name="Connector Script">
+                    <ModTime>1735582603642</ModTime>
+                    <parameter name="enabled">true</parameter>
+                    <parameter name="script"><![CDATA[//
+//						GLOBAL VARIABLES
+//
+var __debug = connector.getParam("debug");
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+var __baseUrl = connector.getParam("url");
+var __requestEntry = system.newEntry();
+var __http = system.getConnector("ibmdi.HTTPClient");
+
+var __counter = 0;
+
+//
+//							FUNCTIONS
+//
+
+function getCertificate () {
+	var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
+}
+
+// Function to make HTTP requests. The first lines of code show you the parameters you can send
+function makeRequest(params) {
+	var verb = params.verb || "POST";
+	var url = params.url || connector.getParam("url");
+	var body = params.body || null;
+	var ctype = params.ctype || "application/json";
+	var where = params.where || "";
+	var headers = params.headers || {};
+
+	// Prepend the host (baseURL) if not already there
+	if (url.toLowerCase().indexOf(__baseUrl.toLowerCase()) < 0) {
+		url = __baseUrl + url;
+	}
+	
+	__requestEntry.removeAllAttributes();
+	
+	if (typeof body !== "undefined" && body !== null && body.trim().length > 0) {
+		method = "POST";
+		__requestEntry["http.body"] = body;
+	}
+	
+	__http.setParam("method", verb.toUpperCase());
+	__http.setParam("url", connector.getParam("url"));
+	__http.setParam("username", connector.getParam("user"));
+	__http.setParam("password", connector.getParam("password"));
+
+	__requestEntry["http.Content-Type"] = ctype;
+	
+	__http.terminate();
+	
+	__http.initialize(null);
+	
+	if (__debug) {
+		logDetails({"msg" : "Request to itim", 
+					"obj" : __requestEntry, 
+					"url" : url, 
+					"verb" : verb, 
+					"ctype" : ctype, 
+					"where" : where});
+	}
+
+	do {
+		var retry = false;
+		try {	
+			var retEntry = __http.queryReply(__requestEntry);
+		} catch (ex) {
+			if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+				if (ex.toString().indexOf("Certificate chaining error") >= 0) {
+					throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+				}
+				getCertificate();
+				retry = true;
+			} else {
+				throw ex;
+			}	
+		}
+	} while (retry);
+	
+	if (__debug) {
+		logDetails({"msg" : "Response from itim", 
+					"obj" : retEntry,
+				    "entry" : retEntry});
+	}
+	
+	var reply = parseReply(retEntry);
+	
+	return reply;
+}
+
+function logmsg(lvl, msg) {
+	if (typeof(lvl) == "undefined") {
+		msg = ""
+		lvl = "INFO"
+	} else
+	if (typeof(msg) == "undefined") {
+		msg = lvl
+		lvl = "INFO"
+	}
+	
+	if (lvl.toLowerCase().startsWith("console")) {
+		java.lang.System.out.println(msg)
+		lvl = "INFO"
+		msg = "(CONSOLE) " + msg
+	}	
+	task.logmsg(lvl, msg)
+}
+
+function throwException(msg) {
+	throw new java.lang.IllegalArgumentException(msg);
+}
+
+function fixQueryParam(qp, value) {
+	var retval = qp.name + "=";
+	var value = (value || value == "") ? value : "<" + qp.description + ">"
+
+	if (qp.schema.type == "string") {
+		retval += "\"" + value + "\""
+	} else {
+		retval += value
+	}
+
+	return retval
+}
+
+var __emptyEntry = system.newEntry();
+
+function craftQueryString(args) {
+	var item = args.item;
+	var action = args.action;
+	var entry = args.entry || __emptyEntry;
+
+	var queryParams = [];
+	var arguments = __schema.getChildren(["paths", item, action, "parameters"]);
+	for (var i in arguments) {
+		var qp = arguments[i];
+		queryParams.push(qp.name +
+			"=" +
+			fixQueryParam(qp, entry[qp.name]))
+	}
+	return queryParams.join("&")
+}
+
+function parseReply(replyEntry) {
+	if (replyEntry === null) { return; } 
+	
+	var status = replyEntry.getString("http.responseCode");
+	
+	if (!status.startsWith("2")) {
+		throwException("Error response from ServiceNow. Response code: " 
+							+ status
+							+ "    Message: " + replyEntry.getString("http.responseMsg"));
+	}
+	
+	var body = replyEntry.getString("http.bodyAsString");
+
+	try {
+		var reply = fromJson(body);
+	} catch (ex) {
+		throwException("Error parsing return payload from itim: " + ex.toString()
+						+ "\n*** dump of reply ***\n" 
+						+ replyEntry)
+	}
+		
+	return reply;
+}
+
+
+function fixUrl(url) {
+	if (!url.endsWith("/")) {
+		return url + "/";
+	} else {
+		return url;
+	}
+}
+
+function resetConnector() {
+	initialized = false;
+	list = null;
+	listCnt = 0;
+}
+
+function logDetails(params) {
+	var msg = params.msg;
+	var obj = params.obj; 
+	var url = params.url;
+	var verb = params.verb;
+	var ctype = params.ctype; 
+	var where = params.where;
+	
+	if (msg == null) {
+		msg = "*unknown entry*";
+	}
+
+	var s = new java.lang.StringBuffer();
+	
+	if (where != null) {
+		s.append("\n@@@------> (" + where + ") " + msg);
+	} else {
+		s.append("\n---------> " + msg);
+	}
+	
+	
+	if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+	if (ctype != null) { s.append("   " + ctype); } 
+	if (url != null) { s.append("   " + url); } 
+	s.append("\n");
+
+	if (obj != null) {
+		if (obj instanceof com.ibm.di.entry.Entry) {	
+			var attNames = obj.getAttributeNames();
+			for (var a in attNames) {
+				if (a.indexOf("http.") >= 0 && 
+					!("http.bodyAsString".equalsIgnoreCase(a)
+						|| "http.bodyAsBytes".equalsIgnoreCase(a)) ) {
+					s += " " + a + ": " + obj[a] + "\n";
+				}
+			}	
+		} else {
+			s.append(obj.toString());
+		}
+	}	
+	logmsg(s.toString());
+}
+
+//
+// -------  Standard Connector functions 
+//
+function initialize() {
+	initializeAndParseSchema();
+}
+
+function selectEntries() {
+
+}
+
+function queryReply() {
+	var item = connector.getParam("item");
+	if (!item) throw new java.lang.RuntimeException("Item parameter has not been set")
+	var action = connector.getParam("action");
+	if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+
+	var queryString = craftQueryString({
+		item: item,
+		action: action,
+		entry: entry
+	});
+	
+	makeRequest({
+		
+	});
+
+	logmsg("<" + action + "> " + item + "?" + queryString)	
+}
+
+function getNextEntry() {
+	if (__counter > 0) {
+		result.setStatus(0);
+		return
+	}
+
+	entry.setAttribute("__counter", __counter);
+	result.setStatus(1);
+	__counter++;
+
+	return entry;
+}
+
+function putEntry() {}
+
+function modEntry() {}
+
+function deleteEntry() {}
+
+function findEntry() {}
+
+function querySchema() {
+	var item = connector.getParam("item");
+	if (!item) throw new java.lang.RuntimeException("Item parameter has not been set")
+	var action = connector.getParam("action");
+	if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+
+	var parameters = __schema.getChildren(["paths",
+		item,
+		action,
+		"parameters"
+	]);
+
+	for (var i in parameters) {
+		var param = parameters[i];
+		var e = new com.ibm.di.entry.Entry();
+		e.name = param.name;
+		e.syntax = "MUST/" + param.schema.type;
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+	result.setStatus(1);
+
+	return list
+}
+
+// --------------- library with f.ex. OpenAPI parsing
+
+function debugMsg(msg) {
+	if (__debug) {
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	debugMsg("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	debugMsg(arr.toString())
+}
+
+function initializeAndParseSchema() {
+	resetConnector()	
+
+	if (__initialized) return;
+	__initialized = true;
+
+	//debugMsg("Initializing...");
+
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+
+	parseSchema()	
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	if (__schema) return __schema;
+
+	debugMsg("Fetching schema...")
+	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+
+	//debugMsg("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));
+	__schema = new SCHEMA(schemaJSON, "JSON");
+
+	//var toplvl = "";
+	//for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+	//debugMsg("SCHEMA -> " + toplvl)
+
+	//debugMsg("Got it!");
+	return __schema
+}]]></parameter>
+                </Script>
+                <Script name="Test Connector Script">
+                    <ModTime>1735414647429</ModTime>
+                    <parameter name="enabled">true</parameter>
+                    <parameter name="script"><![CDATA[initialize();
+queryReply();
+l = querySchema();
+
+i = 42]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    <AssemblyLine name="__testService 20250103 2016">
+            <ModTime>1735931738303</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="Script lib" state="Enabled"/>
+                    <Component name="Handle call" state="Enabled"/>
+                    <Component name="HTTPServerConnector" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1735931738303</ModTime>
+                <Connector name="HTTPServerConnector">
+                    <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
+                    <ModTime>1735931738303</ModTime>
+                    <ConnectorMode>Server</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="tcpPort">8080</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1735931738303</ModTime>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings/>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1735931699150</ModTime>
+                <Script name="Script lib">
+                    <ModTime>1735931699150</ModTime>
+                    <parameter name="script"><![CDATA[authReturn = {
+  csrftoken: "token-xyz",
+  sessionId: "session-xyz",
+  user: {
+    id: "12345",
+    name: "Edbird"
+  }	
+}
+
+function getString(e, attname) {
+	return e.getString(attname) || "*" + attname + " not specified*"
+}
+
+function bodyHas(req, props) {
+	var body = req.getString("http.bodyAsString");
+	try {
+		var creds = fromJson(body);		
+	} catch (ex) {
+		task.logmsg("ERROR", "Cannot parse http.body - " + e + ": " + body);
+		return false
+	}
+
+	for (var p in props) {
+		if (!req[p] == props[p]) {
+			task.logmsg("ERROR", "Credentials " + p + " does not match: " + req[p]);
+			return false	
+		}
+	}
+	
+	return true
+}
+
+function handleAuth(req) {
+	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
+		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
+	} else
+	if (getString(req, "http.Authorization").toLowerCase().indexOf("bearer") < 0) {
+		fail("Authorization code is wrong: " + request.getString("http.authorization"))
+	} else
+	if (!bodyHas(req, {username: "edbird", password: "R0kz"})) {
+		fail("Username/password invalid: " + getString("http.bodyAsString"))
+	}
+
+	req["http.body"] = toJson(authReturn);
+	req["http.responseCode"] = 200
+}
+
+function handleGetAccounts(req) {
+	
+}]]></parameter>
+                </Script>
+                <Script name="Handle call">
+                    <ModTime>1735930175223</ModTime>
+                    <parameter name="script"><![CDATA[// Dump the work entry
+task.dumpEntry(work);
+
+base = work.getString("http.base");
+
+if (base.endsWith("/auth")) {
+	handleAuth(work)
+} else
+if (base.endsWith("/accounts")) {
+	handleGetAccounts(work)
+}]]></parameter>
                 </Script>
             </ContainerDF>
             <ThreadOptions/>
