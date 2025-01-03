@@ -1,4 +1,0 @@
-Mock Server - Postman (Mac)
-https://104f2ca7-2f12-43f4-99c7-9b24ce78c640.mock.pstmn.io
-
-API key to Postman: PMAK-66188076bae3080001756f38-034fe5f03d23345fcb5a2b50453b65e4aa
