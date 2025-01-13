@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sat Jan 11 19:32:55 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Mon Jan 13 20:59:43 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -669,7 +669,7 @@ var ENDPOINTS = function(args) {
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1736620073688</ModTime>
+            <ModTime>1736798368746</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -695,9 +695,9 @@ SCHEMA class]]></parameter>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1736620073688</ModTime>
+                <ModTime>1736798368746</ModTime>
                 <Script name="SpoofLib">
-                    <ModTime>1736619205696</ModTime>
+                    <ModTime>1736796241560</ModTime>
                     <parameter name="script"><![CDATA[connector = {
 	getParam: function(pname) {
 		switch (pname.toLowerCase()) {
@@ -708,7 +708,7 @@ SCHEMA class]]></parameter>
 			case "path": 	 return "/people/{personId}/accounts";
 			case "password": return "R0kz";
 			case "url": 	 return "http://localhost:8080";
-			case "user": 	 return "edbird";
+			case "username": return "edbird";
 			default: 		 return "*Invalid param: " + pname + "*";
 		}
 	}
@@ -916,7 +916,7 @@ fetchItems();
 i = 42;]]></parameter>
                 </Script>
                 <Script name="Connector Script">
-                    <ModTime>1736620073688</ModTime>
+                    <ModTime>1736798368746</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[// 20250104 2008 Initial
 // 20250111 1915 Handling queryParameters in url
@@ -947,6 +947,7 @@ function getCertificate () {
 // Get the authentication token
 function getToken() {
 	var reply = makeRequest({
+			token: true, // Getting a token
 			verb: "POST",
 			url: connector.getParam("authUrl"),
 			ctype: "application/json",
@@ -996,22 +997,33 @@ function parseReply(replyEntry) {
 
 // Function to make HTTP requests. The first lines of code show you the parameters you can send
 function makeRequest(params) {
-	var verb = params.verb || "POST";
+	var verb = params.verb || "GET";
 	var url = params.url || throwException("makeRequest called with no URL");
 	var body = params.body || null;
 	var ctype = params.ctype || "application/json";
 	var where = params.where || "";
 	var headers = params.headers || {};
+	var gettingToken = params.token || false;
+	
+	// Get token if necessary
+	if (!__token && !gettingToken) {
+		getToken();
+	} 
+	
+	// Add auth artifacts
+	if (!gettingToken) {
+		__requestEntry["http.X-CSRV-TOKEN"] = __token;
+		if (__sessionId) __requestEntry["http.sessionId"] = __sessionId;
+	}
 	
 	// Prepend the host (baseURL) if not already there
 	if (url.toLowerCase().indexOf(__baseUrl.toLowerCase()) < 0) {
 		url = __baseUrl + "/" + url;
 	}
 	
-	__requestEntry.removeAllAttributes();
-	
+	// If a body is passed, this must be a POST (I think)
 	if (typeof body !== "undefined" && body !== null) {
-		method = "POST";
+		verb = "POST";
 
 		if (typeof body != "string") {
 			__requestEntry["http.body"] = toJson(body);
@@ -1020,22 +1032,18 @@ function makeRequest(params) {
 		}
 	}	
 	
+	// Set up the global HTTP Connector
 	__http.setParam("method", verb.toUpperCase());
-	__http.setParam("url", connector.getParam("url"));
-	__http.setParam("username", connector.getParam("user"));
+	__http.setParam("url", url);
+	__http.setParam("username", connector.getParam("username"));
 	__http.setParam("password", connector.getParam("password"));
 
+	// Now set up the request entry
 	__requestEntry["http.Content-Type"] = ctype;
 	
 	for (var hdr in headers) {
 		__requestEntry["http." + hdr] = headers[hdr]
 	}
-	
-	if (__token) __requestEntry["http.X-CSRV-TOKEN"] = __token;
-	if (__sessionId) __requestEntry["http.sessionId"] = __sessionId;
-	
-	__http.terminate();
-	__http.initialize(null);
 	
 	if (__debug) {
 		logDetails({"msg" : "Request to itim", 
@@ -1046,16 +1054,23 @@ function makeRequest(params) {
 					"where" : where});
 	}
 
+	// Reinitialize the HTTP Client connector so the updated parameters are applied
+	__http.terminate();
+	__http.initialize(null);
+
+	// Make the call
 	do {
 		var retry = false;
 		try {	
 			var retEntry = __http.queryReply(__requestEntry);
 			var reply = parseReply(retEntry);
 		} catch (ex) {
+			// If the token has expired, get a new one
 			if (ex.toString().indexOf("Unauthorized") >= 0) {
 				getToken();
 				retry = true
 			} else
+			// Else if we first must import the client cert, then do so. The Server must be restarted after.
 			if (ex instanceof javax.net.ssl.SSLHandshakeException) {
 				if (ex.toString().indexOf("Certificate chaining error") >= 0) {
 					throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
@@ -1067,6 +1082,9 @@ function makeRequest(params) {
 			}	
 		}
 	} while (retry);
+	
+	// Clean up
+	__requestEntry.removeAllAttributes();
 	
 	if (__debug) {
 		logDetails({"msg" : "Response from itim", 
@@ -1207,8 +1225,7 @@ function replaceUID(path, entry) {
 function initialize() {
 	resetConnector();
 	refreshParameters();
-	initializeAndParseSchema();
-	querySchema()
+	loadLibsAndParseSchema()
 }
 
 function terminate() {
@@ -1247,7 +1264,7 @@ function queryReply() {
 	queryString = queryString ? "?" + queryString : "";
 	
 	var reply = makeRequest({
-			verb: "POST",
+			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
 			url: __schema.replaceEmbeddedUID(usePath, entry) + queryString,
 			ctype: "application/json",
 			where: "queryReply()"
@@ -1326,7 +1343,7 @@ function alertObject(objName, obj) {
 	debugMsg(arr.toString())
 }
 
-function initializeAndParseSchema() {
+function loadLibsAndParseSchema() {
 	if (__initialized) return;
 	__initialized = true;
 
@@ -2544,7 +2561,7 @@ function fullStacktrace(e, delimArg) {
     
     
     <AssemblyLine name="__testService">
-            <ModTime>1736013634079</ModTime>
+            <ModTime>1736797642804</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -2559,10 +2576,10 @@ function fullStacktrace(e, delimArg) {
             </SimulationConfig>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer">
-                <ModTime>1735931738303</ModTime>
+                <ModTime>1736797108027</ModTime>
                 <Connector name="HTTPServerConnector">
                     <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
-                    <ModTime>1735931738303</ModTime>
+                    <ModTime>1736797108027</ModTime>
                     <ConnectorMode>Server</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -2601,6 +2618,27 @@ function fullStacktrace(e, delimArg) {
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1736797108027</ModTime>
+                        <Hook name="before_reply">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>before_reply</Name>
+                            <Script><![CDATA[task.logmsg(">>> Making response: \n" + conn.toJSON());
+
+
+// Check if this call was handled
+var statusCode = conn["http.responseCode"];
+// If not, then fix the return
+if (!statusCode) {
+	conn.removeAllAttributes();
+	conn["http.responseCode"] = "400";
+	conn["http.responseMsg"] = "Bad request";
+	conn["http.body"] = toJson({
+		error: "Bad request",
+		base_received: base
+	})
+}]]></Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
                     </Hooks>
                     <CheckpointConfig/>
                     <SandboxConfig/>
@@ -2616,9 +2654,9 @@ function fullStacktrace(e, delimArg) {
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1736013634079</ModTime>
+                <ModTime>1736797642804</ModTime>
                 <Script name="Script lib">
-                    <ModTime>1735933132751</ModTime>
+                    <ModTime>1736797642804</ModTime>
                     <parameter name="script"><![CDATA[var authReturn = {
   csrftoken: "token-xyz",
   sessionId: "session-xyz",
@@ -2629,7 +2667,7 @@ function fullStacktrace(e, delimArg) {
 }
 
 function getString(e, attname) {
-	return e.getString(attname) || "*" + attname + " not specified*"
+	return e.getString(attname) || "** " + attname + " not specified **"
 }
 
 function bodyHas(req, props) {
@@ -2649,6 +2687,18 @@ function bodyHas(req, props) {
 	}
 	
 	return true
+}
+
+function fail(msg) {
+	task.logmsg("FATAL", msg);
+	work.removeAllAttributes();
+	work["http.responseCode"] = 400;
+	work["http.responseMsg"] = msg;
+	work["http.body"] = toJson({
+		error: msg,
+		base_received: base
+	})
+	system.exitFlow()
 }
 
 function handleAuth(req) {
@@ -2671,23 +2721,24 @@ function handleAuth(req) {
 
 function handleGetAccounts(req) {
 	if (getString(req, "http.method") != "GET") {
-		fail("You must GET person accounts, instead of " + getString(req, "http.method"))
+		fail("You must GET person accounts, instead of " + req["http.method"])
 	} else
 	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
-		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
+		fail("Request type must be application/json but is instead '" + req["http.content-type"])
 	} else
 	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyzzy") < 0) {
-		fail("Authorization code is wrong: " + request.getString("http.authorization"))
+		fail("Authorization code is wrong: " + req["http.authorization"])
 	} else
 	if (getString(req, "http.X-CRF-TOKEN").toLowerCase().indexOf("xyzzy") < 0) {
-		fail("Access token is wrong: " + request.getString("http.X-CRF-TOKEN"))
+		fail("Access token is wrong: " + req["http.X-CRF-TOKEN"])
 	}
 
 	req["http.body"] = system.getScriptText("__testService_getReturn");
-	req["http.responseCode"] = 200}]]></parameter>
+	req["http.responseCode"] = 200
+}]]></parameter>
                 </Script>
                 <Script name="Handle call">
-                    <ModTime>1736013634079</ModTime>
+                    <ModTime>1736797062891</ModTime>
                     <parameter name="script"><![CDATA[// Dump the work entry
 task.logmsg("====== Request: "
 	+ work.getString("http.method")
@@ -2701,7 +2752,7 @@ if (base.endsWith("/auth")) {
 	handleAuth(work);
 	task.logmsg("Authorized!")
 } else
-if (base.endsWith("/accounts")) {
+if (base.indexOf("/accounts") > 0) {
 	task.logmsg("Returning accounts");
 	handleGetAccounts(work)
 }
@@ -17259,139 +17310,7 @@ components:
   }
 }]]></parameter>
         </Script>
-    <Script name="_deleteMe">
-            <ModTime>1733598779639</ModTime>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[//
-//						GLOBAL VARIABLES
-//
-var __debug = true;
-var __schema = null;
-var __initialized = false;
-var __lib = null;
-
-//
-//							FUNCTIONS
-//
-
-function alert(msg) {
-	if (__debug) form.alert(msg)
-}
-
-function alertObject(objName, obj) {
-	alert("alertObj(" + objName + ", " + toJson(obj));
-	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
-	for (var child in obj) {
-		arr.push("   " + child + "\n")
-	}
-	alert(arr.toString())
-} 
-
-function initialize() {
-	if (__initialized) return;
-	__initialized = true;
-	
-	//alert("Initializing...");
-	eval(system.getScriptText("RESTIFY library class"));
-	__lib = new RESTIFY();
-	
-	parseSchema();
-}
-
-// Return the openAPI schema - @TEST hardcoded for now
-function parseSchema() {
-	//alert("Fetching schema...")
-	if (__schema) return __schema;
-
-	//alert("About to loadFileToString...");
-    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
     
-    //alert("Creating SCHEMA object");
-	eval(system.getScriptText("SCHEMA class"));    
-    __schema = new SCHEMA(schemaJSON, "JSON");
-    
-    var toplvl = "";
-    for (var tl in toplvl) toplvl = (toplvl ? ", " + tl : tl);
-    alert("SCHEMA -> " + toplvl)
-    
-    //alert("Got it!");
-	return __schema
-}
-
-// Update the dropdown with resource items
-function fetchItems() {
-	//alert("---> fetchItems");
-    var path = form.getControl("PathToObjects").getText();
-
-    updateDropdown("Item",
-        [form.getControl("PathToObjects").getText()],
-        "Cannot fetch operations for a resource item")
-
-}
-
-// Update the dropdown with operations for the selected item
-function fetchOperations() {
-	alert("---> fetchOperations");
-    var item = form.getControl("Items").getText();
-
-    updateDropdown("Operation",
-        [form.getControl("PathToObjects").getText(),
-            form.getControl("Item").getText()],
-        "Cannot fetch operations for a resource item")
-}
-
-// Update the dropdown with operations for the selected item
-function fetchSchema() {
-	alert("---> fetchSchema");
-	var item = form.getControl("Object").getText();
-    var operation = form.getControl("Operation").getText();
-}
-
-// Update dropdown based on REST call
-function updateDropdown(controlName, path, errorMsg) {
-    var combo = form.getControl(controlName);
-    try {
-    	alert("updateDropdown("
-    			+ controlName
-    			+ ", " + path + ", errmsg)");
-
-	    initialize();
-		
-        if (!path) throw "Item Path must be set";
-
-        var subtree = __schema.getChildren(path);
-        
-    	alert("subtree: \n"
-    			+ toJson(subtree));
-		combo.removeAll(); // Empty drop-down
-    			
-        for (var res in subtree) {
-            //alert(res)
-            combo.add(res)
-        }
-        alert("drop-down updated!")
-    } catch (ex) {
-        var msg = "Cannot get API schema - " + ex;
-        alert(msg);
-        throw msg
-    }
-
-    combo.select(0)
-
-}
-
-function write(fname, str) {
-    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
-    //	for (var m in obj.getClass().getMethods()) {
-    //		bw.write(m)
-    //		bw.newLine()
-    //	}
-
-    bw.write(str)
-    bw.newLine()
-    bw.close()
-}]]></parameter>
-        </Script>
     
     <Script name="SCHEMA class">
             <ModTime>1736619929141</ModTime>
