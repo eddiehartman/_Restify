@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Tue Jan 14 18:17:13 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Tue Jan 14 21:06:21 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -318,7 +318,7 @@ function fullStacktrace(e, delimArg) {
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1736875033247</ModTime>
+            <ModTime>1736884803166</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -344,7 +344,7 @@ SCHEMA class]]></parameter>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1736875033247</ModTime>
+                <ModTime>1736884803166</ModTime>
                 <Script name="SpoofLib">
                     <ModTime>1736796241560</ModTime>
                     <parameter name="script"><![CDATA[connector = {
@@ -565,7 +565,7 @@ fetchItems();
 i = 42;]]></parameter>
                 </Script>
                 <Script name="Connector Script">
-                    <ModTime>1736875033247</ModTime>
+                    <ModTime>1736884803166</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[// 20250104 2008 Initial
 // 20250111 1915 Handling queryParameters in url
@@ -668,6 +668,10 @@ function httpEntry(entry, sent) {
 	return txt
 }
 
+/*
+ *     WHAT IS HAPPING WITH THE URL IN THIS FUNCTION BELOW! IT RESORTS TO /AUTH
+ */
+
 // Function to make HTTP requests. The first lines of code show you the parameters you can send
 function makeRequest(params) {
 	var verb = params.verb || "GET";
@@ -714,19 +718,24 @@ function makeRequest(params) {
 	__http.setParam("password", connector.getParam("password"));
 
 	// Now set up the request entry
+	__requestEntry["http.url"] = url;
+	__requestEntry["http.method"] = verb.toUpperCase();
 	__requestEntry["http.Content-Type"] = ctype;
+	__requestEntry["http.remote_user"] = connector.getParam("username");
+	__requestEntry["http.remote_password"] = connector.getParam("username");
 	
 	for (var hdr in headers) {
 		__requestEntry["http." + hdr] = headers[hdr]
 	}
 	
 	if (__debug) {
-		logDetails({"msg" : "Request to itim", 
-					"obj" : httpEntry(__requestEntry, true), 
-					"url" : url, 
-					"verb" : verb, 
-					"ctype" : ctype, 
-					"where" : where});
+		logDetails({msg : "Request to itim", 
+					obj : httpEntry(__requestEntry, true), 
+					url : url, 
+					verb : verb, 
+					ctype : ctype, 
+					where : where,
+					sent: true});
 	}
 
 	// Reinitialize the HTTP Client connector so the updated parameters are applied
@@ -759,9 +768,9 @@ function makeRequest(params) {
 	} while (retry);
 	
 	if (__debug) {
-		logDetails({"msg" : "Response from itim", 
-					"obj" : httpEntry(retEntry),
-				    "entry" : retEntry});
+		logDetails({msg : "Response from itim", 
+					obj : httpEntry(retEntry),
+				    entry : retEntry});
 	}
 	
 	return reply;
@@ -840,7 +849,8 @@ function resetConnector() {
 	if (__http) __http.terminate()
 }
 
-function logDetails(params) {
+function logDetails(params, sent) {
+	sent = sent || false;
 	var msg = params.msg;
 	var obj = params.obj; 
 	var url = params.url;
@@ -868,18 +878,12 @@ function logDetails(params) {
 
 	if (obj != null) {
 		if (obj instanceof com.ibm.di.entry.Entry) {	
-			var attNames = obj.getAttributeNames();
-			for (var a in attNames) {
-				if (a.indexOf("http.") >= 0 && 
-					!("http.bodyAsString".equalsIgnoreCase(a)
-						|| "http.bodyAsBytes".equalsIgnoreCase(a)) ) {
-					s += " " + a + ": " + obj[a] + "\n";
-				}
-			}	
+			s.append(httpEntry(obj, sent))	
 		} else {
 			s.append(obj.toString());
 		}
 	}	
+
 	logmsg(s.toString());
 }
 
@@ -1161,7 +1165,7 @@ i = 42]]></parameter>
     
     
     <AssemblyLine name="__testService">
-            <ModTime>1736874768828</ModTime>
+            <ModTime>1736885179803</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -1251,9 +1255,9 @@ if (!statusCode) {
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1736874768828</ModTime>
+                <ModTime>1736885179803</ModTime>
                 <Script name="Script lib">
-                    <ModTime>1736874768828</ModTime>
+                    <ModTime>1736885179803</ModTime>
                     <parameter name="script"><![CDATA[var authReturn = {
   csrftoken: "token-xyz",
   sessionId: "session-xyz",
@@ -1329,7 +1333,7 @@ function handleAuth(req) {
 	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
 		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
 	} else
-	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyzzy") < 0) {
+	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyz") < 0) {
 		fail("Authorization code is wrong: " + request.getString("http.authorization"))
 	} else
 	if (!bodyHas(req, {username: "edbird", password: "R0kz"})) {
@@ -1344,15 +1348,12 @@ function handleGetAccounts(req) {
 	if (getString(req, "http.method") != "GET") {
 		fail("You must GET person accounts, instead of " + req["http.method"])
 	} else
-	if ((getString(req, "http.content-type") || "application/json").equalsIgnoreCase("appliation/json")) {
+	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
 		fail("Request type must be application/json but is instead '" + req["http.content-type"])
-	} else
-//	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyzzy") < 0) {
-//		fail("Authorization code is wrong: " + req["http.authorization"])
-//	} else
-	if (getString(req, "http.X-CRF-TOKEN").toLowerCase().indexOf("xyzzy") < 0) {
+	} /* else
+	if (getString(req, "http.X-CRF-TOKEN").toLowerCase().indexOf("xyz") < 0) {
 		fail("Access token is wrong: " + req["http.X-CRF-TOKEN"])
-	}
+	} */
 
 	req["http.body"] = system.getScriptText("__testService_getReturn");
 	req["http.responseCode"] = 200
