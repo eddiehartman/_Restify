@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Tue Jan 14 21:06:21 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Jan 16 12:34:02 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -318,14 +318,15 @@ function fullStacktrace(e, delimArg) {
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1736884803166</ModTime>
+            <ModTime>1737027091434</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
                 <parameter name="createTombstones">false</parameter>
                 <parameter name="includeGlobalPrologs">true</parameter>
                 <parameter name="includePrologs"><![CDATA[RESTIFY library class
-SCHEMA class]]></parameter>
+SCHEMA class
+HTTPCLIENT class]]></parameter>
                 <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
             </Settings>
             <Hooks/>
@@ -344,14 +345,15 @@ SCHEMA class]]></parameter>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1736884803166</ModTime>
+                <ModTime>1737027091434</ModTime>
                 <Script name="SpoofLib">
-                    <ModTime>1736796241560</ModTime>
+                    <ModTime>1737023974658</ModTime>
                     <parameter name="script"><![CDATA[connector = {
 	getParam: function(pname) {
 		switch (pname.toLowerCase()) {
 			case "action": 	 return "get";
 			case "apikey": 	 return "xyzzy";
+			case "schema":	 return "/v1.0/endpoint/default/token";
 			case "authurl":  return "/auth";
 			case "debug": 	 return true;
 			case "path": 	 return "/people/{personId}/accounts";
@@ -407,8 +409,8 @@ entry["x-forwarded-host"] = "xfwdhost_value";
 entry["x-admin-invocation"] = "xadmininvoc_value";]]></parameter>
                 </Script>
                 <Script name="Connector Form Event Script">
-                    <ModTime>1736620065934</ModTime>
-                    <parameter name="enabled">false</parameter>
+                    <ModTime>1737027091434</ModTime>
+                    <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[// 20250104 1959 Initial
 //
 //						GLOBAL VARIABLES
@@ -440,22 +442,46 @@ function initialize() {
 	__initialized = true;
 	
 	//alert("Initializing...");
-	eval(system.getScriptText("RESTIFY library class"));
+	if (typeof RESTIFY == "undefined") {
+		eval(system.getScriptText("RESTIFY library class")); // Load script library class
+	}
 	__lib = new RESTIFY();
+
+	if (typeof HTTPCLIENT == "undefined") {
+		eval(system.getScriptText("HTTPCLIENT class")); // Load HTTP Client class
+	}
 	
-	parseSchema();
+	// Recreate in case parameters are changed
+	__http = new HTTPCLIENT({
+						baseUrl:  connector.getParam("url"),
+						authUrl:  connector.getParam("authUrl"),
+						apikey:   connector.getParam("apikey"),
+						username: connector.getParam("username"),
+						password: connector.getParam("password"),
+						schemaUrl: connector.getParam("schema"),
+						debug: true // true => debug output
+				}); 
+		
+	if (typeof SCHEMA == "undefined") {		
+		eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+	}	
 }
 
 // Return the openAPI schema - @TEST hardcoded for now
-function parseSchema() {
+function fetchSchema() {
 	//alert("Fetching schema...")
 	if (__schema) return __schema;
 
 	//alert("About to loadFileToString...");
-    var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaYAML = __http.makeRequest({
+			verb: "GET",
+			url: connector.getParam("schema"),
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
     
     //alert("Creating SCHEMA object");
-	eval(system.getScriptText("SCHEMA class"));    
     __schema = new SCHEMA(schemaJSON, "JSON");
     
     //var toplvl = "";
@@ -557,16 +583,18 @@ function write(fname, str) {
 }]]></parameter>
                 </Script>
                 <Script name="Test Form Event Script">
-                    <ModTime>1734968613370</ModTime>
-                    <parameter name="enabled">false</parameter>
+                    <ModTime>1737024308032</ModTime>
+                    <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[initialize();
+fetchSchema();
 fetchItems();
+fetchActions();
 
 i = 42;]]></parameter>
                 </Script>
                 <Script name="Connector Script">
-                    <ModTime>1736884803166</ModTime>
-                    <parameter name="enabled">true</parameter>
+                    <ModTime>1737026880278</ModTime>
+                    <parameter name="enabled">false</parameter>
                     <parameter name="script"><![CDATA[// 20250104 2008 Initial
 // 20250111 1915 Handling queryParameters in url
 
@@ -578,225 +606,21 @@ var __debug = connector.getParam("debug");	// debug output?
 var __schema = null;						// shared openAPI schema object (SCHEMA class)
 var __initialized = false;					// Do I need this?
 var __lib = null;							// for eval of RestLib
-var __baseUrl = connector.getParam("url");	// the service domain and port
-var __requestEntry = system.newEntry();		// global shared to limit memory usage
-var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
-var __token = "";							// returned OAuth token
-var __sessionId = "";						// current session id
+var __emptyEntry = system.newEntry();		// for craftQueryString
+
+
+//var __baseUrl = connector.getParam("url");	// the service domain and port
+//var __requestEntry = system.newEntry();		// global shared to limit memory usage
+//var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
+//var __token = "";							// returned OAuth token
+//var __sessionId = "";						// current session id
 
 //
 //							FUNCTIONS
 //
 
-// Get the client certificate from the server and import it to the TDI keystore
-function getCertificate () {
-	var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
-}
 
-// Get the authentication token
-function getToken() {
-	var reply = makeRequest({
-			token: true, // Getting a token
-			verb: "POST",
-			url: connector.getParam("authUrl"),
-			ctype: "application/json",
-			where: "getToken()",
-			headers: {
-				Authorization: "Bearer " + connector.getParam("apikey")
-			},
-			body: {
-				username: connector.getParam("username"),
-				password: connector.getParam("password")
-			}
-	});
-	
-	__token = reply.csrftoken || "";
-	__sessionId = reply.sessionId || ""
-}
 
-// Checks the validity of the reply and sets up for Iteration
-function parseReply(replyEntry) {
-	if (replyEntry === null) { return } 
-	
-	var status = replyEntry.getString("http.responseCode");
-
-	// Check the return status
-	if (status == "401") { // Unauthorized - time to renew the token
-		throwException("Unauthorized")
-	}
-	if (!status.startsWith("2")) {
-		throwException("Error response from ITIM. Response code: " 
-							+ status
-							+ "    Message: " + replyEntry.getString("http.responseMsg"));
-	}
-	
-	// Now parse the body
-	var body = replyEntry.getString("http.bodyAsString");
-
-	try {
-		var reply = fromJson(body);
-	} catch (ex) {
-		throwException("Error parsing return payload from itim: " + ex.toString()
-						+ "\n*** dump of reply ***\n" 
-						+ replyEntry)
-	}
-		
-	return reply;
-}
-
-// Left justified text
-function LJ(txt, len) {
-	txt = txt || "";
-	len = len || txt.length;
-	return (txt + "                                                       ").substring(0, len)
-}
-
-function httpEntry(entry, sent) {
-	sent = sent || false;
-	var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
-
-	for (var att in entry) {
-		var name = att.getName();
-		var val = att.getValue();
-		if (val && name.indexOf("tcp.") < 0 
-			&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
-			&& !(val instanceof Array) && !val.startsWith("[B@")) {
-			txt += "  " + LJ(name + ": ", 25) + val + "\n"
-		}
-	}
-	
-	return txt
-}
-
-/*
- *     WHAT IS HAPPING WITH THE URL IN THIS FUNCTION BELOW! IT RESORTS TO /AUTH
- */
-
-// Function to make HTTP requests. The first lines of code show you the parameters you can send
-function makeRequest(params) {
-	var verb = params.verb || "GET";
-	var url = params.url || throwException("makeRequest called with no URL");
-	var body = params.body || null;
-	var ctype = params.ctype || "application/json";
-	var where = params.where || "";
-	var headers = params.headers || {};
-	var gettingToken = params.token || false;
-	
-	__requestEntry.removeAllAttributes();
-	
-	// Get token if necessary
-	if (!__token && !gettingToken) {
-		getToken();
-	} 
-		
-	// Add auth artifacts
-	if (!gettingToken) {
-		__requestEntry["http.X-CSRV-TOKEN"] = __token;
-		if (__sessionId) __requestEntry["http.sessionId"] = __sessionId;
-	}
-	
-	// Prepend the host (baseURL) if not already there
-	if (url.toLowerCase().indexOf(__baseUrl.toLowerCase()) < 0) {
-		url = __baseUrl + "/" + url;
-	}
-	
-	// If a body is passed, this must be a POST (I think)
-	if (typeof body !== "undefined" && body !== null) {
-		verb = "POST";
-
-		if (typeof body != "string") {
-			__requestEntry["http.body"] = toJson(body);
-		} else {
-			__requestEntry["http.body"] = body;
-		}
-	}	
-	
-	// Set up the global HTTP Connector
-	__http.setParam("method", verb.toUpperCase());
-	__http.setParam("url", url);
-	__http.setParam("username", connector.getParam("username"));
-	__http.setParam("password", connector.getParam("password"));
-
-	// Now set up the request entry
-	__requestEntry["http.url"] = url;
-	__requestEntry["http.method"] = verb.toUpperCase();
-	__requestEntry["http.Content-Type"] = ctype;
-	__requestEntry["http.remote_user"] = connector.getParam("username");
-	__requestEntry["http.remote_password"] = connector.getParam("username");
-	
-	for (var hdr in headers) {
-		__requestEntry["http." + hdr] = headers[hdr]
-	}
-	
-	if (__debug) {
-		logDetails({msg : "Request to itim", 
-					obj : httpEntry(__requestEntry, true), 
-					url : url, 
-					verb : verb, 
-					ctype : ctype, 
-					where : where,
-					sent: true});
-	}
-
-	// Reinitialize the HTTP Client connector so the updated parameters are applied
-	__http.terminate();
-	__http.initialize(null);
-
-	// Make the call
-	do {
-		var retry = false;
-		try {	
-			var retEntry = __http.queryReply(__requestEntry);
-			var reply = parseReply(retEntry);
-		} catch (ex) {
-			// If the token has expired, get a new one
-			if (ex.toString().indexOf("Unauthorized") >= 0) {
-				getToken();
-				retry = true
-			} else
-			// Else if we first must import the client cert, then do so. The Server must be restarted after.
-			if (ex instanceof javax.net.ssl.SSLHandshakeException) {
-				if (ex.toString().indexOf("Certificate chaining error") >= 0) {
-					throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
-				}
-				getCertificate();
-				retry = true;
-			} else {
-				throw ex;
-			}	
-		}
-	} while (retry);
-	
-	if (__debug) {
-		logDetails({msg : "Response from itim", 
-					obj : httpEntry(retEntry),
-				    entry : retEntry});
-	}
-	
-	return reply;
-}
-
-function logmsg(lvl, msg) {
-	if (typeof(lvl) == "undefined") {
-		msg = ""
-		lvl = "INFO"
-	} else
-	if (typeof(msg) == "undefined") {
-		msg = lvl
-		lvl = "INFO"
-	}
-	
-	if (lvl.toLowerCase().startsWith("console")) {
-		java.lang.System.out.println(msg)
-		lvl = "INFO"
-		msg = "(CONSOLE) " + msg
-	}	
-	task.logmsg(lvl, msg)
-}
-
-function throwException(msg) {
-	throw new java.lang.IllegalArgumentException(msg);
-}
 
 function fixQueryParam(qp, value) {
 	var retval = qp.name + "=";
@@ -810,8 +634,6 @@ function fixQueryParam(qp, value) {
 
 	return retval
 }
-
-var __emptyEntry = system.newEntry();
 
 function craftQueryString(args) {
 	var path = args.path;
@@ -847,44 +669,6 @@ function resetConnector() {
 
 	if (typeof list != "undefined") list.clear(); // so it works while spoofing
 	if (__http) __http.terminate()
-}
-
-function logDetails(params, sent) {
-	sent = sent || false;
-	var msg = params.msg;
-	var obj = params.obj; 
-	var url = params.url;
-	var verb = params.verb;
-	var ctype = params.ctype; 
-	var where = params.where;
-	
-	if (msg == null) {
-		msg = "*unknown entry*";
-	}
-
-	var s = new java.lang.StringBuffer();
-	
-	if (where != null) {
-		s.append("\n@@@------> (" + where + ") " + msg);
-	} else {
-		s.append("\n---------> " + msg);
-	}
-	
-	
-	if (verb != null) { s.append("   " + verb.toUpperCase()); } 
-	if (ctype != null) { s.append("   " + ctype); } 
-	if (url != null) { s.append("   " + url); } 
-	s.append("\n");
-
-	if (obj != null) {
-		if (obj instanceof com.ibm.di.entry.Entry) {	
-			s.append(httpEntry(obj, sent))	
-		} else {
-			s.append(obj.toString());
-		}
-	}	
-
-	logmsg(s.toString());
 }
 
 // Change the URL path so the UID placeholder is replace with the Attribute value
@@ -939,7 +723,7 @@ function queryReply() {
 	
 	queryString = queryString ? "?" + queryString : "";
 	
-	var reply = makeRequest({
+	var reply = __http.makeRequest({
 			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
 			url: __schema.replaceEmbeddedUID(usePath, entry) + queryString,
 			ctype: "application/json",
@@ -1052,8 +836,8 @@ function parseSchema() {
 }]]></parameter>
                 </Script>
                 <Script name="Test Connector Script">
-                    <ModTime>1736866322352</ModTime>
-                    <parameter name="enabled">true</parameter>
+                    <ModTime>1737022297162</ModTime>
+                    <parameter name="enabled">false</parameter>
                     <parameter name="script"><![CDATA[initialize();
 queryReply();
 task.logmsg(entry)
@@ -1165,7 +949,7 @@ i = 42]]></parameter>
     
     
     <AssemblyLine name="__testService">
-            <ModTime>1736885179803</ModTime>
+            <ModTime>1737024901079</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -1255,9 +1039,9 @@ if (!statusCode) {
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1736885179803</ModTime>
+                <ModTime>1737024901079</ModTime>
                 <Script name="Script lib">
-                    <ModTime>1736885179803</ModTime>
+                    <ModTime>1737024901079</ModTime>
                     <parameter name="script"><![CDATA[var authReturn = {
   csrftoken: "token-xyz",
   sessionId: "session-xyz",
@@ -1357,23 +1141,34 @@ function handleGetAccounts(req) {
 
 	req["http.body"] = system.getScriptText("__testService_getReturn");
 	req["http.responseCode"] = 200
+}
+
+function handleSchema(req) {
+	req["http.body"] = system.getScriptText("itim_swagger.json");
+	req["http.responseCode"] = 200
 }]]></parameter>
                 </Script>
                 <Script name="Handle call">
-                    <ModTime>1736874528269</ModTime>
+                    <ModTime>1737022047078</ModTime>
                     <parameter name="script"><![CDATA[// Dump the work entry
 task.logmsg("\n<<<<<--- Request: " + httpEntry(work));
 
 base = work.getString("http.base");
 
+if (base.endsWith("token")) {
+	task.logmsg("Schema request...");
+	handleSchema(work);
+	task.logmsg("Schema sent!");
+} else
 if (base.endsWith("/auth")) {
 	task.logmsg("Authorizing...");
 	handleAuth(work);
 	task.logmsg("Authorized!")
 } else
 if (base.indexOf("/accounts") > 0) {
-	task.logmsg("Returning accounts");
-	handleGetAccounts(work)
+	task.logmsg("Returning accounts...");
+	handleGetAccounts(work);
+	task.logmsg("Accounts returned!")
 }
 
 task.logmsg("\n--->>>> Reply: " + httpEntry(work));]]></parameter>
@@ -3028,6 +2823,1090 @@ i = 42]]></parameter>
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
+    <AssemblyLine name="_testScriptConnectorCode 20250116 1150 Adding HTTPClient class - in flux">
+            <ModTime>1737024447918</ModTime>
+            <Settings>
+                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
+                <parameter name="automapattributes">false</parameter>
+                <parameter name="createTombstones">false</parameter>
+                <parameter name="includeGlobalPrologs">true</parameter>
+                <parameter name="includePrologs"><![CDATA[RESTIFY library class
+SCHEMA class]]></parameter>
+                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
+            </Settings>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="SpoofLib" state="Enabled"/>
+                    <Component name="Connector Form Event Script" state="Enabled"/>
+                    <Component name="Test Form Event Script" state="Enabled"/>
+                    <Component name="Connector Script" state="Enabled"/>
+                    <Component name="Test Connector Script" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1737024447918</ModTime>
+                <Script name="SpoofLib">
+                    <ModTime>1737023974658</ModTime>
+                    <parameter name="script"><![CDATA[connector = {
+	getParam: function(pname) {
+		switch (pname.toLowerCase()) {
+			case "action": 	 return "get";
+			case "apikey": 	 return "xyzzy";
+			case "schema":	 return "/v1.0/endpoint/default/token";
+			case "authurl":  return "/auth";
+			case "debug": 	 return true;
+			case "path": 	 return "/people/{personId}/accounts";
+			case "password": return "R0kz";
+			case "url": 	 return "http://localhost:8080";
+			case "username": return "edbird";
+			default: 		 return "*Invalid param: " + pname + "*";
+		}
+	}
+}
+
+/*
+combo = {
+	text: "",
+	getText: function() { return txt },
+	removeAll: function() {},
+	add: function() {},
+	select: function() {}
+}	
+*/
+COMBO = function(value) {
+	this.value = string = value;
+	this.getText = function() {return this.value};
+	this.add = function() {};
+	this.select = function() {};
+	this.removeAll = function() {}
+}
+
+form = {
+	getControl: function(name) {
+		switch (name) {
+			case "Item": return new COMBO("/people");
+			case "Action": return new COMBO("post");			
+		}
+	},
+	
+	alert: function(msg) {
+		task.logmsg(msg)
+	}
+}
+
+list = new java.util.ArrayList();
+
+entry = system.newEntry();
+entry.personId = "NO12345";
+//entry.embedded = "yessir";
+entry.limit = "42000";
+entry.Range = "0-42"
+entry.attributes = "name,rank,serialnumber";
+entry["cache-control"] = "no-cache";
+
+entry["x-forwarded-host"] = "xfwdhost_value";
+entry["x-admin-invocation"] = "xadmininvoc_value";]]></parameter>
+                </Script>
+                <Script name="Connector Form Event Script">
+                    <ModTime>1737024447918</ModTime>
+                    <parameter name="enabled">true</parameter>
+                    <parameter name="script"><![CDATA[// 20250104 1959 Initial
+//
+//						GLOBAL VARIABLES
+//
+var __debug = false;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function alert(msg) {
+	if (__debug) form.alert(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	eval(system.getScriptText("RESTIFY library class")); // Load script library class
+	__lib = new RESTIFY();
+	
+	eval(system.getScriptText("HTTPClient class")); // Load HTTP Client class
+	__http = new HTTPClient(connector.getParam("baseUrl"));
+	
+	eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaYAML = 
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with paths
+function fetchItems() {
+	//alert("---> fetchItems");
+    //var path = form.getControl("PathToObjects").getText();
+	path = "paths";
+
+    updateDropdown("path",
+        [path],
+        "Cannot fetch actions for Path");
+        
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected path
+function fetchActions() {
+    var selectedItem = form.getControl("path").getText() || "";
+	alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for Path: " + selectedItem)
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) {
+        	form.alert("updateDropdown() - Path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	form.alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arrList = java.util.ArrayList();
+        for (var propName in subtree) {
+        	arrList.add(propName);
+        }
+        var arr = arrList.toArray();
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+
+        alert("drop-down updated!");
+
+        combo.select(0)
+
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("path").removeAll();
+	form.getControl("action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]></parameter>
+                </Script>
+                <Script name="Test Form Event Script">
+                    <ModTime>1737024308032</ModTime>
+                    <parameter name="enabled">true</parameter>
+                    <parameter name="script"><![CDATA[initialize();
+fetchSchema();
+fetchItems();
+fetchActions();
+
+i = 42;]]></parameter>
+                </Script>
+                <Script name="Connector Script">
+                    <ModTime>1737023656997</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[// 20250104 2008 Initial
+// 20250111 1915 Handling queryParameters in url
+
+//
+//						GLOBAL VARIABLES
+//
+var __parameters = {};						// params for the chosen path and action
+var __debug = connector.getParam("debug");	// debug output?
+var __schema = null;						// shared openAPI schema object (SCHEMA class)
+var __initialized = false;					// Do I need this?
+var __lib = null;							// for eval of RestLib
+var __emptyEntry = system.newEntry();		// for craftQueryString
+
+
+//var __baseUrl = connector.getParam("url");	// the service domain and port
+//var __requestEntry = system.newEntry();		// global shared to limit memory usage
+//var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
+//var __token = "";							// returned OAuth token
+//var __sessionId = "";						// current session id
+
+//
+//							FUNCTIONS
+//
+
+
+
+
+function fixQueryParam(qp, value) {
+	var retval = qp.name + "=";
+	var value = (value || value == "") ? value : "<" + qp.description + ">"
+
+	if (qp.schema.type == "string") {
+		retval += "\"" + value + "\""
+	} else {
+		retval += value
+	}
+
+	return retval
+}
+
+function craftQueryString(args) {
+	var path = args.path;
+	var action = args.action;
+	var parameters = args.parameters || {};
+	var entry = args.entry || __emptyEntry;
+	
+	var embeddedUID = __schema.getEmbeddedUID(path);
+	
+	var queryParams = [];
+	for (var param in parameters) {
+		if (param != embeddedUID) {
+			paramValue = entry[param];
+			if (paramValue != null) {
+				queryParams.push(param + "=" + paramValue)
+			}
+		}	
+	}	
+	
+	return queryParams.join("&")
+}
+
+function fixUrl(url) {
+	if (!url.endsWith("/")) {
+		return url + "/";
+	} else {
+		return url;
+	}
+}
+
+function resetConnector() {
+	initialized = false;
+
+	if (typeof list != "undefined") list.clear(); // so it works while spoofing
+	if (__http) __http.terminate()
+}
+
+function logDetails(params, sent) {
+	sent = sent || false;
+	var msg = params.msg;
+	var obj = params.obj; 
+	var url = params.url;
+	var verb = params.verb;
+	var ctype = params.ctype; 
+	var where = params.where;
+	
+	if (msg == null) {
+		msg = "*unknown entry*";
+	}
+
+	var s = new java.lang.StringBuffer();
+	
+	if (where != null) {
+		s.append("\n@@@------> (" + where + ") " + msg);
+	} else {
+		s.append("\n---------> " + msg);
+	}
+	
+	
+	if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+	if (ctype != null) { s.append("   " + ctype); } 
+	if (url != null) { s.append("   " + url); } 
+	s.append("\n");
+
+	if (obj != null) {
+		if (obj instanceof com.ibm.di.entry.Entry) {	
+			s.append(httpEntry(obj, sent))	
+		} else {
+			s.append(obj.toString());
+		}
+	}	
+
+	logmsg(s.toString());
+}
+
+// Change the URL path so the UID placeholder is replace with the Attribute value
+function replaceUID(path, entry) {
+	
+}
+
+
+
+
+//
+// -------  Standard Connector functions 
+//
+function initialize() {
+	resetConnector();
+	refreshParameters();
+	loadLibsAndParseSchema()
+}
+
+function terminate() {
+	resetConnector()
+}
+
+function selectEntries() {
+
+}
+
+function refreshParameters() {
+	var path = connector.getParam("path");
+	if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
+	var action = connector.getParam("action");
+	if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+
+	__parameters = {
+		path: path,
+		action: action
+	};
+
+	return __parameters
+}
+
+function queryReply() {
+	var params = refreshParameters();
+	var usePath = __schema.replaceEmbeddedUID(params.path, entry)
+
+	var queryString = craftQueryString({
+		path: usePath,
+		parameters: __schema.getParameters(params.path, params.action),
+		action: params.action,
+		entry: entry
+	});
+	
+	queryString = queryString ? "?" + queryString : "";
+	
+	var reply = makeRequest({
+			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+			url: __schema.replaceEmbeddedUID(usePath, entry) + queryString,
+			ctype: "application/json",
+			where: "queryReply()"
+	});
+
+	logmsg("<" + params.action + "> " + usePath + "?" + queryString)	
+}
+
+function getNextEntry() {
+	if (__counter > 0) {
+		result.setStatus(0);
+		return
+	}
+
+	entry.setAttribute("__counter", __counter);
+	result.setStatus(1);
+	__counter++;
+
+	return entry;
+}
+
+function putEntry() {}
+
+function modEntry() {}
+
+function deleteEntry() {}
+
+function findEntry() {}
+
+function querySchema() {
+	var params = refreshParameters();
+	var path = params.path;
+	var action = params.action;
+
+	var parameters = __schema.getParameters(path, action);
+
+	var embeddedParameter = __schema.getEmbeddedUID(path);
+	if (embeddedParameter) {
+		var e = system.newEntry();
+		e.name = embeddedParameter;
+		e.syntax = "MUST/uid";
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+
+	for (var i in parameters) {
+		var param = parameters[i];
+		var e = system.newEntry();
+		e.name = param.name;
+		e.syntax = "MUST/" + param.schema.type;
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+	result.setStatus(1);
+
+	return list
+}
+
+// --------------- library with f.ex. OpenAPI parsing
+
+function debugMsg(msg) {
+	if (__debug) {
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	debugMsg("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	debugMsg(arr.toString())
+}
+
+function loadLibsAndParseSchema() {
+	if (__initialized) return;
+	__initialized = true;
+
+	//debugMsg("Initializing...");
+
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+
+	parseSchema()	
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	if (__schema) return __schema;
+
+	// @@TODO Make actual call
+	debugMsg("Fetching schema...")
+	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+
+	//debugMsg("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));
+	__schema = new SCHEMA(schemaJSON, "JSON");
+
+	//var toplvl = "";
+	//for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+	//debugMsg("SCHEMA -> " + toplvl)
+
+	//debugMsg("Got it!");
+	return __schema
+}]]></parameter>
+                </Script>
+                <Script name="Test Connector Script">
+                    <ModTime>1737022297162</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[initialize();
+queryReply();
+task.logmsg(entry)
+
+i = 42]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    <AssemblyLine name="_testScriptConnectorCode 20250116 1232 Almost done _ backup at end of work">
+            <ModTime>1737027091434</ModTime>
+            <Settings>
+                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
+                <parameter name="automapattributes">false</parameter>
+                <parameter name="createTombstones">false</parameter>
+                <parameter name="includeGlobalPrologs">true</parameter>
+                <parameter name="includePrologs"><![CDATA[RESTIFY library class
+SCHEMA class
+HTTPCLIENT class]]></parameter>
+                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
+            </Settings>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="SpoofLib" state="Enabled"/>
+                    <Component name="Connector Form Event Script" state="Enabled"/>
+                    <Component name="Test Form Event Script" state="Enabled"/>
+                    <Component name="Connector Script" state="Enabled"/>
+                    <Component name="Test Connector Script" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1737027091434</ModTime>
+                <Script name="SpoofLib">
+                    <ModTime>1737023974658</ModTime>
+                    <parameter name="script"><![CDATA[connector = {
+	getParam: function(pname) {
+		switch (pname.toLowerCase()) {
+			case "action": 	 return "get";
+			case "apikey": 	 return "xyzzy";
+			case "schema":	 return "/v1.0/endpoint/default/token";
+			case "authurl":  return "/auth";
+			case "debug": 	 return true;
+			case "path": 	 return "/people/{personId}/accounts";
+			case "password": return "R0kz";
+			case "url": 	 return "http://localhost:8080";
+			case "username": return "edbird";
+			default: 		 return "*Invalid param: " + pname + "*";
+		}
+	}
+}
+
+/*
+combo = {
+	text: "",
+	getText: function() { return txt },
+	removeAll: function() {},
+	add: function() {},
+	select: function() {}
+}	
+*/
+COMBO = function(value) {
+	this.value = string = value;
+	this.getText = function() {return this.value};
+	this.add = function() {};
+	this.select = function() {};
+	this.removeAll = function() {}
+}
+
+form = {
+	getControl: function(name) {
+		switch (name) {
+			case "Item": return new COMBO("/people");
+			case "Action": return new COMBO("post");			
+		}
+	},
+	
+	alert: function(msg) {
+		task.logmsg(msg)
+	}
+}
+
+list = new java.util.ArrayList();
+
+entry = system.newEntry();
+entry.personId = "NO12345";
+//entry.embedded = "yessir";
+entry.limit = "42000";
+entry.Range = "0-42"
+entry.attributes = "name,rank,serialnumber";
+entry["cache-control"] = "no-cache";
+
+entry["x-forwarded-host"] = "xfwdhost_value";
+entry["x-admin-invocation"] = "xadmininvoc_value";]]></parameter>
+                </Script>
+                <Script name="Connector Form Event Script">
+                    <ModTime>1737027091434</ModTime>
+                    <parameter name="enabled">true</parameter>
+                    <parameter name="script"><![CDATA[// 20250104 1959 Initial
+//
+//						GLOBAL VARIABLES
+//
+var __debug = false;
+var __schema = null;
+var __initialized = false;
+var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function alert(msg) {
+	if (__debug) form.alert(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	if (typeof RESTIFY == "undefined") {
+		eval(system.getScriptText("RESTIFY library class")); // Load script library class
+	}
+	__lib = new RESTIFY();
+
+	if (typeof HTTPCLIENT == "undefined") {
+		eval(system.getScriptText("HTTPCLIENT class")); // Load HTTP Client class
+	}
+	
+	// Recreate in case parameters are changed
+	__http = new HTTPCLIENT({
+						baseUrl:  connector.getParam("url"),
+						authUrl:  connector.getParam("authUrl"),
+						apikey:   connector.getParam("apikey"),
+						username: connector.getParam("username"),
+						password: connector.getParam("password"),
+						schemaUrl: connector.getParam("schema"),
+						debug: true // true => debug output
+				}); 
+		
+	if (typeof SCHEMA == "undefined") {		
+		eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+	}	
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaYAML = __http.makeRequest({
+			verb: "GET",
+			url: connector.getParam("schema"),
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with paths
+function fetchItems() {
+	//alert("---> fetchItems");
+    //var path = form.getControl("PathToObjects").getText();
+	path = "paths";
+
+    updateDropdown("path",
+        [path],
+        "Cannot fetch actions for Path");
+        
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected path
+function fetchActions() {
+    var selectedItem = form.getControl("path").getText() || "";
+	alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for Path: " + selectedItem)
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) {
+        	form.alert("updateDropdown() - Path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	form.alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arrList = java.util.ArrayList();
+        for (var propName in subtree) {
+        	arrList.add(propName);
+        }
+        var arr = arrList.toArray();
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+
+        alert("drop-down updated!");
+
+        combo.select(0)
+
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("path").removeAll();
+	form.getControl("action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]></parameter>
+                </Script>
+                <Script name="Test Form Event Script">
+                    <ModTime>1737024308032</ModTime>
+                    <parameter name="enabled">true</parameter>
+                    <parameter name="script"><![CDATA[initialize();
+fetchSchema();
+fetchItems();
+fetchActions();
+
+i = 42;]]></parameter>
+                </Script>
+                <Script name="Connector Script">
+                    <ModTime>1737026880278</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[// 20250104 2008 Initial
+// 20250111 1915 Handling queryParameters in url
+
+//
+//						GLOBAL VARIABLES
+//
+var __parameters = {};						// params for the chosen path and action
+var __debug = connector.getParam("debug");	// debug output?
+var __schema = null;						// shared openAPI schema object (SCHEMA class)
+var __initialized = false;					// Do I need this?
+var __lib = null;							// for eval of RestLib
+var __emptyEntry = system.newEntry();		// for craftQueryString
+
+
+//var __baseUrl = connector.getParam("url");	// the service domain and port
+//var __requestEntry = system.newEntry();		// global shared to limit memory usage
+//var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
+//var __token = "";							// returned OAuth token
+//var __sessionId = "";						// current session id
+
+//
+//							FUNCTIONS
+//
+
+
+
+
+function fixQueryParam(qp, value) {
+	var retval = qp.name + "=";
+	var value = (value || value == "") ? value : "<" + qp.description + ">"
+
+	if (qp.schema.type == "string") {
+		retval += "\"" + value + "\""
+	} else {
+		retval += value
+	}
+
+	return retval
+}
+
+function craftQueryString(args) {
+	var path = args.path;
+	var action = args.action;
+	var parameters = args.parameters || {};
+	var entry = args.entry || __emptyEntry;
+	
+	var embeddedUID = __schema.getEmbeddedUID(path);
+	
+	var queryParams = [];
+	for (var param in parameters) {
+		if (param != embeddedUID) {
+			paramValue = entry[param];
+			if (paramValue != null) {
+				queryParams.push(param + "=" + paramValue)
+			}
+		}	
+	}	
+	
+	return queryParams.join("&")
+}
+
+function fixUrl(url) {
+	if (!url.endsWith("/")) {
+		return url + "/";
+	} else {
+		return url;
+	}
+}
+
+function resetConnector() {
+	initialized = false;
+
+	if (typeof list != "undefined") list.clear(); // so it works while spoofing
+	if (__http) __http.terminate()
+}
+
+// Change the URL path so the UID placeholder is replace with the Attribute value
+function replaceUID(path, entry) {
+	
+}
+
+
+
+
+//
+// -------  Standard Connector functions 
+//
+function initialize() {
+	resetConnector();
+	refreshParameters();
+	loadLibsAndParseSchema()
+}
+
+function terminate() {
+	resetConnector()
+}
+
+function selectEntries() {
+
+}
+
+function refreshParameters() {
+	var path = connector.getParam("path");
+	if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
+	var action = connector.getParam("action");
+	if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+
+	__parameters = {
+		path: path,
+		action: action
+	};
+
+	return __parameters
+}
+
+function queryReply() {
+	var params = refreshParameters();
+	var usePath = __schema.replaceEmbeddedUID(params.path, entry)
+
+	var queryString = craftQueryString({
+		path: usePath,
+		parameters: __schema.getParameters(params.path, params.action),
+		action: params.action,
+		entry: entry
+	});
+	
+	queryString = queryString ? "?" + queryString : "";
+	
+	var reply = __http.makeRequest({
+			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+			url: __schema.replaceEmbeddedUID(usePath, entry) + queryString,
+			ctype: "application/json",
+			where: "queryReply()"
+	});
+
+	logmsg("<" + params.action + "> " + usePath + "?" + queryString)	
+}
+
+function getNextEntry() {
+	if (__counter > 0) {
+		result.setStatus(0);
+		return
+	}
+
+	entry.setAttribute("__counter", __counter);
+	result.setStatus(1);
+	__counter++;
+
+	return entry;
+}
+
+function putEntry() {}
+
+function modEntry() {}
+
+function deleteEntry() {}
+
+function findEntry() {}
+
+function querySchema() {
+	var params = refreshParameters();
+	var path = params.path;
+	var action = params.action;
+
+	var parameters = __schema.getParameters(path, action);
+
+	var embeddedParameter = __schema.getEmbeddedUID(path);
+	if (embeddedParameter) {
+		var e = system.newEntry();
+		e.name = embeddedParameter;
+		e.syntax = "MUST/uid";
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+
+	for (var i in parameters) {
+		var param = parameters[i];
+		var e = system.newEntry();
+		e.name = param.name;
+		e.syntax = "MUST/" + param.schema.type;
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+	result.setStatus(1);
+
+	return list
+}
+
+// --------------- library with f.ex. OpenAPI parsing
+
+function debugMsg(msg) {
+	if (__debug) {
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	debugMsg("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	debugMsg(arr.toString())
+}
+
+function loadLibsAndParseSchema() {
+	if (__initialized) return;
+	__initialized = true;
+
+	//debugMsg("Initializing...");
+
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+
+	parseSchema()	
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	if (__schema) return __schema;
+
+	// @@TODO Make actual call
+	debugMsg("Fetching schema...")
+	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+
+	//debugMsg("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));
+	__schema = new SCHEMA(schemaJSON, "JSON");
+
+	//var toplvl = "";
+	//for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+	//debugMsg("SCHEMA -> " + toplvl)
+
+	//debugMsg("Got it!");
+	return __schema
+}]]></parameter>
+                </Script>
+                <Script name="Test Connector Script">
+                    <ModTime>1737022297162</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[initialize();
+queryReply();
+task.logmsg(entry)
+
+i = 42]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
     </Folder>
     <Folder name="Connectors">
         
@@ -4572,15 +5451,15 @@ function makeCall(uri, errormsg) {
     
     <Connector name="RestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1736870228324</ModTime>
+            <ModTime>1737024269167</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1736870216981</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="565" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sat Jan 11 19:21:56 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1737024269167</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="572" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Thu Jan 16 11:44:29 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1736619697859</ModTime>
+        <ModTime>1737024268372</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -4596,6 +5475,8 @@ function makeCall(uri, errormsg) {
             <ListItem>password</ListItem>
             <ListItem>authUrl</ListItem>
             <ListItem>path</ListItem>
+            <ListItem>schema</ListItem>
+            <ListItem>url</ListItem>
         </FormItemNames>
         <FormSectionNames>
             <ListItem>General</ListItem>
@@ -4611,11 +5492,11 @@ function makeCall(uri, errormsg) {
             <parameter name="syntax">dropedit</parameter>
         </FormItem>
         <FormItem name="Clear">
-            <ModTime>1734099115175</ModTime>
+            <ModTime>1737024086705</ModTime>
             <parameter name="label"/>
             <parameter name="noLabel">true</parameter>
             <parameter name="script">clearDropdowns</parameter>
-            <parameter name="scriptLabel">Clear</parameter>
+            <parameter name="scriptLabel">Clear Path and Action</parameter>
             <parameter name="syntax">static</parameter>
         </FormItem>
         <FormItem name="Item">
@@ -4676,6 +5557,11 @@ function makeCall(uri, errormsg) {
             <ModTime>1736012659868</ModTime>
             <parameter name="label">Auth URL</parameter>
         </FormItem>
+        <FormItem name="baseUrl">
+            <ModTime>1737024040596</ModTime>
+            <parameter name="description">The first part of the URL, http://&lt;domain&gt;:&lt;port&gt;, with colon and port number required only if not port 80</parameter>
+            <parameter name="label">var __emptyEntry = system.newEntry();</parameter>
+        </FormItem>
         <FormItem name="dashes">
             <ModTime>1734099205004</ModTime>
             <parameter name="label">_________________________________________________________________________________</parameter>
@@ -4713,13 +5599,25 @@ function makeCall(uri, errormsg) {
             <parameter name="syntax">password</parameter>
         </FormItem>
         <FormItem name="path">
-            <ModTime>1736619697859</ModTime>
+            <ModTime>1737024268372</ModTime>
             <parameter name="Required">true</parameter>
-            <parameter name="description">API path to invoke</parameter>
+            <parameter name="description">The URL path representing the resource item to work with</parameter>
             <parameter name="label">Path</parameter>
             <parameter name="script">fetchItems</parameter>
             <parameter name="scriptLabel">Fetch</parameter>
             <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="schema">
+            <ModTime>1737024188497</ModTime>
+            <parameter name="description">The REST endpoint that returns the schema for this API</parameter>
+            <parameter name="label">Schema</parameter>
+            <parameter name="script">fetchSchema</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+        </FormItem>
+        <FormItem name="url">
+            <ModTime>1737024046822</ModTime>
+            <parameter name="description">The first part of the URL, http://&lt;domain&gt;:&lt;port&gt;, with colon and port number required only if not port 80</parameter>
+            <parameter name="label">Base URL</parameter>
         </FormItem>
         <FormItem name="username">
             <ModTime>1736017120599</ModTime>
@@ -4735,8 +5633,8 @@ function makeCall(uri, errormsg) {
                 <ListItem>$GLOBAL.debug</ListItem>
                 <ListItem>$GLOBAL.userComment</ListItem>
                 <ListItem>$GLOBAL.script</ListItem>
-                <ListItem>Clear</ListItem>
                 <ListItem>authUrl</ListItem>
+                <ListItem>Clear</ListItem>
             </FormSectionNames>
             <parameter name="initiallyExpanded">false</parameter>
             <parameter name="title">Advanced</parameter>
@@ -4748,6 +5646,8 @@ function makeCall(uri, errormsg) {
         </FormSection>
         <FormSection name="General">
             <FormSectionNames>
+                <ListItem>url</ListItem>
+                <ListItem>schema</ListItem>
                 <ListItem>path</ListItem>
                 <ListItem>action</ListItem>
             </FormSectionNames>
@@ -11921,11 +12821,13 @@ components:
         </Script>
         
     <Script name="RESTIFY library class">
-            <ModTime>1733415625214</ModTime>
+            <ModTime>1737026508610</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20241127 2024 Created
 
-var RESTIFY = function() {
+// Restify script library class
+
+function RESTIFY () {
 	this.loadFileToByteArray = function(filepath) {
 		var file = new java.io.File(filepath);
 		var fis = new java.io.FileInputStream(file);
@@ -11965,68 +12867,7 @@ var RESTIFY = function() {
 	}
 }]]></parameter>
         </Script>
-    <Script name="ENDPOINTS class NOT IN USE">
-            <ModTime>1733321570626</ModTime>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[// ENDPOINTS class to parse the schema object
-var ENDPOINTS = function(args) {
-	_WHERE = "ENDPOINTS class";	// Global variable available for error reporting
-	this.name = "ENDPOINTS";
-
-	this.schema = args.openAPIschema || {};
-	this.api = args.api || null;
-	this.hm = new java.util.HashMap();
-	this.resources = {};
-	this.paths = {};
-	this.uriList = system.splitString("", "");	// Empty array
-	this.config = {};
-
-	
-	// Main processing starts here
-	if (!this.api || this.schema == {}) {
-		throw "ENDPOINTS constructure requires the OpenAPI schema and instantiated API object"
-	}
-	
-	// Get the various URIs and parse into parts to analyze
-	for (var uri in this.schema) {
-		var arr = this.hm.get(uri);
-		if (arr == null) {
-			arr = [];
-			this.hm.put(uri.substring(1), arr)
-		}
-		arr.push(this.schema[uri])
-	}
-
-	// Set up a sorted array of the paths returned
-	this.uriList = this.hm.keySet().toArray();
-	java.util.Arrays.sort(this.uriList);
-	
-	// The next step is to create
-	
-	// Now to parse each to retrieve the first part of the base - the resource item type
-	for (var uri in this.uriList) {
-		var parts = system.splitString(uri, "/");
-		var type = parts[0].trim();
-		for (var i = 1; i < parts.length; i++) {
-			var bit = parts[i].trim();
-			// Check if it's an identifier
-			if (bit.startWith("{") && bit.endsWith("}")) {
-				
-			}
-		}
-	}
-	
-	
-	// check it
-	var keys = hm.keySet().toArray();
-	java.util.Arrays.sort(keys);
-	for (var key in keys) {
-		task.logmsg("-----> " + key)
-	}
-	
-	return hm
-}]]></parameter>
-        </Script>
+    
         <Script name="OAuth Class">
             <ModTime>1733657022206</ModTime>
             <parameter name="includeFiles"/>
@@ -25208,177 +26049,8 @@ function parseSchema() {
 	return __schema
 }]]></parameter>
         </Script>
-    <Script name="SCHEMA class 20241213 1631 Before getting creative">
-            <ModTime>1734103167667</ModTime>
-            <parameter name="enabled">true</parameter>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[function SCHEMA(schemaStr, format) {
-	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
-	this.name = "SCHEMA";
-	this.schemaObj = {};
-	
-	/* Main init logic after method definitions
-
-       The name says it all. Returns a JS Obj */
-       
-    this.parseOpenAPIschema = function(openApiSchema) {
-        openApiSchema = openApiSchema.trim();
-        var jsonString = "";
-
-        /* Load Jackson libraries */
-        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
-        var objectMapper = new ObjectMapper();
-
-        /* Check if YAML and if so, convert to Json */
-        if ("YAML".equalsIgnoreCase(this.format)) {
-            /* Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read */
-            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
-            /* Create instances of Yaml and ObjectMapper */
-            var yaml = new Yaml();
-            /* Parse YAML into a Java Map */
-            var map = yaml.load(openApiSchema);
-
-            /* Convert Java Map to JSON string */
-            jsonString = objectMapper.writeValueAsString(map)
-        } else {
-            jsonString = openApiSchema;
-        }
-
-        this.schemaObj = fromJson(jsonString);
-        return this.schemaObj
-    }
-
-    /* Returns the child elements (JS Obj) of the specified path
-       Root level if no argument or blank text passed */
-    this.getChildren = function(path) { 
-        //var children = {};
-        var subtree;
-        
-        if (!path) {
-        	path = []
-        }
-        else 
-        if (!(path instanceof Array)) {
-        	path = [path]	
-        }
-        
-        subtree = this.schemaObj[path[0]];
-        for (var i = 1; i < path.length && subtree; i++) {
-        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
-        		if (subtree instanceof Array) {
-	        		for (var j = 0; j < subtree.length; j++) {
-	        			if (subtree[j][path[i]]) {
-	        				subtree = subtree[j][path[i]];
-	        				break
-	        			}
-	        		}
-        		}
-        		subtree = {}; // return empty
-        	} else {
-        		subtree = subtree[path[i]]
-        	}
-        }
-
-        return subtree;
-    }
     
-    /* Main init logic */
-    this.schemaStr = schemaStr;
-    this.format = format || "YAML";
-    this.schemaObj = this.parseOpenAPIschema(schemaStr)
-}]]></parameter>
-        </Script>
-        <Script name="SCHEMA class 20241213 1658 querySchema handles MAY_MUST and format">
-            <ModTime>1734104270686</ModTime>
-            <parameter name="enabled">true</parameter>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[function SCHEMA(schemaStr, format) {
-	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
-	this.name = "SCHEMA";
-	this.schemaObj = {};
-	
-	/* Main init logic after method definitions
-
-       The name says it all. Returns a JS Obj */
-       
-    this.parseOpenAPIschema = function(openApiSchema) {
-        openApiSchema = openApiSchema.trim();
-        var jsonString = "";
-
-        /* Load Jackson libraries */
-        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
-        var objectMapper = new ObjectMapper();
-
-        /* Check if YAML and if so, convert to Json */
-        if ("YAML".equalsIgnoreCase(this.format)) {
-            /* Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read */
-            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
-            /* Create instances of Yaml and ObjectMapper */
-            var yaml = new Yaml();
-            /* Parse YAML into a Java Map */
-            var map = yaml.load(openApiSchema);
-
-            /* Convert Java Map to JSON string */
-            jsonString = objectMapper.writeValueAsString(map)
-        } else {
-            jsonString = openApiSchema;
-        }
-
-        this.schemaObj = fromJson(jsonString);
-        return this.schemaObj
-    }
-
-    /* Returns the child elements (JS Obj) of the specified path
-       Root level if no argument or blank text passed. Always return a JS object
-    */
-    this.getChildren = function(path) { 
-        //var children = {};
-        var subtree;
         
-        if (!path) {
-        	path = []
-        }
-        else 
-        if (!(path instanceof Array)) {
-        	path = [path]	
-        }
-        
-        subtree = this.schemaObj[path[0]];
-        for (var i = 1; i < path.length && subtree; i++) {
-        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
-        		if (subtree instanceof Array) {
-	        		for (var j = 0; j < subtree.length; j++) {
-	        			if (subtree[j][path[i]]) {
-	        				subtree = subtree[j][path[i]];
-	        				break
-	        			}
-	        		}
-        		}
-        		subtree = {}; // return empty
-        	} else {
-        		subtree = subtree[path[i]]
-        	}
-        }
-        
-        if (subtree instanceof Array) { // If it is an array, then it is parameters, so retrun as an object
-        	// Make an object
-        	var retTree = {};
-        	for (var i = 0; i < subtree.length; i++) {
-        		var param = subtree[i];
-        		retTree[param.name] = param
-        	}
-        	return retTree
-        }
-
-        return subtree;
-    }
-    
-    /* Main init logic */
-    this.schemaStr = schemaStr;
-    this.format = format || "YAML";
-    this.schemaObj = this.parseOpenAPIschema(schemaStr)
-}]]></parameter>
-        </Script>
     <Script name="__testService_getReturn">
             <ModTime>1735932935073</ModTime>
             <parameter name="includeFiles"/>
@@ -25413,106 +26085,7 @@ function parseSchema() {
   }
 ]]]></parameter>
         </Script>
-    <Script name="SCHEMA class 20250111 1719 Before adding .getEmbeddedUID">
-            <ModTime>1736612009554</ModTime>
-            <parameter name="enabled">true</parameter>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[function SCHEMA(schemaStr, format) {
-	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
-	this.name = "SCHEMA";
-	this.schemaObj = {};
-	
-	/* Main init logic after method definitions
-
-       The name says it all. Returns a JS Obj */
-       
-    this.parseOpenAPIschema = function(openApiSchema) {
-        openApiSchema = openApiSchema.trim();
-        var jsonString = "";
-
-        /* Load Jackson libraries */
-        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
-        var objectMapper = new ObjectMapper();
-
-        /* Check if YAML and if so, convert to Json */
-        if ("YAML".equalsIgnoreCase(this.format)) {
-            /* Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read */
-            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
-            /* Create instances of Yaml and ObjectMapper */
-            var yaml = new Yaml();
-            /* Parse YAML into a Java Map */
-            var map = yaml.load(openApiSchema);
-
-            /* Convert Java Map to JSON string */
-            jsonString = objectMapper.writeValueAsString(map)
-        } else {
-            jsonString = openApiSchema;
-        }
-
-        this.schemaObj = fromJson(jsonString);
-        return this.schemaObj
-    }
-
-	/*
-		Uses .getChildren() to return the parameters array for the chosen path and action.
-	*/
-	this.getParameters = function(path, action) {
-		return this.getChildren([path, action, "parameters"])
-	}
-	
-    /* Returns the child elements (JS Obj) of the specified path
-       Root level if no argument or blank text passed. Always return a JS object
-    */
-    this.getChildren = function(path) { 
-        //var children = {};
-        var subtree;
-        
-        if (!path) {
-        	path = []
-        }
-        else 
-        if (!(path instanceof Array)) {
-        	path = [path]	
-        }
-        
-        subtree = this.schemaObj[path[0]];
-        for (var i = 1; i < path.length && subtree; i++) {
-        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
-        		if (subtree instanceof Array) {
-	        		for (var j = 0; j < subtree.length; j++) {
-	        			if (subtree[j][path[i]]) {
-	        				subtree = subtree[j][path[i]];
-	        				break
-	        			}
-	        		}
-        		}
-        		
-        		// subtree does not exist
-        		subtree = {}; // return empty
-        	} else {
-        		subtree = subtree[path[i]]
-        	}
-        }
-        
-        if (subtree instanceof Array) { // If it is an array, then it is parameters, so retrun as an object
-        	// Make an object
-        	var retTree = {};
-        	for (var i = 0; i < subtree.length; i++) {
-        		var param = subtree[i];
-        		retTree[param.name] = param
-        	}
-        	return retTree
-        }
-
-        return subtree;
-    }
     
-    /* Main init logic */
-    this.schemaStr = schemaStr;
-    this.format = format || "YAML";
-    this.schemaObj = this.parseOpenAPIschema(schemaStr)
-}]]></parameter>
-        </Script>
     <Script name="SCHEMA class 20250111 1932 Next up queryReply result and test service">
             <ModTime>1736619929141</ModTime>
             <parameter name="enabled">true</parameter>
@@ -25791,6 +26364,549 @@ function parseSchema() {
     this.schemaStr = schemaStr;
     this.format = format || "YAML";
     this.schemaObj = this.parseOpenAPIschema(schemaStr)
+}]]></parameter>
+        </Script>
+    
+    <Script name="HTTPCLIENT class">
+            <ModTime>1737027144217</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250116 1116 Created
+
+// This is the class that provides methods for making HTTP requests
+
+function HTTPCLIENT(args) {
+	this.baseUrl = args.baseUrl || throwException("HTTPClient constructor requires the baseUrl argument");
+	this.schemaUrl = args.schemaUrl || throwException("HTTPClient constructor requires the schemaUrl argument");
+	this.authUrl = args.authUrl || "";
+	this.apikey = args.apikey || "";
+	this.username = args.username || "";
+	this.password = args.password || "";
+	this.debug = args.debug || true;
+	
+	// The HTTP Client Connector to use
+	this.http = system.getConnector("ibmdi.HTTPClient");
+	
+	// Member variables
+	this.requestEntry = system.newEntry();
+	this.token = null;
+	this.sessionId = null;
+	
+	// HTTP Client call method. The first lines of code show you the parameters you can send
+	this.makeRequest = function(params) {
+		var verb = params.verb || "GET";
+		var url = params.url || this.throwException("makeRequest called with no URL");
+		var body = params.body || null;
+		var ctype = params.ctype || "application/json";
+		var where = params.where || "";
+		var headers = params.headers || {};
+		var gettingToken = params.token || false;
+		var username = params.username || "";
+		var password = params.password || "";
+		
+		this.requestEntry.removeAllAttributes();
+		
+		// Get token if necessary
+		if (!this.token && !gettingToken) {
+			this.getToken();
+		} 
+			
+		// Add auth artifacts
+		if (!gettingToken) {
+			this.requestEntry["http.X-CSRV-TOKEN"] = this.token;
+			if (this.sessionId) this.requestEntry["http.sessionId"] = this.sessionId;
+		}
+		
+		// Prepend the host (baseURL) if not already there
+		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
+			url = this.baseUrl + "/" + url;
+		}
+		
+		// If a body is passed, this must be a POST (I think)
+		if (typeof body !== "undefined" && body !== null) {
+			verb = "POST";
+	
+			if (typeof body != "string") {
+				this.requestEntry["http.body"] = toJson(body);
+			} else {
+				this.requestEntry["http.body"] = body;
+			}
+		}	
+		
+		// Set up the global HTTP Connector
+		this.http.setParam("method", verb.toUpperCase());
+		this.http.setParam("url", url);
+		this.http.setParam("username", username);
+		this.http.setParam("password", password);
+	
+		// Now set up the request entry
+		this.requestEntry["http.url"] = url;
+		this.requestEntry["http.method"] = verb.toUpperCase();
+		this.requestEntry["http.Content-Type"] = ctype;
+		this.requestEntry["http.remote_user"] = username;
+		this.requestEntry["http.remote_password"] = password;
+		
+		for (var hdr in headers) {
+			this.requestEntry["http." + hdr] = headers[hdr]
+		}
+		
+		if (this.debug) {
+			this.logDetails({msg : "Request to itim", 
+						obj : this.httpEntry(this.requestEntry, true), 
+						url : url, 
+						verb : verb, 
+						ctype : ctype, 
+						where : where,
+						sent: true});
+		}
+	
+		// Reinitialize the HTTP Client connector so the updated parameters are applied
+		this.http.terminate();
+		this.http.initialize(null);
+	
+		// Make the call
+		do {
+			var retry = false;
+			try {	
+				var retEntry = this.http.queryReply(this.requestEntry);
+				var reply = this.parseReply(retEntry);
+			} catch (ex) {
+				// If the token has expired, get a new one
+				if (ex.toString().indexOf("Unauthorized") >= 0) {
+					this.getToken();
+					retry = true
+				} else
+				// Else if we first must import the client cert, then do so. The Server must be restarted after.
+				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+					if (ex.toString().indexOf("Certificate chaining error") >= 0) {
+						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+					}
+					this.getCertificate();
+					retry = true;
+				} else {
+					throw ex;
+				}	
+			}
+		} while (retry);
+		
+		if (this.debug) {
+			this.logDetails({msg : "Response from itim", 
+						obj : this.httpEntry(retEntry),
+					    entry : retEntry});
+		}
+		
+		return reply;
+	}
+	
+	// Get the client certificate from the server and import it to the TDI keystore
+	this.getCertificate = function() {
+		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
+	}
+	
+	// Get the authentication token
+	this.getToken = function() {
+		var reply = this.makeRequest({
+				token: true, // Getting a token
+				verb: "POST",
+				url: this.authUrl,
+				ctype: "application/json",
+				where: "getToken()",
+				headers: {
+					Authorization: "Bearer " + this.apikey
+				},
+				body: {
+					username: this.username,
+					password: this.password
+				}
+		});
+		
+		this.token = reply.csrftoken || "";
+		this.sessionId = reply.sessionId || ""
+	}
+
+	this.logDetails = function(params, sent) {
+		sent = sent || false;
+		var msg = params.msg;
+		var obj = params.obj; 
+		var url = params.url;
+		var verb = params.verb;
+		var ctype = params.ctype; 
+		var where = params.where;
+		
+		if (msg == null) {
+			msg = "*unknown entry*";
+		}
+	
+		var s = new java.lang.StringBuffer();
+		
+		if (where != null) {
+			s.append("\n@@@------> (" + where + ") " + msg);
+		} else {
+			s.append("\n---------> " + msg);
+		}
+		
+		
+		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+		if (ctype != null) { s.append("   " + ctype); } 
+		if (url != null) { s.append("   " + url); } 
+		s.append("\n");
+	
+		if (obj != null) {
+			if (obj instanceof com.ibm.di.entry.Entry) {	
+				s.append(this.httpEntry(obj, sent))	
+			} else {
+				s.append(obj.toString());
+			}
+		}	
+	
+		this.logmsg(s.toString());
+	}
+
+	this.logmsg = function(lvl, msg) {
+		if (typeof(lvl) == "undefined") {
+			msg = ""
+			lvl = "INFO"
+		} else
+		if (typeof(msg) == "undefined") {
+			msg = lvl
+			lvl = "INFO"
+		}
+		
+		if (lvl.toLowerCase().startsWith("console")) {
+			java.lang.System.out.println(msg)
+			lvl = "INFO"
+			msg = "(CONSOLE) " + msg
+		}	
+		task.logmsg(lvl, msg)
+	}
+	
+	this.throwException = function(msg) {
+		throw new java.lang.IllegalArgumentException(msg);
+	}
+
+	// Checks the validity of the reply and sets up for Iteration
+	this.parseReply = function(replyEntry) {
+		if (replyEntry === null) { return } 
+		
+		var status = replyEntry.getString("http.responseCode");
+	
+		// Check the return status
+		if (status == "401") { // Unauthorized - time to renew the token
+			throwException("Unauthorized")
+		}
+		if (!status.startsWith("2")) {
+			throwException("Error response from ITIM. Response code: " 
+								+ status
+								+ "    Message: " + replyEntry.getString("http.responseMsg"));
+		}
+		
+		// Now parse the body
+		var body = replyEntry.getString("http.bodyAsString");
+	
+		try {
+			var reply = fromJson(body);
+		} catch (ex) {
+			throwException("Error parsing return payload from itim: " + ex.toString()
+							+ "\n*** dump of reply ***\n" 
+							+ replyEntry)
+		}
+			
+		return reply;
+	}
+	
+	// Left justified text
+	this.LJ = function(txt, len) {
+		txt = txt || "";
+		len = len || txt.length;
+		return (txt + "                                                       ").substring(0, len)
+	}
+	
+	this.httpEntry = function(entry, sent) {
+		sent = sent || false;
+		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
+	
+		for (var att in entry) {
+			var name = att.getName();
+			var val = att.getValue();
+			if (val && name.indexOf("tcp.") < 0 
+				&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
+				&& !(val instanceof Array) && !val.startsWith("[B@")) {
+				txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
+			}
+		}
+		
+		return txt
+	}
+}]]></parameter>
+        </Script>
+        <Script name="HTTPCLIENT class 20250116 1233 backup after almost working">
+            <ModTime>1737027144217</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250116 1116 Created
+
+// This is the class that provides methods for making HTTP requests
+
+function HTTPCLIENT(args) {
+	this.baseUrl = args.baseUrl || throwException("HTTPClient constructor requires the baseUrl argument");
+	this.schemaUrl = args.schemaUrl || throwException("HTTPClient constructor requires the schemaUrl argument");
+	this.authUrl = args.authUrl || "";
+	this.apikey = args.apikey || "";
+	this.username = args.username || "";
+	this.password = args.password || "";
+	this.debug = args.debug || true;
+	
+	// The HTTP Client Connector to use
+	this.http = system.getConnector("ibmdi.HTTPClient");
+	
+	// Member variables
+	this.requestEntry = system.newEntry();
+	this.token = null;
+	this.sessionId = null;
+	
+	// HTTP Client call method. The first lines of code show you the parameters you can send
+	this.makeRequest = function(params) {
+		var verb = params.verb || "GET";
+		var url = params.url || this.throwException("makeRequest called with no URL");
+		var body = params.body || null;
+		var ctype = params.ctype || "application/json";
+		var where = params.where || "";
+		var headers = params.headers || {};
+		var gettingToken = params.token || false;
+		var username = params.username || "";
+		var password = params.password || "";
+		
+		this.requestEntry.removeAllAttributes();
+		
+		// Get token if necessary
+		if (!this.token && !gettingToken) {
+			this.getToken();
+		} 
+			
+		// Add auth artifacts
+		if (!gettingToken) {
+			this.requestEntry["http.X-CSRV-TOKEN"] = this.token;
+			if (this.sessionId) this.requestEntry["http.sessionId"] = this.sessionId;
+		}
+		
+		// Prepend the host (baseURL) if not already there
+		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
+			url = this.baseUrl + "/" + url;
+		}
+		
+		// If a body is passed, this must be a POST (I think)
+		if (typeof body !== "undefined" && body !== null) {
+			verb = "POST";
+	
+			if (typeof body != "string") {
+				this.requestEntry["http.body"] = toJson(body);
+			} else {
+				this.requestEntry["http.body"] = body;
+			}
+		}	
+		
+		// Set up the global HTTP Connector
+		this.http.setParam("method", verb.toUpperCase());
+		this.http.setParam("url", url);
+		this.http.setParam("username", username);
+		this.http.setParam("password", password);
+	
+		// Now set up the request entry
+		this.requestEntry["http.url"] = url;
+		this.requestEntry["http.method"] = verb.toUpperCase();
+		this.requestEntry["http.Content-Type"] = ctype;
+		this.requestEntry["http.remote_user"] = username;
+		this.requestEntry["http.remote_password"] = password;
+		
+		for (var hdr in headers) {
+			this.requestEntry["http." + hdr] = headers[hdr]
+		}
+		
+		if (this.debug) {
+			this.logDetails({msg : "Request to itim", 
+						obj : this.httpEntry(this.requestEntry, true), 
+						url : url, 
+						verb : verb, 
+						ctype : ctype, 
+						where : where,
+						sent: true});
+		}
+	
+		// Reinitialize the HTTP Client connector so the updated parameters are applied
+		this.http.terminate();
+		this.http.initialize(null);
+	
+		// Make the call
+		do {
+			var retry = false;
+			try {	
+				var retEntry = this.http.queryReply(this.requestEntry);
+				var reply = this.parseReply(retEntry);
+			} catch (ex) {
+				// If the token has expired, get a new one
+				if (ex.toString().indexOf("Unauthorized") >= 0) {
+					this.getToken();
+					retry = true
+				} else
+				// Else if we first must import the client cert, then do so. The Server must be restarted after.
+				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+					if (ex.toString().indexOf("Certificate chaining error") >= 0) {
+						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+					}
+					this.getCertificate();
+					retry = true;
+				} else {
+					throw ex;
+				}	
+			}
+		} while (retry);
+		
+		if (this.debug) {
+			this.logDetails({msg : "Response from itim", 
+						obj : this.httpEntry(retEntry),
+					    entry : retEntry});
+		}
+		
+		return reply;
+	}
+	
+	// Get the client certificate from the server and import it to the TDI keystore
+	this.getCertificate = function() {
+		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
+	}
+	
+	// Get the authentication token
+	this.getToken = function() {
+		var reply = this.makeRequest({
+				token: true, // Getting a token
+				verb: "POST",
+				url: this.authUrl,
+				ctype: "application/json",
+				where: "getToken()",
+				headers: {
+					Authorization: "Bearer " + this.apikey
+				},
+				body: {
+					username: this.username,
+					password: this.password
+				}
+		});
+		
+		this.token = reply.csrftoken || "";
+		this.sessionId = reply.sessionId || ""
+	}
+
+	this.logDetails = function(params, sent) {
+		sent = sent || false;
+		var msg = params.msg;
+		var obj = params.obj; 
+		var url = params.url;
+		var verb = params.verb;
+		var ctype = params.ctype; 
+		var where = params.where;
+		
+		if (msg == null) {
+			msg = "*unknown entry*";
+		}
+	
+		var s = new java.lang.StringBuffer();
+		
+		if (where != null) {
+			s.append("\n@@@------> (" + where + ") " + msg);
+		} else {
+			s.append("\n---------> " + msg);
+		}
+		
+		
+		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+		if (ctype != null) { s.append("   " + ctype); } 
+		if (url != null) { s.append("   " + url); } 
+		s.append("\n");
+	
+		if (obj != null) {
+			if (obj instanceof com.ibm.di.entry.Entry) {	
+				s.append(this.httpEntry(obj, sent))	
+			} else {
+				s.append(obj.toString());
+			}
+		}	
+	
+		this.logmsg(s.toString());
+	}
+
+	this.logmsg = function(lvl, msg) {
+		if (typeof(lvl) == "undefined") {
+			msg = ""
+			lvl = "INFO"
+		} else
+		if (typeof(msg) == "undefined") {
+			msg = lvl
+			lvl = "INFO"
+		}
+		
+		if (lvl.toLowerCase().startsWith("console")) {
+			java.lang.System.out.println(msg)
+			lvl = "INFO"
+			msg = "(CONSOLE) " + msg
+		}	
+		task.logmsg(lvl, msg)
+	}
+	
+	this.throwException = function(msg) {
+		throw new java.lang.IllegalArgumentException(msg);
+	}
+
+	// Checks the validity of the reply and sets up for Iteration
+	this.parseReply = function(replyEntry) {
+		if (replyEntry === null) { return } 
+		
+		var status = replyEntry.getString("http.responseCode");
+	
+		// Check the return status
+		if (status == "401") { // Unauthorized - time to renew the token
+			throwException("Unauthorized")
+		}
+		if (!status.startsWith("2")) {
+			throwException("Error response from ITIM. Response code: " 
+								+ status
+								+ "    Message: " + replyEntry.getString("http.responseMsg"));
+		}
+		
+		// Now parse the body
+		var body = replyEntry.getString("http.bodyAsString");
+	
+		try {
+			var reply = fromJson(body);
+		} catch (ex) {
+			throwException("Error parsing return payload from itim: " + ex.toString()
+							+ "\n*** dump of reply ***\n" 
+							+ replyEntry)
+		}
+			
+		return reply;
+	}
+	
+	// Left justified text
+	this.LJ = function(txt, len) {
+		txt = txt || "";
+		len = len || txt.length;
+		return (txt + "                                                       ").substring(0, len)
+	}
+	
+	this.httpEntry = function(entry, sent) {
+		sent = sent || false;
+		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
+	
+		for (var att in entry) {
+			var name = att.getName();
+			var val = att.getValue();
+			if (val && name.indexOf("tcp.") < 0 
+				&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
+				&& !(val instanceof Array) && !val.startsWith("[B@")) {
+				txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
+			}
+		}
+		
+		return txt
+	}
 }]]></parameter>
         </Script>
     </Folder>
