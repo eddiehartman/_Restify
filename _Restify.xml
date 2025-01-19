@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Jan 16 12:34:02 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sun Jan 19 21:22:20 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="Reading schema">
             <ModTime>1733656916711</ModTime>
@@ -318,7 +318,7 @@ function fullStacktrace(e, delimArg) {
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1737027091434</ModTime>
+            <ModTime>1737318091135</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -326,7 +326,8 @@ function fullStacktrace(e, delimArg) {
                 <parameter name="includeGlobalPrologs">true</parameter>
                 <parameter name="includePrologs"><![CDATA[RESTIFY library class
 SCHEMA class
-HTTPCLIENT class]]></parameter>
+RESTCLIENT class
+]]></parameter>
                 <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
             </Settings>
             <Hooks/>
@@ -345,16 +346,16 @@ HTTPCLIENT class]]></parameter>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1737027091434</ModTime>
+                <ModTime>1737318091135</ModTime>
                 <Script name="SpoofLib">
-                    <ModTime>1737023974658</ModTime>
+                    <ModTime>1737318091135</ModTime>
                     <parameter name="script"><![CDATA[connector = {
 	getParam: function(pname) {
 		switch (pname.toLowerCase()) {
 			case "action": 	 return "get";
 			case "apikey": 	 return "xyzzy";
-			case "schema":	 return "/v1.0/endpoint/default/token";
-			case "authurl":  return "/auth";
+			case "schema":	 return "/schema";
+			case "authurl":  return "/v1.0/endpoint/default/token";
 			case "debug": 	 return true;
 			case "path": 	 return "/people/{personId}/accounts";
 			case "password": return "R0kz";
@@ -409,7 +410,7 @@ entry["x-forwarded-host"] = "xfwdhost_value";
 entry["x-admin-invocation"] = "xadmininvoc_value";]]></parameter>
                 </Script>
                 <Script name="Connector Form Event Script">
-                    <ModTime>1737027091434</ModTime>
+                    <ModTime>1737314168209</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[// 20250104 1959 Initial
 //
@@ -447,12 +448,12 @@ function initialize() {
 	}
 	__lib = new RESTIFY();
 
-	if (typeof HTTPCLIENT == "undefined") {
-		eval(system.getScriptText("HTTPCLIENT class")); // Load HTTP Client class
+	if (typeof RESTCLIENT == "undefined") {
+		eval(system.getScriptText("RESTCLIENT class")); // Load HTTP Client class
 	}
 	
 	// Recreate in case parameters are changed
-	__http = new HTTPCLIENT({
+	__http = new RESTCLIENT({
 						baseUrl:  connector.getParam("url"),
 						authUrl:  connector.getParam("authUrl"),
 						apikey:   connector.getParam("apikey"),
@@ -949,7 +950,7 @@ i = 42]]></parameter>
     
     
     <AssemblyLine name="__testService">
-            <ModTime>1737024901079</ModTime>
+            <ModTime>1737316861120</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -1039,7 +1040,7 @@ if (!statusCode) {
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1737024901079</ModTime>
+                <ModTime>1737316861120</ModTime>
                 <Script name="Script lib">
                     <ModTime>1737024901079</ModTime>
                     <parameter name="script"><![CDATA[var authReturn = {
@@ -1149,18 +1150,18 @@ function handleSchema(req) {
 }]]></parameter>
                 </Script>
                 <Script name="Handle call">
-                    <ModTime>1737022047078</ModTime>
+                    <ModTime>1737316861120</ModTime>
                     <parameter name="script"><![CDATA[// Dump the work entry
 task.logmsg("\n<<<<<--- Request: " + httpEntry(work));
 
 base = work.getString("http.base");
 
-if (base.endsWith("token")) {
+if (base.endsWith("/schema")) {
 	task.logmsg("Schema request...");
 	handleSchema(work);
 	task.logmsg("Schema sent!");
 } else
-if (base.endsWith("/auth")) {
+if (base.endsWith("/token")) {
 	task.logmsg("Authorizing...");
 	handleAuth(work);
 	task.logmsg("Authorized!")
@@ -3382,7 +3383,8 @@ i = 42]]></parameter>
                 <parameter name="includeGlobalPrologs">true</parameter>
                 <parameter name="includePrologs"><![CDATA[RESTIFY library class
 SCHEMA class
-HTTPCLIENT class]]></parameter>
+RESTCLIENT class
+]]></parameter>
                 <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
             </Settings>
             <Hooks/>
@@ -26367,7 +26369,8 @@ function parseSchema() {
 }]]></parameter>
         </Script>
     
-    <Script name="HTTPCLIENT class">
+    
+        <Script name="HTTPCLIENT class 20250116 1233 backup after almost working">
             <ModTime>1737027144217</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
@@ -26638,14 +26641,14 @@ function HTTPCLIENT(args) {
 	}
 }]]></parameter>
         </Script>
-        <Script name="HTTPCLIENT class 20250116 1233 backup after almost working">
-            <ModTime>1737027144217</ModTime>
+    <Script name="HTTPCLIENT class 20250119 2013 renaming to RESTCLIENT">
+            <ModTime>1737313648267</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 
 // This is the class that provides methods for making HTTP requests
 
-function HTTPCLIENT(args) {
+function RESTCLIENT(args) {
 	this.baseUrl = args.baseUrl || throwException("HTTPClient constructor requires the baseUrl argument");
 	this.schemaUrl = args.schemaUrl || throwException("HTTPClient constructor requires the schemaUrl argument");
 	this.authUrl = args.authUrl || "";
@@ -26815,6 +26818,285 @@ function HTTPCLIENT(args) {
 			s.append("\n---------> " + msg);
 		}
 		
+		
+		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+		if (ctype != null) { s.append("   " + ctype); } 
+		if (url != null) { s.append("   " + url); } 
+		s.append("\n");
+	
+		if (obj != null) {
+			if (obj instanceof com.ibm.di.entry.Entry) {	
+				s.append(this.httpEntry(obj, sent))	
+			} else {
+				s.append(obj.toString());
+			}
+		}	
+	
+		this.logmsg(s.toString());
+	}
+
+	this.logmsg = function(lvl, msg) {
+		if (typeof(lvl) == "undefined") {
+			msg = ""
+			lvl = "INFO"
+		} else
+		if (typeof(msg) == "undefined") {
+			msg = lvl
+			lvl = "INFO"
+		}
+		
+		if (lvl.toLowerCase().startsWith("console")) {
+			java.lang.System.out.println(msg)
+			lvl = "INFO"
+			msg = "(CONSOLE) " + msg
+		}	
+		task.logmsg(lvl, msg)
+	}
+	
+	this.throwException = function(msg) {
+		throw new java.lang.IllegalArgumentException(msg);
+	}
+
+	// Checks the validity of the reply and sets up for Iteration
+	this.parseReply = function(replyEntry) {
+		if (replyEntry === null) { return } 
+		
+		var status = replyEntry.getString("http.responseCode");
+	
+		// Check the return status
+		if (status == "401") { // Unauthorized - time to renew the token
+			throwException("Unauthorized")
+		}
+		if (!status.startsWith("2")) {
+			throwException("Error response from ITIM. Response code: " 
+								+ status
+								+ "    Message: " + replyEntry.getString("http.responseMsg"));
+		}
+		
+		// Now parse the body
+		var body = replyEntry.getString("http.bodyAsString");
+	
+		try {
+			var reply = fromJson(body);
+		} catch (ex) {
+			throwException("Error parsing return payload from itim: " + ex.toString()
+							+ "\n*** dump of reply ***\n" 
+							+ replyEntry)
+		}
+			
+		return reply;
+	}
+	
+	// Left justified text
+	this.LJ = function(txt, len) {
+		txt = txt || "";
+		len = len || txt.length;
+		return (txt + "                                                       ").substring(0, len)
+	}
+	
+	this.httpEntry = function(entry, sent) {
+		sent = sent || false;
+		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
+	
+		for (var att in entry) {
+			var name = att.getName();
+			var val = att.getValue();
+			if (val && name.indexOf("tcp.") < 0 
+				&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
+				&& !(val instanceof Array) && !val.startsWith("[B@")) {
+				txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
+			}
+		}
+		
+		return txt
+	}
+}]]></parameter>
+        </Script>
+        <Script name="RESTCLIENT class">
+            <ModTime>1737317991755</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250116 1116 Created
+
+// This is the class that provides methods for making HTTP requests
+
+function RESTCLIENT(args) {
+	this.baseUrl = args.baseUrl || throwException("RESTClient constructor requires the baseUrl argument");
+	this.schemaUrl = args.schemaUrl || throwException("RESTClient constructor requires the schemaUrl argument");
+	this.authUrl = args.authUrl || "";
+	this.apikey = args.apikey || "";
+	this.username = args.username || "";
+	this.password = args.password || "";
+	this.debug = args.debug || true;
+	
+	// The HTTP Client Connector to use
+	this.http = system.getConnector("ibmdi.HTTPClient");
+	
+	// Member variables
+	this.requestEntry = system.newEntry();
+	this.token = null;
+	this.sessionId = null;
+	
+	// HTTP Client call method. The first lines of code show you the parameters you can send
+	this.makeRequest = function(params) {
+		// Get token if necessary
+		if (!this.schema && !params.token) {
+			this.getToken();
+		} 
+			
+		// Here come the various local variables set from parameters passed OR default values
+		var verb = params.verb || "GET";
+		var url = params.url || this.throwException("makeRequest called with no URL");
+		var body = params.body || null;
+		var ctype = params.ctype || "application/json";
+		var where = params.where || "";
+		var headers = params.headers || {};
+		var gettingToken = params.token || false;
+		var username = params.username || "";
+		var password = params.password || "";
+		
+		// Empty out the requestEntry before setting it up for the call
+		this.requestEntry.removeAllAttributes();
+		
+		// Add auth artifacts
+		if (!gettingToken) {
+			this.requestEntry["http.X-CSRV-TOKEN"] = this.token;
+			if (this.sessionId) this.requestEntry["http.sessionId"] = this.sessionId;
+		}
+		
+		// Prepend the host (baseURL) if not already there
+		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
+			url = this.baseUrl + "/" + url;
+		}
+		
+		// If a body is passed, this must be a POST (I think)
+		if (typeof body !== "undefined" && body !== null) {
+			verb = "POST";
+	
+			if (typeof body != "string") {
+				this.requestEntry["http.body"] = toJson(body);
+			} else {
+				this.requestEntry["http.body"] = body;
+			}
+		}	
+		
+		// Set up the global HTTP Connector
+		this.http.setParam("method", verb.toUpperCase());
+		this.http.setParam("url", url);
+		this.http.setParam("username", username);
+		this.http.setParam("password", password);
+	
+		// Now set up the request entry
+		this.requestEntry["http.url"] = url;
+		this.requestEntry["http.method"] = verb.toUpperCase();
+		this.requestEntry["http.Content-Type"] = ctype;
+		this.requestEntry["http.remote_user"] = username;
+		this.requestEntry["http.remote_password"] = password;
+		
+		for (var hdr in headers) {
+			this.requestEntry["http." + hdr] = headers[hdr]
+		}
+		
+		if (this.debug) {
+			this.logDetails({msg : "Request to itim", 
+						obj : this.httpEntry(this.requestEntry, true), 
+						url : url, 
+						verb : verb, 
+						ctype : ctype, 
+						where : where,
+						sent: true});
+		}
+	
+		// Reinitialize the HTTP Client connector so the updated parameters are applied
+		this.http.terminate();
+		this.http.initialize(null);
+	
+		// Make the call
+		do {
+			var retry = false;
+			try {	
+				var retEntry = this.http.queryReply(this.requestEntry);
+				var reply = this.parseReply(retEntry);
+			} catch (ex) {
+				// If the token has expired, get a new one
+				if (ex.toString().indexOf("Unauthorized") >= 0) {
+					this.getToken();
+					retry = true
+				} else
+				// Else if we first must import the client cert, then do so. The Server must be restarted after.
+				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+					if (ex.toString().indexOf("Certificate chaining error") >= 0) {
+						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+					}
+					this.getCertificate();
+					retry = true;
+				} else {
+					throw ex;
+				}	
+			}
+		} while (retry);
+		
+		retEntry["http.url"] = "http://" + retEntry["http.host"] + retEntry["http.base"];
+		retEntry.removeAttribute("http.url");
+		retEntry.removeAttribute("http.base");
+		retEntry.removeAttribute("http.host");
+		retEntry.removeAttribute("http.method");
+		
+		if (this.debug) {
+			this.logDetails({msg : "Response from itim", 
+						obj : this.httpEntry(retEntry),
+					    entry : retEntry});
+		}
+		
+		return reply;
+	}
+	
+	// Get the client certificate from the server and import it to the TDI keystore
+	this.getCertificate = function() {
+		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
+	}
+	
+	// Get the authentication token
+	this.getToken = function() {
+		var reply = this.makeRequest({
+				token: true, // Getting a token
+				verb: "POST",
+				url: this.authUrl,
+				ctype: "application/json",
+				where: "getToken()",
+				headers: {
+					Authorization: "Bearer " + this.apikey
+				},
+				body: {
+					username: this.username,
+					password: this.password
+				}
+		});
+		
+		this.token = reply.csrftoken || "";
+		this.sessionId = reply.sessionId || ""
+	}
+
+	this.logDetails = function(params, sent) {
+		sent = sent || false;
+		var msg = params.msg;
+		var obj = params.obj; 
+		var url = params.url;
+		var verb = params.verb;
+		var ctype = params.ctype; 
+		var where = params.where;
+		
+		if (msg == null) {
+			msg = "*unknown entry*";
+		}
+	
+		var s = new java.lang.StringBuffer();
+/*		
+		if (where != null) {
+			s.append("\n<<" + where + ">> " + msg);
+		} else {
+			s.append("\n---------> " + msg);
+		}
+*/		
 		
 		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
 		if (ctype != null) { s.append("   " + ctype); } 
