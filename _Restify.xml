@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Tue Jan 21 21:07:03 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Wed Jan 22 13:15:06 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -21,7 +21,7 @@
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1737489909252</ModTime>
+            <ModTime>1737547503728</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -49,9 +49,9 @@ RESTCLIENT class
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1737489909252</ModTime>
+                <ModTime>1737547503728</ModTime>
                 <Script name="SpoofLib">
-                    <ModTime>1737488726144</ModTime>
+                    <ModTime>1737546512119</ModTime>
                     <parameter name="script"><![CDATA[function control(val) {
 	this.val = val;
 	
@@ -96,6 +96,29 @@ form = {
 	}
 }
 
+
+connector = {
+	getParam: function(pname) {
+		switch (pname.toLowerCase()) {
+			case "action": 	 return "get";
+			case "apikey": 	 return "xyzzy";
+			case "schema":	 return "/schema";
+			case "authurl":  return "/v1.0/endpoint/default/token";
+			case "debug": 	 return true;
+			case "path": 	 return "/people/{personId}/accounts";
+			case "password": return "R0kz";
+			case "url": 	 return "https://mockitim.free.beeceptor.com";
+			case "username": return "edbird";
+			case "item": 	 return "/people";
+			case "action": 	 return "post";			
+			default: 		 return "*Invalid param: " + pname + "*"
+		}
+	},
+	alert: function(msg) {
+		task.logmsg(msg)
+	}
+}
+
 /*
 combo = {
 	text: "",
@@ -127,8 +150,8 @@ entry["x-forwarded-host"] = "xfwdhost_value";
 entry["x-admin-invocation"] = "xadmininvoc_value";]]></parameter>
                 </Script>
                 <Script name="Connector Form Event Script">
-                    <ModTime>1737489909252</ModTime>
-                    <parameter name="enabled">true</parameter>
+                    <ModTime>1737546097403</ModTime>
+                    <parameter name="enabled">false</parameter>
                     <parameter name="script"><![CDATA[// 20250104 1959 Initial
 // 20250121 1154 Created RESTCLIENT class and used that instead of lots of functions
 // 20250121 2047 Copied back test Event Script after _testScriptConnectorCode succeeded in testing Form code
@@ -312,8 +335,8 @@ function write(fname, str) {
 }]]></parameter>
                 </Script>
                 <Script name="Test Form Event Script">
-                    <ModTime>1737460731512</ModTime>
-                    <parameter name="enabled">true</parameter>
+                    <ModTime>1737543883182</ModTime>
+                    <parameter name="enabled">false</parameter>
                     <parameter name="script"><![CDATA[//initialize();
 fetchSchema();
 fetchItems();
@@ -322,8 +345,8 @@ fetchActions();
 i = 42;]]></parameter>
                 </Script>
                 <Script name="Connector Script">
-                    <ModTime>1737026880278</ModTime>
-                    <parameter name="enabled">false</parameter>
+                    <ModTime>1737547503728</ModTime>
+                    <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[// 20250104 2008 Initial
 // 20250111 1915 Handling queryParameters in url
 
@@ -334,8 +357,22 @@ var __parameters = {};						// params for the chosen path and action
 var __debug = connector.getParam("debug");	// debug output?
 var __schema = null;						// shared openAPI schema object (SCHEMA class)
 var __initialized = false;					// Do I need this?
-var __lib = null;							// for eval of RestLib
 var __emptyEntry = system.newEntry();		// for craftQueryString
+var __http = null; 							// for the RESTCLIENT we will use for the calls
+
+var __paramNames = {
+	action: true,
+	apikey: true,
+	schema: true,
+	authurl: true,
+	debug: true,
+	path: true,
+	password: true,
+	url: true,
+	username: true,
+	item: true,
+	action: true
+}
 
 
 //var __baseUrl = connector.getParam("url");	// the service domain and port
@@ -393,11 +430,28 @@ function fixUrl(url) {
 	}
 }
 
+function debug() {
+	return __debug;
+}
+
+// Rest the connector and re-initialize it in case parameters have changed
 function resetConnector() {
-	initialized = false;
+	__initialized = false;
 
 	if (typeof list != "undefined") list.clear(); // so it works while spoofing
-	if (__http) __http.terminate()
+	if (__http) __http.terminate();
+	
+	// Renew the RESTCLIENT with the currently set parameters
+	if (!RESTCLIENT) eval(system.getScriptText("RESTCLIENT class"));
+	__http = new RESTCLIENT({
+						baseUrl:   __parameters.url,
+						authUrl:   __parameters.authUrl,
+						apikey:    __parameters.apikey,
+						username:  __parameters.username,
+						password:  __parameters.password,
+						schemaUrl: __parameters.schema,
+						debug: 	   debug() // true => debug output		
+					})
 }
 
 // Change the URL path so the UID placeholder is replace with the Attribute value
@@ -412,9 +466,9 @@ function replaceUID(path, entry) {
 // -------  Standard Connector functions 
 //
 function initialize() {
-	resetConnector();
 	refreshParameters();
-	loadLibsAndParseSchema()
+	resetConnector();
+	parseSchema()
 }
 
 function terminate() {
@@ -427,15 +481,16 @@ function selectEntries() {
 
 function refreshParameters() {
 	var path = connector.getParam("path");
-	if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
+	//if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
 	var action = connector.getParam("action");
-	if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+	// if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
 
-	__parameters = {
-		path: path,
-		action: action
-	};
-
+	__parameters = {};
+	
+	for (var paramName in __paramNames) {
+		__parameters[paramName] = connector.getParam(paranName);
+	}
+	
 	return __parameters
 }
 
@@ -532,25 +587,43 @@ function alertObject(objName, obj) {
 	debugMsg(arr.toString())
 }
 
-function loadLibsAndParseSchema() {
-	if (__initialized) return;
-	__initialized = true;
+// Return the openAPI schema
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
 
-	//debugMsg("Initializing...");
-
-	eval(system.getScriptText("RESTIFY library class"));
-	__lib = new RESTIFY();
-
-	parseSchema()	
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: __parameters.schema,
+			authUrl: __parameters.authUrl,
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
 }
 
-// Return the openAPI schema - @TEST hardcoded for now
+// Parse the openAPI schema
 function parseSchema() {
 	if (__schema) return __schema;
 
 	// @@TODO Make actual call
 	debugMsg("Fetching schema...")
-	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	//var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = fetchSchema();
 
 	//debugMsg("Creating SCHEMA object");
 	eval(system.getScriptText("SCHEMA class"));
@@ -565,11 +638,12 @@ function parseSchema() {
 }]]></parameter>
                 </Script>
                 <Script name="Test Connector Script">
-                    <ModTime>1737022297162</ModTime>
-                    <parameter name="enabled">false</parameter>
+                    <ModTime>1737543979018</ModTime>
+                    <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[initialize();
-queryReply();
-task.logmsg(entry)
+main.logmsg(__http.httpEntry(queryReply()));
+selectEntries();
+main.logmsg(__http.httpEntry(getNextEntry()));
 
 i = 42]]></parameter>
                 </Script>
@@ -4150,15 +4224,15 @@ i = 42]]></parameter>
     
     <Connector name="RestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1737489903690</ModTime>
+            <ModTime>1737544090499</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1737489903690</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="620" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Tue Jan 21 21:05:03 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1737544090499</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="622" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Jan 22 12:08:10 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1737489902922</ModTime>
+        <ModTime>1737544048218</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -4177,6 +4251,7 @@ i = 42]]></parameter>
             <ListItem>schema</ListItem>
             <ListItem>url</ListItem>
             <ListItem>debug</ListItem>
+            <ListItem>searchCrit</ListItem>
         </FormItemNames>
         <FormSectionNames>
             <ListItem>General</ListItem>
@@ -4321,6 +4396,11 @@ i = 42]]></parameter>
             <parameter name="script">fetchSchema</parameter>
             <parameter name="scriptLabel">Fetch</parameter>
         </FormItem>
+        <FormItem name="searchCrit">
+            <ModTime>1737544048218</ModTime>
+            <parameter name="description">The Id of the Resource Item you want to retrieve</parameter>
+            <parameter name="label">Search for ID</parameter>
+        </FormItem>
         <FormItem name="url">
             <ModTime>1737024046822</ModTime>
             <parameter name="description">The first part of the URL, http://&lt;domain&gt;:&lt;port&gt;, with colon and port number required only if not port 80</parameter>
@@ -4356,6 +4436,7 @@ i = 42]]></parameter>
                 <ListItem>schema</ListItem>
                 <ListItem>path</ListItem>
                 <ListItem>action</ListItem>
+                <ListItem>searchCrit</ListItem>
             </FormSectionNames>
         </FormSection>
         <parameter name="formevents"><![CDATA[// 20250104 1959 Initial
@@ -4557,7 +4638,7 @@ function write(fname, str) {
                 <parameter name="includePrologs"><![CDATA[SCHEMA class
 RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
-                <parameter encrypted="true" name="password">UEqpXHnib+4kUofHmdoBhzg1NXOfGaJnrwBsNxPowLEZKOkMIEuuD7d4G6BDHgNQyxcsaHkOkdjo0aleATlxRrQtHl6oR01nns9Tejqq0vA7OjrbTYhY29lD58d/Q36JW/CkHh0+Ryo5w8/qho8Lg82ISXB2aNlMKTmATxyJoic=</parameter>
+                <parameter encrypted="true" name="password">alsFrMDabmOZZo6r7AOhYR5cyxv8W0NzXb+7QJrXNdDP/jNFtjltJVQ1+39ifsVma3IdmICEoQz+lx2OYU2LO09AAkmDpSE2gE5VL65bDW/pcW34FAovKVHFQlqL/rgvEj9lDxESrTn0DdXVySxgFRsKJ/WrnTfKa/ON7r2BD4g=</parameter>
                 <parameter name="path">/access/assignments/{assignmentId}</parameter>
                 <parameter name="schema">/schema</parameter>
                 <parameter name="script"><![CDATA[// 20250104 2008 Initial
