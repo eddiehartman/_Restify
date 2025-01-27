@@ -52,7 +52,7 @@ post '/v1.0/endpoint/default/token' => sub {
     $c->render(json => $response);
 };
 
-# Route for /people/NO12345
+# Route for /person/NO12345
 get '/people/NO12345' => sub {
     my $c = shift;
 
@@ -85,16 +85,20 @@ get '/people/NO12345' => sub {
 };
 
 # Route for /schema
-# Route for /schema
 get '/schema' => sub {
     my $c = shift;
 
-    # Define the response
+    # Define the OpenAPI schema response
     my $response = {
         openapi => "3.0.3",
-        info    => { title => "Merged documentation", version => "1.0" },
-        servers => [{ url => "https://192.168.2.39:30943" }],
-        tags    => [
+        info    => {
+            title   => "Merged documentation",
+            version => "1.0"
+        },
+        servers => [{
+            url => "https://192.168.2.39:30943"
+        }],
+        tags => [
             { name => "Access Administration Batch Submit" },
             { name => "Access Management" },
             { name => "Activity Management" },
@@ -123,92 +127,49 @@ get '/schema' => sub {
             { name => "Risk Bulk APIs" }
         ],
         paths => {
-            "/lifecyclerule/{lifecycleRuleIdentifier}" => {
+            "/people/{personId}" => {
                 get => {
-                    tags        => ["LifecycleRule Management"],
-                    summary     => "LifecycleRule Lookup",
-                    description => "Returns information about the specified Lifecycle Rule.",
+                    tags        => ["Person Management"],
+                    summary     => "Person Lookup",
+                    description => "Returns information about the specified user.",
                     parameters  => [
                         {
-                            name        => "lifecycleRuleIdentifier",
+                            name        => "personId",
                             in          => "path",
-                            description => "Unique Identifier for a lifecycleRule.",
+                            description => "Unique Identifier for a user.",
                             required    => \1,
-                            schema      => { type => "string" }
-                        },
-                        {
-                            name        => "attributes",
-                            in          => "query",
-                            description => "Specifies the comma-separated attributes to return for the LifecycleRule.",
                             schema      => { type => "string" }
                         }
                     ],
                     responses => {
                         "200" => {
-                            description => "OK. The request was successful",
+                            description => "OK. The request was successful.",
                             content     => {
                                 "application/vnd.ibm.isim-v1+json" => {
                                     example => {
                                         _links => {
                                             self => {
-                                                href  => "/itim/rest/lifecyclerule/OTA4ODM0OTc2NDIwODE5ODI4MHxudWxsfG51bGw",
-                                                title => "Deletion Lifecycle Rule"
+                                                href  => "/itim/rest/people/{personId}",
+                                                title => "Alan Smith"
                                             }
                                         },
                                         _attributes => {
-                                            name      => "Deletion Lifecycle Rule",
-                                            operation => "delete"
+                                            uid             => "asmith",
+                                            ercustomdisplay => "Smith"
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                },
-                put => {
-                    tags        => ["LifecycleRule Management"],
-                    summary     => "LifecycleRule Modify",
-                    description => "Modifies information for specified lifecycle Rule.",
-                    parameters  => [
-                        {
-                            name        => "lifecycleRuleIdentifier",
-                            in          => "path",
-                            description => "Unique identifier for a LifecycleRule.",
-                            required    => \1,
-                            schema      => { type => "string" }
-                        },
-                        {
-                            name        => "CSRFToken",
-                            in          => "header",
-                            description => "CSRF token for authentication.",
-                            required    => \1,
-                            schema      => { type => "string" }
-                        }
-                    ],
-                    responses => { "202" => { description => "OK" } }
-                },
-                delete => {
-                    tags        => ["LifecycleRule Management"],
-                    summary     => "LifecycleRule Remove",
-                    description => "Remove the specified LifecycleRule.",
-                    parameters  => [
-                        {
-                            name        => "lifecycleRuleIdentifier",
-                            in          => "path",
-                            required    => \1,
-                            schema      => { type => "string" }
-                        },
-                        {
-                            name        => "CSRFToken",
-                            in          => "header",
-                            description => "CSRF token for authentication.",
-                            required    => \1,
-                            schema      => { type => "string" }
-                        }
-                    ],
-                    responses => { "200" => { description => "OK. The request was successful" } }
                 }
-            }
+            },
+            # Include all other paths but without any details
+            "/activities/quicksearches" => {},
+            "/entitlements/assignments/search" => {},
+            "/organizationcontainers/{category}/{orgContainerId}" => {},
+            "/workitems" => {},
+            "/lifecyclerule/{lifecycleRuleIdentifier}" => {}
         }
     };
 
