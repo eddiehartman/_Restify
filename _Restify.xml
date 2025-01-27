@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sun Jan 26 18:30:52 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Mon Jan 27 13:59:49 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -21,7 +21,7 @@
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1737912486723</ModTime>
+            <ModTime>1737982310382</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -43,15 +43,17 @@ RESTCLIENT class
                     <Component name="Test Form Event Script" state="Enabled"/>
                     <Component name="Connector Script" state="Enabled"/>
                     <Component name="Test Connector Script" state="Enabled"/>
+                    <Component name="Connector Form Event Script_1" state="Enabled"/>
+                    <Component name="RestClientConnector" state="Enabled"/>
                 </SimulationStates>
                 <ProxySettings/>
             </SimulationConfig>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1737912486723</ModTime>
+                <ModTime>1737982310382</ModTime>
                 <Script name="SpoofLib">
-                    <ModTime>1737652322293</ModTime>
+                    <ModTime>1737915538874</ModTime>
                     <parameter name="script"><![CDATA[function control(val) {
 	this.val = val;
 	
@@ -87,7 +89,8 @@ form = {
 			case "url": 	 return control("http://localhost:8080");
 			case "username": return control("edbird");
 			case "item": return new control("/people");
-			case "action": return new control("post");			
+			case "action": return new control("post");	
+			case "querymode" : return new control("Available parameters"); // Available parameters or Data from REST call
 			default: 		 return control("*Invalid param: " + pname + "*")
 		}
 	},
@@ -126,7 +129,7 @@ list = new java.util.ArrayList();
 entry = system.newEntry();]]></parameter>
                 </Script>
                 <Script name="Connector Form Event Script">
-                    <ModTime>1737546097403</ModTime>
+                    <ModTime>1737914828719</ModTime>
                     <parameter name="enabled">false</parameter>
                     <parameter name="script"><![CDATA[// 20250104 1959 Initial
 // 20250121 1154 Created RESTCLIENT class and used that instead of lots of functions
@@ -311,7 +314,7 @@ function write(fname, str) {
 }]]></parameter>
                 </Script>
                 <Script name="Test Form Event Script">
-                    <ModTime>1737543883182</ModTime>
+                    <ModTime>1737914831075</ModTime>
                     <parameter name="enabled">false</parameter>
                     <parameter name="script"><![CDATA[//initialize();
 fetchSchema();
@@ -321,10 +324,12 @@ fetchActions();
 i = 42;]]></parameter>
                 </Script>
                 <Script name="Connector Script">
-                    <ModTime>1737912486723</ModTime>
+                    <ModTime>1737982310382</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[// 20250104 2008 Initial
 // 20250111 1915 Handling queryParameters in url
+// 20250126 1901 Adding queryMode for querySchema to return either params, or schema of data
+// 20250117 1346 initialize(), terminate(), selectEntries() and a test queryReply() in place
 
 //
 //						GLOBAL VARIABLES
@@ -347,11 +352,11 @@ var __paramNames = {
 	url: true,
 	username: true,
 	item: true,
-	action: true
+	action: true,
+	queryMode: true
 }
 
-
-//var __baseUrl = connector.getParam("url");	// the service domain and port
+//var __baseUrl = connector.|etParam("url");	// the service domain and port
 //var __requestEntry = system.newEntry();		// global shared to limit memory usage
 //var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
 //var __token = "";							// returned OAuth token
@@ -464,6 +469,7 @@ function refreshParameters() {
 	__parameters = {};
 	
 	for (var paramName in __paramNames) {
+		//java.lang.System.out.println("> " + paramName);
 		__parameters[paramName] = connector.getParam(paramName);
 	}
 	
@@ -503,7 +509,7 @@ function queryReply() {
 	// Make the REST call @@TODO Only does GET for now
 	var reply = __http.makeRequest({
 			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
-			url: __schema.replaceEmbeddedUID(usePath, entry) + queryString,
+			url: usePath + queryString,
 			ctype: "application/json",
 			where: "queryReply()"
 	});
@@ -534,6 +540,13 @@ function querySchema() {
 	var params = refreshParameters();
 	var path = params.path;
 	var action = params.action;
+	
+	if (params.queryMode == "Data schema") {
+		var e = system.newEntry();
+		e.name = "!TODO! Read from REST service";
+		list.add(e);
+		return list
+	}
 
 	var parameters = __schema.getParameters(path, action);
 
@@ -549,6 +562,9 @@ function querySchema() {
 
 	for (var i in parameters) {
 		var param = parameters[i];
+
+		if (param == "CSRFToken") continue;
+		
 		var e = system.newEntry();
 		e.name = param.name;
 		e.syntax = "MUST/" + param.schema.type;
@@ -565,8 +581,8 @@ function querySchema() {
 
 function debugMsg(msg) {
 	if (__debug) {
-		task.logmsg(msg);
-		main.logmsg(msg);
+//		task.logmsg(msg);
+//		main.logmsg(msg);
 		java.lang.System.out.println(msg)
 	}
 }
@@ -616,7 +632,7 @@ function parseSchema() {
 	// @@TODO Make actual call
 	debugMsg("Fetching schema...")
 	//var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
-	var schemaJSON = fetchSchema();
+	//var schemaJSON = fetchSchema();
 
 	//debugMsg("Creating SCHEMA object");
 	__schema = fetchSchema();
@@ -630,10 +646,11 @@ function parseSchema() {
 }]]></parameter>
                 </Script>
                 <Script name="Test Connector Script">
-                    <ModTime>1737912354689</ModTime>
+                    <ModTime>1737981374714</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[initialize();
-
+querySchema();
+entry.personId = "NO12345";
 main.logmsg(__http.httpEntry(queryReply()));
 selectEntries();
 main.logmsg(__http.httpEntry(getNextEntry()));
@@ -641,6 +658,246 @@ main.logmsg(__http.httpEntry(getNextEntry()));
 
 i = 42]]></parameter>
                 </Script>
+                <Script name="Connector Form Event Script_1">
+                    <ModTime>1737914686188</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[// 20250104 1959 Initial
+// 20250121 1154 Created RESTCLIENT class and used that instead of lots of functions
+// 20250121 2047 Copied back test Event Script after _testScriptConnectorCode succeeded in testing Form code
+// 20250121 2103 Form Working! Now to look at Mode ops (putEntry, findEntry, ...)
+// 20250126 1901 Adding queryMode for querySchema to return either params, or schema of data
+//
+//						GLOBAL VARIABLES
+//
+var __schema = null;
+var __initialized = false;
+//var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function debug() {
+	return false;
+	return form.getControl("debug").getText()
+}
+
+function alert(msg) {
+	if (debug()) alert(msg);
+	main.logmsg(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	//eval(system.getScriptText("RESTIFY library class")); // Load script library class
+	//__lib = new RESTIFY();
+
+	eval(system.getScriptText("RESTCLIENT class")); // Load HTTP Client class
+	
+	// Recreate in case parameters are changed
+	__http = new RESTCLIENT({
+						baseUrl:  form.getControl("url").getText(),
+						authUrl:  form.getControl("authUrl").getText(),
+						apikey:   form.getControl("apikey").getText(),
+						username: form.getControl("username").getText(),
+						password: form.getControl("password").getText(),
+						schemaUrl: form.getControl("schema").getText(),
+						debug: debug() // true => debug output
+				})		
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	initialize();
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: "/schema",
+			authUrl: form.getControl("authUrl").getText(),
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with paths
+function fetchItems() {
+	//alert("---> fetchItems");
+    //var path = form.getControl("PathToObjects").getText();
+
+	initialize();
+
+	path = "paths";
+
+    updateDropdown("path",
+        [path],
+        "Cannot fetch actions for Path");
+        
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected path
+function fetchActions() {
+	initialize();
+	
+    var selectedItem = form.getControl("path").getText() || "";
+	// alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for Path: " + selectedItem)
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) {
+        	alert("updateDropdown() - Path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arrList = java.util.ArrayList();
+        for (var propName in subtree) {
+        	arrList.add(propName);
+        }
+        var arr = arrList.toArray();
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+
+        alert("drop-down updated!");
+
+        combo.select(0)
+
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("path").removeAll();
+	form.getControl("action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]></parameter>
+                </Script>
+                <Connector name="RestClientConnector">
+                    <InheritFrom>/Connectors/RestClientConnector</InheritFrom>
+                    <ModTime>1737982106197</ModTime>
+                    <ConnectorMode>CallReply</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1737982106197</ModTime>
+                        <AttributeMapItem>
+                            <Name>personId</Name>
+                            <Type>advanced</Type>
+                            <Script>"NO12345"</Script>
+                            <Simple>personId</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <ModTime>1737982073881</ModTime>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
             </ContainerDF>
             <ThreadOptions/>
             <Operations/>
@@ -3078,15 +3335,15 @@ i = 42]]></parameter>
     
     <Connector name="RestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1737544090499</ModTime>
+            <ModTime>1737982645111</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1737544090499</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="622" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Jan 22 12:08:10 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1737982645111</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="629" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sun Jan 26 19:02:48 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
-        <ModTime>1737544048218</ModTime>
+        <ModTime>1737914541613</ModTime>
         <FormItemNames>
             <ListItem>$GLOBAL.script</ListItem>
             <ListItem>keepGlobalState</ListItem>
@@ -3106,6 +3363,7 @@ i = 42]]></parameter>
             <ListItem>url</ListItem>
             <ListItem>debug</ListItem>
             <ListItem>searchCrit</ListItem>
+            <ListItem>queryMode</ListItem>
         </FormItemNames>
         <FormSectionNames>
             <ListItem>General</ListItem>
@@ -3243,6 +3501,16 @@ i = 42]]></parameter>
             <parameter name="scriptLabel">Fetch</parameter>
             <parameter name="syntax">dropedit</parameter>
         </FormItem>
+        <FormItem name="queryMode">
+            <ModTime>1737914541613</ModTime>
+            <Values>
+                <ListItem>Available parameters</ListItem>
+                <ListItem>Data schema</ListItem>
+            </Values>
+            <parameter name="description">Pressing Next in the Attribute Schema pane will either return available parameters for the selected Path, or the schema of the data</parameter>
+            <parameter name="label">Query Schema mode</parameter>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
         <FormItem name="schema">
             <ModTime>1737024188497</ModTime>
             <parameter name="description">The REST endpoint that returns the schema for this API</parameter>
@@ -3291,6 +3559,7 @@ i = 42]]></parameter>
                 <ListItem>path</ListItem>
                 <ListItem>action</ListItem>
                 <ListItem>searchCrit</ListItem>
+                <ListItem>queryMode</ListItem>
             </FormSectionNames>
         </FormSection>
         <parameter name="formevents"><![CDATA[// 20250104 1959 Initial
@@ -3492,11 +3761,14 @@ function write(fname, str) {
                 <parameter name="includePrologs"><![CDATA[SCHEMA class
 RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
-                <parameter encrypted="true" name="password">alsFrMDabmOZZo6r7AOhYR5cyxv8W0NzXb+7QJrXNdDP/jNFtjltJVQ1+39ifsVma3IdmICEoQz+lx2OYU2LO09AAkmDpSE2gE5VL65bDW/pcW34FAovKVHFQlqL/rgvEj9lDxESrTn0DdXVySxgFRsKJ/WrnTfKa/ON7r2BD4g=</parameter>
+                <parameter encrypted="true" name="password">cHT9gEHGA7amaJawp1tjOh7OvKBiBGPNkTTDzuPtyUyTIbtQVtR0e7HngTyEoepbEnQsqgonvSzYFUfMXkIw4y/rPrwpGUZjJzTBe5p2pbdnVzrSylDUj5L69OEScLg7JU9ssxTbjcLHYPAvI3mzgmP3uiRoWjHpsRTIfgtXJ3U=</parameter>
                 <parameter name="path">/access/assignments/{assignmentId}</parameter>
+                <parameter name="queryMode">Available parameters</parameter>
                 <parameter name="schema">/schema</parameter>
                 <parameter name="script"><![CDATA[// 20250104 2008 Initial
 // 20250111 1915 Handling queryParameters in url
+// 20250126 1901 Adding queryMode for querySchema to return either params, or schema of data
+// 20250117 1346 initialize(), terminate(), selectEntries() and a test queryReply() in place
 
 //
 //						GLOBAL VARIABLES
@@ -3505,176 +3777,36 @@ var __parameters = {};						// params for the chosen path and action
 var __debug = connector.getParam("debug");	// debug output?
 var __schema = null;						// shared openAPI schema object (SCHEMA class)
 var __initialized = false;					// Do I need this?
-var __lib = null;							// for eval of RestLib
-var __baseUrl = connector.getParam("url");	// the service domain and port
-var __requestEntry = system.newEntry();		// global shared to limit memory usage
-var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
-var __token = "";							// returned OAuth token
-var __sessionId = "";						// current session id
+var __emptyEntry = system.newEntry();		// for craftQueryString
+var __http = null; 							// for the RESTCLIENT we will use for the calls
+
+var __paramNames = {
+	action: true,
+	apikey: true,
+	schema: true,
+	authUrl: true,
+	debug: true,
+	path: true,
+	password: true,
+	url: true,
+	username: true,
+	item: true,
+	action: true,
+	queryMode: true
+}
+
+//var __baseUrl = connector.|etParam("url");	// the service domain and port
+//var __requestEntry = system.newEntry();		// global shared to limit memory usage
+//var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
+//var __token = "";							// returned OAuth token
+//var __sessionId = "";						// current session id
 
 //
 //							FUNCTIONS
 //
 
-// Get the client certificate from the server and import it to the TDI keystore
-function getCertificate () {
-	var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
-}
 
-// Get the authentication token
-function getToken() {
-	var reply = makeRequest({
-			verb: "POST",
-			url: connector.getParam("authUrl"),
-			ctype: "application/json",
-			where: "getToken()",
-			headers: {
-				Authorization: "Bearer " + connector.getParam("apikey")
-			},
-			body: {
-				username: connector.getParam("user"),
-				password: connector.getParam("password")
-			}
-	});
-	
-	__token = reply.csrftoken || "";
-	__sessionId = reply.sessionId || ""
-}
 
-// Checks the validity of the reply and sets up for Iteration
-function parseReply(replyEntry) {
-	if (replyEntry === null) { return } 
-	
-	var status = replyEntry.getString("http.responseCode");
-
-	// Check the return status
-	if (status == "401") { // Unauthorized - time to renew the token
-		throwException("Unauthorized")
-	}
-	if (!status.startsWith("2")) {
-		throwException("Error response from ServiceNow. Response code: " 
-							+ status
-							+ "    Message: " + replyEntry.getString("http.responseMsg"));
-	}
-	
-	// Now parse the body
-	var body = replyEntry.getString("http.bodyAsString");
-
-	try {
-		var reply = fromJson(body);
-	} catch (ex) {
-		throwException("Error parsing return payload from itim: " + ex.toString()
-						+ "\n*** dump of reply ***\n" 
-						+ replyEntry)
-	}
-		
-	return reply;
-}
-
-// Function to make HTTP requests. The first lines of code show you the parameters you can send
-function makeRequest(params) {
-	var verb = params.verb || "POST";
-	var url = params.url || throwException("makeRequest called with no URL");
-	var body = params.body || null;
-	var ctype = params.ctype || "application/json";
-	var where = params.where || "";
-	var headers = params.headers || {};
-	
-	// Prepend the host (baseURL) if not already there
-	if (url.toLowerCase().indexOf(__baseUrl.toLowerCase()) < 0) {
-		url = __baseUrl + "/" + url;
-	}
-	
-	__requestEntry.removeAllAttributes();
-	
-	if (typeof body !== "undefined" && body !== null) {
-		method = "POST";
-
-		if (typeof body != "string") {
-			__requestEntry["http.body"] = toJson(body);
-		} else {
-			__requestEntry["http.body"] = body;
-		}
-	}	
-	
-	__http.setParam("method", verb.toUpperCase());
-	__http.setParam("url", connector.getParam("url"));
-	__http.setParam("username", connector.getParam("user"));
-	__http.setParam("password", connector.getParam("password"));
-
-	__requestEntry["http.Content-Type"] = ctype;
-	
-	for (var hdr in headers) {
-		__requestEntry["http." + hdr] = headers[hdr]
-	}
-	
-	if (__token) __requestEntry["http.X-CSRV-TOKEN"] = __token;
-	if (__sessionId) __requestEntry["http.sessionId"] = __sessionId;
-	
-	__http.terminate();
-	__http.initialize(null);
-	
-	if (__debug) {
-		logDetails({"msg" : "Request to itim", 
-					"obj" : __requestEntry, 
-					"url" : url, 
-					"verb" : verb, 
-					"ctype" : ctype, 
-					"where" : where});
-	}
-
-	do {
-		var retry = false;
-		try {	
-			var retEntry = __http.queryReply(__requestEntry);
-			var reply = parseReply(retEntry);
-		} catch (ex) {
-			if (ex.toString().indexOf("Unauthorized") >= 0) {
-				getToken();
-				retry = true
-			} else
-			if (ex instanceof javax.net.ssl.SSLHandshakeException) {
-				if (ex.toString().indexOf("Certificate chaining error") >= 0) {
-					throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
-				}
-				getCertificate();
-				retry = true;
-			} else {
-				throw ex;
-			}	
-		}
-	} while (retry);
-	
-	if (__debug) {
-		logDetails({"msg" : "Response from itim", 
-					"obj" : retEntry,
-				    "entry" : retEntry});
-	}
-	
-	return reply;
-}
-
-function logmsg(lvl, msg) {
-	if (typeof(lvl) == "undefined") {
-		msg = ""
-		lvl = "INFO"
-	} else
-	if (typeof(msg) == "undefined") {
-		msg = lvl
-		lvl = "INFO"
-	}
-	
-	if (lvl.toLowerCase().startsWith("console")) {
-		java.lang.System.out.println(msg)
-		lvl = "INFO"
-		msg = "(CONSOLE) " + msg
-	}	
-	task.logmsg(lvl, msg)
-}
-
-function throwException(msg) {
-	throw new java.lang.IllegalArgumentException(msg);
-}
 
 function fixQueryParam(qp, value) {
 	var retval = qp.name + "=";
@@ -3688,8 +3820,6 @@ function fixQueryParam(qp, value) {
 
 	return retval
 }
-
-var __emptyEntry = system.newEntry();
 
 function craftQueryString(args) {
 	var path = args.path;
@@ -3720,54 +3850,28 @@ function fixUrl(url) {
 	}
 }
 
-function resetConnector() {
-	initialized = false;
-
-	if (typeof list != "undefined") list.clear(); // so it works while spoofing
-	if (__http) __http.terminate()
+function debug() {
+	return __debug;
 }
 
-function logDetails(params) {
-	var msg = params.msg;
-	var obj = params.obj; 
-	var url = params.url;
-	var verb = params.verb;
-	var ctype = params.ctype; 
-	var where = params.where;
-	
-	if (msg == null) {
-		msg = "*unknown entry*";
-	}
+// Rest the connector and re-initialize it in case parameters have changed
+function resetConnector() {
+	__initialized = false;
 
-	var s = new java.lang.StringBuffer();
+	if (typeof list != "undefined") list.clear(); // so it works while spoofing
+	if (__http) __http.terminate();
 	
-	if (where != null) {
-		s.append("\n@@@------> (" + where + ") " + msg);
-	} else {
-		s.append("\n---------> " + msg);
-	}
-	
-	
-	if (verb != null) { s.append("   " + verb.toUpperCase()); } 
-	if (ctype != null) { s.append("   " + ctype); } 
-	if (url != null) { s.append("   " + url); } 
-	s.append("\n");
-
-	if (obj != null) {
-		if (obj instanceof com.ibm.di.entry.Entry) {	
-			var attNames = obj.getAttributeNames();
-			for (var a in attNames) {
-				if (a.indexOf("http.") >= 0 && 
-					!("http.bodyAsString".equalsIgnoreCase(a)
-						|| "http.bodyAsBytes".equalsIgnoreCase(a)) ) {
-					s += " " + a + ": " + obj[a] + "\n";
-				}
-			}	
-		} else {
-			s.append(obj.toString());
-		}
-	}	
-	logmsg(s.toString());
+	// Renew the RESTCLIENT with the currently set parameters
+	if (!RESTCLIENT) eval(system.getScriptText("RESTCLIENT class"));
+	__http = new RESTCLIENT({
+						baseUrl:   __parameters.url,
+						authUrl:   __parameters.authUrl,
+						apikey:    __parameters.apikey,
+						username:  __parameters.username,
+						password:  __parameters.password,
+						schemaUrl: __parameters.schema,
+						debug: 	   debug() // true => debug output		
+					})
 }
 
 // Change the URL path so the UID placeholder is replace with the Attribute value
@@ -3782,10 +3886,9 @@ function replaceUID(path, entry) {
 // -------  Standard Connector functions 
 //
 function initialize() {
-	resetConnector();
 	refreshParameters();
-	initializeAndParseSchema();
-	querySchema()
+	resetConnector();
+	parseSchema()
 }
 
 function terminate() {
@@ -3798,18 +3901,36 @@ function selectEntries() {
 
 function refreshParameters() {
 	var path = connector.getParam("path");
-	if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
+	//if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
 	var action = connector.getParam("action");
-	if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+	// if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
 
-	__parameters = {
-		path: path,
-		action: action
-	};
-
+	__parameters = {};
+	
+	for (var paramName in __paramNames) {
+		//java.lang.System.out.println("> " + paramName);
+		__parameters[paramName] = connector.getParam(paramName);
+	}
+	
 	return __parameters
 }
 
+// Turn the JS object returned from a call into the global entry object
+function toEntry(obj) {
+	entry.removeAllAttributes();
+	
+	for (var propName in obj) {
+		var prepend = (propName == "_links") ? propName + "_" : "";
+		
+		for (var subPropName in obj[propName]) {
+			entry[prepend + subPropName] = obj[propName][subPropName]
+		}
+	}
+	
+	return entry // Not necessary, since entry is global in the Connector context - I just like doing it :)
+}
+
+// CallReply function
 function queryReply() {
 	var params = refreshParameters();
 	var usePath = __schema.replaceEmbeddedUID(params.path, entry)
@@ -3821,29 +3942,29 @@ function queryReply() {
 		entry: entry
 	});
 	
+	// If there is a queryString, prepend it with ?
 	queryString = queryString ? "?" + queryString : "";
 	
-	var reply = makeRequest({
-			verb: "POST",
-			url: __schema.replaceEmbeddedUID(usePath, entry) + queryString,
+	// Make the REST call @@TODO Only does GET for now
+	var reply = __http.makeRequest({
+			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+			url: usePath + queryString,
 			ctype: "application/json",
 			where: "queryReply()"
 	});
 
-	logmsg("<" + action + "> " + path + "?" + queryString)	
+	toEntry(reply);
+	return entry
 }
 
 function getNextEntry() {
 	if (__counter > 0) {
 		result.setStatus(0);
-		return
+		return null;
 	}
-
-	entry.setAttribute("__counter", __counter);
-	result.setStatus(1);
 	__counter++;
 
-	return entry;
+	return entry
 }
 
 function putEntry() {}
@@ -3858,6 +3979,13 @@ function querySchema() {
 	var params = refreshParameters();
 	var path = params.path;
 	var action = params.action;
+	
+	if (params.queryMode == "Data schema") {
+		var e = system.newEntry();
+		e.name = "!TODO! Read from REST service";
+		list.add(e);
+		return list
+	}
 
 	var parameters = __schema.getParameters(path, action);
 
@@ -3873,6 +4001,9 @@ function querySchema() {
 
 	for (var i in parameters) {
 		var param = parameters[i];
+main.logmsg(">> " + param);
+		if (param == "CSRFToken") continue;
+		
 		var e = system.newEntry();
 		e.name = param.name;
 		e.syntax = "MUST/" + param.schema.type;
@@ -3889,7 +4020,8 @@ function querySchema() {
 
 function debugMsg(msg) {
 	if (__debug) {
-		main.logmsg(msg);
+//		task.logmsg(msg);
+//		main.logmsg(msg);
 		java.lang.System.out.println(msg)
 	}
 }
@@ -3903,29 +4035,46 @@ function alertObject(objName, obj) {
 	debugMsg(arr.toString())
 }
 
-function initializeAndParseSchema() {
-	if (__initialized) return;
-	__initialized = true;
+// Return the openAPI schema
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
 
-	//debugMsg("Initializing...");
-
-	eval(system.getScriptText("RESTIFY library class"));
-	__lib = new RESTIFY();
-
-	parseSchema()	
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: __parameters.schema,
+			authUrl: __parameters.authUrl,
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
 }
 
-// Return the openAPI schema - @TEST hardcoded for now
+// Parse the openAPI schema
 function parseSchema() {
 	if (__schema) return __schema;
 
 	// @@TODO Make actual call
 	debugMsg("Fetching schema...")
-	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	//var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	//var schemaJSON = fetchSchema();
 
 	//debugMsg("Creating SCHEMA object");
-	eval(system.getScriptText("SCHEMA class"));
-	__schema = new SCHEMA(schemaJSON, "JSON");
+	__schema = fetchSchema();
 
 	//var toplvl = "";
 	//for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
@@ -3942,19 +4091,27 @@ function parseSchema() {
             </Parser>
             <AttributeMap name="Input">
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1737982246053</ModTime>
             </AttributeMap>
             <AttributeMap name="Output">
                 <InheritFrom>[parent]</InheritFrom>
             </AttributeMap>
             <DeltaSettings>
+                <ModTime>1737982240552</ModTime>
+                <UniqueAttribute/>
                 <WhenToCommit>After every database operation</WhenToCommit>
                 <RowLocking>SERIALIZABLE</RowLocking>
                 <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
             </DeltaSettings>
             <Schema name="Input">
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1737982347551</ModTime>
                 <SchemaItem>
-                    <Name>accessCategoryID</Name>
+                    <Name>CSRFToken</Name>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>assignmentId</Name>
                     <NativeSyntax>MUST/string</NativeSyntax>
                 </SchemaItem>
             </Schema>
@@ -5318,6 +5475,919 @@ function write(fname, str) {
 RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter encrypted="true" name="password">d7j2gfiMItO24MZ5Jt05wuoqVPjvFxQVCCvDvnmrZW1PEXBE254ql7C3wv5+cr7r6/4kFL4d81umkdi8fMmHG7+0ZYckojdpz6rekAdTsT5NlfD1qbzCqRgIQCXafTs8dp2EFMLxLe5dZ5oT6EvGnhTH4wvETQebedmKALSuc9c=</parameter>
+                <parameter name="path">/access/assignments/{assignmentId}</parameter>
+                <parameter name="schema">/schema</parameter>
+                <parameter name="script"><![CDATA[// 20250104 2008 Initial
+// 20250111 1915 Handling queryParameters in url
+
+//
+//						GLOBAL VARIABLES
+//
+var __parameters = {};						// params for the chosen path and action
+var __debug = connector.getParam("debug");	// debug output?
+var __schema = null;						// shared openAPI schema object (SCHEMA class)
+var __initialized = false;					// Do I need this?
+var __lib = null;							// for eval of RestLib
+var __baseUrl = connector.getParam("url");	// the service domain and port
+var __requestEntry = system.newEntry();		// global shared to limit memory usage
+var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
+var __token = "";							// returned OAuth token
+var __sessionId = "";						// current session id
+
+//
+//							FUNCTIONS
+//
+
+// Get the client certificate from the server and import it to the TDI keystore
+function getCertificate () {
+	var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
+}
+
+// Get the authentication token
+function getToken() {
+	var reply = makeRequest({
+			verb: "POST",
+			url: connector.getParam("authUrl"),
+			ctype: "application/json",
+			where: "getToken()",
+			headers: {
+				Authorization: "Bearer " + connector.getParam("apikey")
+			},
+			body: {
+				username: connector.getParam("user"),
+				password: connector.getParam("password")
+			}
+	});
+	
+	__token = reply.csrftoken || "";
+	__sessionId = reply.sessionId || ""
+}
+
+// Checks the validity of the reply and sets up for Iteration
+function parseReply(replyEntry) {
+	if (replyEntry === null) { return } 
+	
+	var status = replyEntry.getString("http.responseCode");
+
+	// Check the return status
+	if (status == "401") { // Unauthorized - time to renew the token
+		throwException("Unauthorized")
+	}
+	if (!status.startsWith("2")) {
+		throwException("Error response from ServiceNow. Response code: " 
+							+ status
+							+ "    Message: " + replyEntry.getString("http.responseMsg"));
+	}
+	
+	// Now parse the body
+	var body = replyEntry.getString("http.bodyAsString");
+
+	try {
+		var reply = fromJson(body);
+	} catch (ex) {
+		throwException("Error parsing return payload from itim: " + ex.toString()
+						+ "\n*** dump of reply ***\n" 
+						+ replyEntry)
+	}
+		
+	return reply;
+}
+
+// Function to make HTTP requests. The first lines of code show you the parameters you can send
+function makeRequest(params) {
+	var verb = params.verb || "POST";
+	var url = params.url || throwException("makeRequest called with no URL");
+	var body = params.body || null;
+	var ctype = params.ctype || "application/json";
+	var where = params.where || "";
+	var headers = params.headers || {};
+	
+	// Prepend the host (baseURL) if not already there
+	if (url.toLowerCase().indexOf(__baseUrl.toLowerCase()) < 0) {
+		url = __baseUrl + "/" + url;
+	}
+	
+	__requestEntry.removeAllAttributes();
+	
+	if (typeof body !== "undefined" && body !== null) {
+		method = "POST";
+
+		if (typeof body != "string") {
+			__requestEntry["http.body"] = toJson(body);
+		} else {
+			__requestEntry["http.body"] = body;
+		}
+	}	
+	
+	__http.setParam("method", verb.toUpperCase());
+	__http.setParam("url", connector.getParam("url"));
+	__http.setParam("username", connector.getParam("user"));
+	__http.setParam("password", connector.getParam("password"));
+
+	__requestEntry["http.Content-Type"] = ctype;
+	
+	for (var hdr in headers) {
+		__requestEntry["http." + hdr] = headers[hdr]
+	}
+	
+	if (__token) __requestEntry["http.X-CSRV-TOKEN"] = __token;
+	if (__sessionId) __requestEntry["http.sessionId"] = __sessionId;
+	
+	__http.terminate();
+	__http.initialize(null);
+	
+	if (__debug) {
+		logDetails({"msg" : "Request to itim", 
+					"obj" : __requestEntry, 
+					"url" : url, 
+					"verb" : verb, 
+					"ctype" : ctype, 
+					"where" : where});
+	}
+
+	do {
+		var retry = false;
+		try {	
+			var retEntry = __http.queryReply(__requestEntry);
+			var reply = parseReply(retEntry);
+		} catch (ex) {
+			if (ex.toString().indexOf("Unauthorized") >= 0) {
+				getToken();
+				retry = true
+			} else
+			if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+				if (ex.toString().indexOf("Certificate chaining error") >= 0) {
+					throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+				}
+				getCertificate();
+				retry = true;
+			} else {
+				throw ex;
+			}	
+		}
+	} while (retry);
+	
+	if (__debug) {
+		logDetails({"msg" : "Response from itim", 
+					"obj" : retEntry,
+				    "entry" : retEntry});
+	}
+	
+	return reply;
+}
+
+function logmsg(lvl, msg) {
+	if (typeof(lvl) == "undefined") {
+		msg = ""
+		lvl = "INFO"
+	} else
+	if (typeof(msg) == "undefined") {
+		msg = lvl
+		lvl = "INFO"
+	}
+	
+	if (lvl.toLowerCase().startsWith("console")) {
+		java.lang.System.out.println(msg)
+		lvl = "INFO"
+		msg = "(CONSOLE) " + msg
+	}	
+	task.logmsg(lvl, msg)
+}
+
+function throwException(msg) {
+	throw new java.lang.IllegalArgumentException(msg);
+}
+
+function fixQueryParam(qp, value) {
+	var retval = qp.name + "=";
+	var value = (value || value == "") ? value : "<" + qp.description + ">"
+
+	if (qp.schema.type == "string") {
+		retval += "\"" + value + "\""
+	} else {
+		retval += value
+	}
+
+	return retval
+}
+
+var __emptyEntry = system.newEntry();
+
+function craftQueryString(args) {
+	var path = args.path;
+	var action = args.action;
+	var parameters = args.parameters || {};
+	var entry = args.entry || __emptyEntry;
+	
+	var embeddedUID = __schema.getEmbeddedUID(path);
+	
+	var queryParams = [];
+	for (var param in parameters) {
+		if (param != embeddedUID) {
+			paramValue = entry[param];
+			if (paramValue != null) {
+				queryParams.push(param + "=" + paramValue)
+			}
+		}	
+	}	
+	
+	return queryParams.join("&")
+}
+
+function fixUrl(url) {
+	if (!url.endsWith("/")) {
+		return url + "/";
+	} else {
+		return url;
+	}
+}
+
+function resetConnector() {
+	initialized = false;
+
+	if (typeof list != "undefined") list.clear(); // so it works while spoofing
+	if (__http) __http.terminate()
+}
+
+function logDetails(params) {
+	var msg = params.msg;
+	var obj = params.obj; 
+	var url = params.url;
+	var verb = params.verb;
+	var ctype = params.ctype; 
+	var where = params.where;
+	
+	if (msg == null) {
+		msg = "*unknown entry*";
+	}
+
+	var s = new java.lang.StringBuffer();
+	
+	if (where != null) {
+		s.append("\n@@@------> (" + where + ") " + msg);
+	} else {
+		s.append("\n---------> " + msg);
+	}
+	
+	
+	if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+	if (ctype != null) { s.append("   " + ctype); } 
+	if (url != null) { s.append("   " + url); } 
+	s.append("\n");
+
+	if (obj != null) {
+		if (obj instanceof com.ibm.di.entry.Entry) {	
+			var attNames = obj.getAttributeNames();
+			for (var a in attNames) {
+				if (a.indexOf("http.") >= 0 && 
+					!("http.bodyAsString".equalsIgnoreCase(a)
+						|| "http.bodyAsBytes".equalsIgnoreCase(a)) ) {
+					s += " " + a + ": " + obj[a] + "\n";
+				}
+			}	
+		} else {
+			s.append(obj.toString());
+		}
+	}	
+	logmsg(s.toString());
+}
+
+// Change the URL path so the UID placeholder is replace with the Attribute value
+function replaceUID(path, entry) {
+	
+}
+
+
+
+
+//
+// -------  Standard Connector functions 
+//
+function initialize() {
+	resetConnector();
+	refreshParameters();
+	initializeAndParseSchema();
+	querySchema()
+}
+
+function terminate() {
+	resetConnector()
+}
+
+function selectEntries() {
+
+}
+
+function refreshParameters() {
+	var path = connector.getParam("path");
+	if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
+	var action = connector.getParam("action");
+	if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+
+	__parameters = {
+		path: path,
+		action: action
+	};
+
+	return __parameters
+}
+
+function queryReply() {
+	var params = refreshParameters();
+	var usePath = __schema.replaceEmbeddedUID(params.path, entry)
+
+	var queryString = craftQueryString({
+		path: usePath,
+		parameters: __schema.getParameters(params.path, params.action),
+		action: params.action,
+		entry: entry
+	});
+	
+	queryString = queryString ? "?" + queryString : "";
+	
+	var reply = makeRequest({
+			verb: "POST",
+			url: __schema.replaceEmbeddedUID(usePath, entry) + queryString,
+			ctype: "application/json",
+			where: "queryReply()"
+	});
+
+	logmsg("<" + action + "> " + path + "?" + queryString)	
+}
+
+function getNextEntry() {
+	if (__counter > 0) {
+		result.setStatus(0);
+		return
+	}
+
+	entry.setAttribute("__counter", __counter);
+	result.setStatus(1);
+	__counter++;
+
+	return entry;
+}
+
+function putEntry() {}
+
+function modEntry() {}
+
+function deleteEntry() {}
+
+function findEntry() {}
+
+function querySchema() {
+	var params = refreshParameters();
+	var path = params.path;
+	var action = params.action;
+
+	var parameters = __schema.getParameters(path, action);
+
+	var embeddedParameter = __schema.getEmbeddedUID(path);
+	if (embeddedParameter) {
+		var e = system.newEntry();
+		e.name = embeddedParameter;
+		e.syntax = "MUST/uid";
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+
+	for (var i in parameters) {
+		var param = parameters[i];
+		var e = system.newEntry();
+		e.name = param.name;
+		e.syntax = "MUST/" + param.schema.type;
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+	result.setStatus(1);
+
+	return list
+}
+
+// --------------- library with f.ex. OpenAPI parsing
+
+function debugMsg(msg) {
+	if (__debug) {
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	debugMsg("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	debugMsg(arr.toString())
+}
+
+function initializeAndParseSchema() {
+	if (__initialized) return;
+	__initialized = true;
+
+	//debugMsg("Initializing...");
+
+	eval(system.getScriptText("RESTIFY library class"));
+	__lib = new RESTIFY();
+
+	parseSchema()	
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function parseSchema() {
+	if (__schema) return __schema;
+
+	// @@TODO Make actual call
+	debugMsg("Fetching schema...")
+	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+
+	//debugMsg("Creating SCHEMA object");
+	eval(system.getScriptText("SCHEMA class"));
+	__schema = new SCHEMA(schemaJSON, "JSON");
+
+	//var toplvl = "";
+	//for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+	//debugMsg("SCHEMA -> " + toplvl)
+
+	//debugMsg("Got it!");
+	return __schema
+}]]></parameter>
+                <parameter name="url"> https://mockitim.free.beeceptor.com </parameter>
+                <parameter name="username">edbird</parameter>
+            </Configuration>
+            <Parser>
+                <InheritFrom>[parent]</InheritFrom>
+            </Parser>
+            <AttributeMap name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <AttributeMap name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <DeltaSettings>
+                <WhenToCommit>After every database operation</WhenToCommit>
+                <RowLocking>SERIALIZABLE</RowLocking>
+                <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+            </DeltaSettings>
+            <Schema name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+                <SchemaItem>
+                    <Name>accessCategoryID</Name>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+            </Schema>
+            <Schema name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                </SchemaItem>
+            </Schema>
+            <LinkCriteria>
+                <InheritFrom>[parent]</InheritFrom>
+            </LinkCriteria>
+            <Hooks>
+                <InheritFrom>[parent]</InheritFrom>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <Reconnect>
+                <InheritFrom>[parent]</InheritFrom>
+                <ReconnectRules/>
+            </Reconnect>
+            <Operations/>
+            <PoolDefinition>
+                <InheritFrom>[parent]</InheritFrom>
+                <Enabled>false</Enabled>
+                <MinPoolSize>0</MinPoolSize>
+                <MaxPoolSize>0</MaxPoolSize>
+                <PurgeInterval>0</PurgeInterval>
+                <InitializeAttempts>1</InitializeAttempts>
+                <InitializeSleepInterval>0</InitializeSleepInterval>
+            </PoolDefinition>
+            <PoolInstance/>
+        </Connector>
+    <Connector name="RestClientConnector 20250126 1836 adding checkbox for Query Schema - params or data">
+            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
+            <ModTime>1737544090499</ModTime>
+            <ConnectorMode>Iterator</ConnectorMode>
+            <ConnectorState>Enabled</ConnectorState>
+            <Configuration>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1737544090499</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="622" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Wed Jan 22 12:08:10 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+    <Form name="Form">
+        <ModTime>1737544048218</ModTime>
+        <FormItemNames>
+            <ListItem>$GLOBAL.script</ListItem>
+            <ListItem>keepGlobalState</ListItem>
+            <ListItem>$GLOBAL.includeFiles</ListItem>
+            <ListItem>includePrologs</ListItem>
+            <ListItem>$GLOBAL.debug</ListItem>
+            <ListItem>$GLOBAL.help</ListItem>
+            <ListItem>PathToObjects</ListItem>
+            <ListItem>Clear</ListItem>
+            <ListItem>apikey</ListItem>
+            <ListItem>action</ListItem>
+            <ListItem>username</ListItem>
+            <ListItem>password</ListItem>
+            <ListItem>authUrl</ListItem>
+            <ListItem>path</ListItem>
+            <ListItem>schema</ListItem>
+            <ListItem>url</ListItem>
+            <ListItem>debug</ListItem>
+            <ListItem>searchCrit</ListItem>
+        </FormItemNames>
+        <FormSectionNames>
+            <ListItem>General</ListItem>
+            <ListItem>Advanced</ListItem>
+        </FormSectionNames>
+        <FormItem name="APIKey"/>
+        <FormItem name="Action">
+            <ModTime>1735050078962</ModTime>
+            <parameter name="description">Operation to apply to the selected Item</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchActions</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="Clear">
+            <ModTime>1737024086705</ModTime>
+            <parameter name="label"/>
+            <parameter name="noLabel">true</parameter>
+            <parameter name="script">clearDropdowns</parameter>
+            <parameter name="scriptLabel">Clear Path and Action</parameter>
+            <parameter name="syntax">static</parameter>
+        </FormItem>
+        <FormItem name="Item">
+            <ModTime>1734098635211</ModTime>
+            <parameter name="description">The resource item to operation on</parameter>
+            <parameter name="label">Item</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="script2"/>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="scriptLabel2"/>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="Object">
+            <ModTime>1733572441046</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Item to perform operations on</parameter>
+            <parameter name="label">	formdata.items = formdata.items || {};</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel"/>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="Operation">
+            <ModTime>1733750352248</ModTime>
+            <parameter name="description">Operation to apply to the selected Object</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchOperations</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="PathToObjects">
+            <ModTime>1733398344461</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">The openAPIschema is hierarchical, so at what level in the tree do resource items appear. Separate tree branches by pipe symbol (|)</parameter>
+            <parameter name="label">Path to Items</parameter>
+            <parameter name="script"/>
+            <parameter name="scriptLabel"/>
+        </FormItem>
+        <FormItem name="Show">
+            <ModTime>1733312883681</ModTime>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="action">
+            <ModTime>1736017096799</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Operation to apply to the selected path (resource item)</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchActions</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="apikey">
+            <ModTime>1737489711326</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">API Key provided for access to the service</parameter>
+            <parameter name="label">API Key</parameter>
+            <parameter name="syntax">password</parameter>
+        </FormItem>
+        <FormItem name="authUrl">
+            <ModTime>1736012659868</ModTime>
+            <parameter name="label">Auth URL</parameter>
+        </FormItem>
+        <FormItem name="baseUrl">
+            <ModTime>1737024040596</ModTime>
+            <parameter name="description">The first part of the URL, http://&lt;domain&gt;:&lt;port&gt;, with colon and port number required only if not port 80</parameter>
+            <parameter name="label">var __emptyEntry = system.newEntry();</parameter>
+        </FormItem>
+        <FormItem name="dashes">
+            <ModTime>1734099205004</ModTime>
+            <parameter name="label">_________________________________________________________________________________</parameter>
+            <parameter name="script"/>
+            <parameter name="scriptLabel"/>
+            <parameter name="syntax">static</parameter>
+        </FormItem>
+        <FormItem name="debug">
+            <ModTime>1737459130079</ModTime>
+            <parameter name="description">Yes or no</parameter>
+            <parameter name="label">Debug output</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="dropdown"/>
+        <FormItem name="includePrologs">
+            <parameter name="description">pro_desc</parameter>
+            <parameter name="label">pro_label</parameter>
+            <parameter name="script">selectGlobalProlog</parameter>
+            <parameter name="scriptLabel">pro_script_label</parameter>
+            <parameter name="scripthelp">pro_script_help</parameter>
+            <parameter name="syntax">textarea</parameter>
+        </FormItem>
+        <FormItem name="item">
+            <ModTime>1735050022484</ModTime>
+            <parameter name="description">The resource to act on</parameter>
+            <parameter name="label">Item</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="keepGlobalState">
+            <parameter name="description">SCRIPT_CONN_KEEP_GLOBAL_STATE_DESC</parameter>
+            <parameter name="label">SCRIPT_CONN_KEEP_GLOBAL_STATE_LABEL</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="password">
+            <ModTime>1736017137163</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Authorization password</parameter>
+            <parameter name="label">Password</parameter>
+            <parameter name="syntax">password</parameter>
+        </FormItem>
+        <FormItem name="path">
+            <ModTime>1737024268372</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">The URL path representing the resource item to work with</parameter>
+            <parameter name="label">Path</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="schema">
+            <ModTime>1737024188497</ModTime>
+            <parameter name="description">The REST endpoint that returns the schema for this API</parameter>
+            <parameter name="label">Schema</parameter>
+            <parameter name="script">fetchSchema</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+        </FormItem>
+        <FormItem name="searchCrit">
+            <ModTime>1737544048218</ModTime>
+            <parameter name="description">The Id of the Resource Item you want to retrieve</parameter>
+            <parameter name="label">Search for ID</parameter>
+        </FormItem>
+        <FormItem name="url">
+            <ModTime>1737024046822</ModTime>
+            <parameter name="description">The first part of the URL, http://&lt;domain&gt;:&lt;port&gt;, with colon and port number required only if not port 80</parameter>
+            <parameter name="label">Base URL</parameter>
+        </FormItem>
+        <FormItem name="username">
+            <ModTime>1736017120599</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Authorization username</parameter>
+            <parameter name="label">Username</parameter>
+        </FormItem>
+        <FormSection name="Advanced">
+            <FormSectionNames>
+                <ListItem>$GLOBAL.userComment</ListItem>
+                <ListItem>$GLOBAL.script</ListItem>
+                <ListItem>authUrl</ListItem>
+                <ListItem>Clear</ListItem>
+            </FormSectionNames>
+            <parameter name="initiallyExpanded">false</parameter>
+            <parameter name="title">Advanced</parameter>
+        </FormSection>
+        <FormSection name="Debug">
+            <FormSectionNames>
+                <ListItem>Clear</ListItem>
+            </FormSectionNames>
+        </FormSection>
+        <FormSection name="General">
+            <FormSectionNames>
+                <ListItem>apikey</ListItem>
+                <ListItem>username</ListItem>
+                <ListItem>password</ListItem>
+                <ListItem>url</ListItem>
+                <ListItem>schema</ListItem>
+                <ListItem>path</ListItem>
+                <ListItem>action</ListItem>
+                <ListItem>searchCrit</ListItem>
+            </FormSectionNames>
+        </FormSection>
+        <parameter name="formevents"><![CDATA[// 20250104 1959 Initial
+// 20250121 1154 Created RESTCLIENT class and used that instead of lots of functions
+// 20250121 2047 Copied back test Event Script after _testScriptConnectorCode succeeded in testing Form code
+// 20250121 2103 Form Working! Now to look at Mode ops (putEntry, findEntry, ...)
+//
+//						GLOBAL VARIABLES
+//
+var __schema = null;
+var __initialized = false;
+//var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function debug() {
+	return false;
+	return form.getControl("debug").getText()
+}
+
+function alert(msg) {
+	if (debug()) alert(msg);
+	main.logmsg(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	//eval(system.getScriptText("RESTIFY library class")); // Load script library class
+	//__lib = new RESTIFY();
+
+	eval(system.getScriptText("RESTCLIENT class")); // Load HTTP Client class
+	
+	// Recreate in case parameters are changed
+	__http = new RESTCLIENT({
+						baseUrl:  form.getControl("url").getText(),
+						authUrl:  form.getControl("authUrl").getText(),
+						apikey:   form.getControl("apikey").getText(),
+						username: form.getControl("username").getText(),
+						password: form.getControl("password").getText(),
+						schemaUrl: form.getControl("schema").getText(),
+						debug: debug() // true => debug output
+				})		
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	initialize();
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: "/schema",
+			authUrl: form.getControl("authUrl").getText(),
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with paths
+function fetchItems() {
+	//alert("---> fetchItems");
+    //var path = form.getControl("PathToObjects").getText();
+
+	initialize();
+
+	path = "paths";
+
+    updateDropdown("path",
+        [path],
+        "Cannot fetch actions for Path");
+        
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected path
+function fetchActions() {
+	initialize();
+	
+    var selectedItem = form.getControl("path").getText() || "";
+	// alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for Path: " + selectedItem)
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) {
+        	alert("updateDropdown() - Path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arrList = java.util.ArrayList();
+        for (var propName in subtree) {
+        	arrList.add(propName);
+        }
+        var arr = arrList.toArray();
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+
+        alert("drop-down updated!");
+
+        combo.select(0)
+
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("path").removeAll();
+	form.getControl("action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]]]><![CDATA[></parameter>
+        <parameter name="formscript"/>
+        <parameter name="title">CONN_TITLE</parameter>
+        <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
+    </Form>
+</MetamergeConfig>]]></parameter>
+                <parameter name="Action"/>
+                <parameter name="Item"/>
+                <parameter name="Object"/>
+                <parameter name="Operation">servers</parameter>
+                <parameter name="PathToObjects">paths</parameter>
+                <parameter name="action">delete</parameter>
+                <parameter name="apikey">xyzzy</parameter>
+                <parameter name="authUrl">/v1.0/endpoint/default/token</parameter>
+                <parameter name="debug">false</parameter>
+                <parameter name="includeFiles"/>
+                <parameter name="includePrologs"><![CDATA[SCHEMA class
+RESTCLIENT class]]></parameter>
+                <parameter name="item">/people</parameter>
+                <parameter encrypted="true" name="password">Y1uAcSKq8doZhjjTlOw6tdakroigwBbKy/wTm8mZR9f9FLU2F1wPIuu9KxEHx5AdrmUcfOZkZWgX2rPPoQskc7VwuH0S9btFdUnw7fIQVIlRAmpwmDRCylh9lil4XPsXg6uZfMUOgdl6yyOW73nOaFrOy+S6gUcyuFvsF1ABOug=</parameter>
                 <parameter name="path">/access/assignments/{assignmentId}</parameter>
                 <parameter name="schema">/schema</parameter>
                 <parameter name="script"><![CDATA[// 20250104 2008 Initial
@@ -10548,7 +11618,7 @@ components:
     
     
     <Script name="SCHEMA class">
-            <ModTime>1737636104086</ModTime>
+            <ModTime>1737914322648</ModTime>
             <parameter name="enabled">true</parameter>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250121 1145	Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
@@ -10594,7 +11664,7 @@ function SCHEMA(schema, format) {
             jsonString = openApiSchema;
         }
 
-        ithis.schemaObj = fromJson(jsonString);
+        this.schemaObj = fromJson(jsonString);
         return this.schemaObj
     }
 
@@ -24713,7 +25783,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1737911681824</ModTime>
+            <ModTime>1737982755447</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -24729,7 +25799,7 @@ function RESTCLIENT(args) {
 	this.apikey = args.apikey || "";
 	this.username = args.username || "";
 	this.password = args.password || "";
-	this.debug = args.debug || true;
+	this.debug = false; //args.debug || false;
 	
 	// The HTTP Client Connector to use
 	this.http = system.getConnector("ibmdi.HTTPClient");
@@ -24935,6 +26005,10 @@ function RESTCLIENT(args) {
 	}
 
 	this.logDetails = function(params, sent) {
+		
+		// @@DEBUG
+		return;
+		
 		sent = sent || false;
 		var msg = params.msg;
 		var obj = params.obj; 

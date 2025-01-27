@@ -52,8 +52,8 @@ post '/v1.0/endpoint/default/token' => sub {
     $c->render(json => $response);
 };
 
-# Route for /person/NO12345
-get '/person/NO12345' => sub {
+# Route for /people/NO12345
+get '/people/NO12345' => sub {
     my $c = shift;
 
     # Define the response
@@ -84,6 +84,7 @@ get '/person/NO12345' => sub {
     $c->render(json => $response);
 };
 
+# Route for /schema
 # Route for /schema
 get '/schema' => sub {
     my $c = shift;
@@ -120,7 +121,95 @@ get '/schema' => sub {
             { name => "Permission Group Bulk APIs" },
             { name => "Risk APIs" },
             { name => "Risk Bulk APIs" }
-        ]
+        ],
+        paths => {
+            "/lifecyclerule/{lifecycleRuleIdentifier}" => {
+                get => {
+                    tags        => ["LifecycleRule Management"],
+                    summary     => "LifecycleRule Lookup",
+                    description => "Returns information about the specified Lifecycle Rule.",
+                    parameters  => [
+                        {
+                            name        => "lifecycleRuleIdentifier",
+                            in          => "path",
+                            description => "Unique Identifier for a lifecycleRule.",
+                            required    => \1,
+                            schema      => { type => "string" }
+                        },
+                        {
+                            name        => "attributes",
+                            in          => "query",
+                            description => "Specifies the comma-separated attributes to return for the LifecycleRule.",
+                            schema      => { type => "string" }
+                        }
+                    ],
+                    responses => {
+                        "200" => {
+                            description => "OK. The request was successful",
+                            content     => {
+                                "application/vnd.ibm.isim-v1+json" => {
+                                    example => {
+                                        _links => {
+                                            self => {
+                                                href  => "/itim/rest/lifecyclerule/OTA4ODM0OTc2NDIwODE5ODI4MHxudWxsfG51bGw",
+                                                title => "Deletion Lifecycle Rule"
+                                            }
+                                        },
+                                        _attributes => {
+                                            name      => "Deletion Lifecycle Rule",
+                                            operation => "delete"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                put => {
+                    tags        => ["LifecycleRule Management"],
+                    summary     => "LifecycleRule Modify",
+                    description => "Modifies information for specified lifecycle Rule.",
+                    parameters  => [
+                        {
+                            name        => "lifecycleRuleIdentifier",
+                            in          => "path",
+                            description => "Unique identifier for a LifecycleRule.",
+                            required    => \1,
+                            schema      => { type => "string" }
+                        },
+                        {
+                            name        => "CSRFToken",
+                            in          => "header",
+                            description => "CSRF token for authentication.",
+                            required    => \1,
+                            schema      => { type => "string" }
+                        }
+                    ],
+                    responses => { "202" => { description => "OK" } }
+                },
+                delete => {
+                    tags        => ["LifecycleRule Management"],
+                    summary     => "LifecycleRule Remove",
+                    description => "Remove the specified LifecycleRule.",
+                    parameters  => [
+                        {
+                            name        => "lifecycleRuleIdentifier",
+                            in          => "path",
+                            required    => \1,
+                            schema      => { type => "string" }
+                        },
+                        {
+                            name        => "CSRFToken",
+                            in          => "header",
+                            description => "CSRF token for authentication.",
+                            required    => \1,
+                            schema      => { type => "string" }
+                        }
+                    ],
+                    responses => { "200" => { description => "OK. The request was successful" } }
+                }
+            }
+        }
     };
 
     # Render the JSON response
