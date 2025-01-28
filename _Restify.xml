@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Mon Jan 27 19:00:02 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Tue Jan 28 15:52:59 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -21,7 +21,7 @@
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1738000500769</ModTime>
+            <ModTime>1738075847388</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -51,9 +51,9 @@ RESTCLIENT class
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1738000500769</ModTime>
+                <ModTime>1738075847388</ModTime>
                 <Script name="SpoofLib">
-                    <ModTime>1737915538874</ModTime>
+                    <ModTime>1738073114381</ModTime>
                     <parameter name="script"><![CDATA[function control(val) {
 	this.val = val;
 	
@@ -79,19 +79,20 @@ RESTCLIENT class
 form = {
 	getControl: function(pname) {
 		switch (pname.toLowerCase()) {
-			case "action": 	 return control("get");
-			case "apikey": 	 return control("xyzzy");
-			case "schema":	 return control("/schema");
-			case "authurl":  return control("/v1.0/endpoint/default/token");
-			case "debug": 	 return control(true);
-			case "path": 	 return control("/people/{personId}");
-			case "password": return control("R0kz");
-			case "url": 	 return control("http://localhost:8080");
-			case "username": return control("edbird");
-			case "item": return new control("/people");
-			case "action": return new control("post");	
-			case "querymode" : return new control("Available parameters"); // Available parameters or Data from REST call
-			default: 		 return control("*Invalid param: " + pname + "*")
+			case "action": 	 	return control("get");
+			case "apikey": 	 	return control("xyzzy");
+			case "schema":	 	return control("/schema");
+			case "authurl":  	return control("/v1.0/endpoint/default/token");
+			case "debug": 	 	return control(true);
+			case "path": 	 	return control("/people/{personId}");
+			case "password": 	return control("R0kz");
+			case "url": 	 	return control("http://localhost:8080");
+			case "username": 	return control("edbird");
+			case "item": 		return new control("/people");
+			case "action": 		return new control("post");	
+			case "searchcrit": 	return new control("NO12345");
+			case "querymode" : 	return new control("Available parameters"); // Available parameters or Data from REST call
+			default: 		 	return control("*Invalid param: " + pname + "*")
 		}
 	},
 	alert: function(msg) {
@@ -324,13 +325,14 @@ fetchActions();
 i = 42;]]></parameter>
                 </Script>
                 <Script name="Connector Script">
-                    <ModTime>1738000500769</ModTime>
+                    <ModTime>1738075847388</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[// 20250104 2008 Initial
 // 20250111 1915 Handling queryParameters in url
 // 20250126 1901 Adding queryMode for querySchema to return either params, or schema of data
 // 20250127 1346 initialize(), terminate(), selectEntries() and a test queryReply() in place
 // 20250127	1854 maded querySchema drop the token in the parameters returned
+// 20250128 1503 selectEntries and getNextEntry implemented - ready for more testing I'm sure :)
 
 //
 //						GLOBAL VARIABLES
@@ -341,6 +343,7 @@ var __schema = null;						// shared openAPI schema object (SCHEMA class)
 var __initialized = false;					// Do I need this?
 var __emptyEntry = system.newEntry();		// for craftQueryString
 var __http = null; 							// for the RESTCLIENT we will use for the calls
+var __resultSet = null;						// A container for returned entries (selectEntries/findEntry)
 
 var __paramNames = {
 	action: true,
@@ -354,7 +357,8 @@ var __paramNames = {
 	username: true,
 	item: true,
 	action: true,
-	queryMode: true
+	queryMode: true,
+	searchCrit: true
 }
 
 //var __baseUrl = connector.|etParam("url");	// the service domain and port
@@ -419,6 +423,10 @@ function debug() {
 // Rest the connector and re-initialize it in case parameters have changed
 function resetConnector() {
 	__initialized = false;
+	__entryFound = null;
+	
+	// Now zero out the __resultSet global ArrayList
+	__resultSet = new java.util.ArrayList();
 
 	if (typeof list != "undefined") list.clear(); // so it works while spoofing
 	if (__http != null) __http.terminate();
@@ -441,42 +449,6 @@ function replaceUID(path, entry) {
 	
 }
 
-
-
-
-//
-// -------  Standard Connector functions 
-//
-function initialize() {
-	refreshParameters();
-	resetConnector();
-	parseSchema()
-}
-
-function terminate() {
-	resetConnector()
-}
-
-function selectEntries() {
-
-}
-
-function refreshParameters() {
-	var path = connector.getParam("path");
-	//if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
-	var action = connector.getParam("action");
-	// if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
-
-	__parameters = {};
-	
-	for (var paramName in __paramNames) {
-		//java.lang.System.out.println("> " + paramName);
-		__parameters[paramName] = connector.getParam(paramName);
-	}
-	
-	return __parameters
-}
-
 // Turn the JS object returned from a call into the global entry object
 function toEntry(obj) {
 	entry.removeAllAttributes();
@@ -491,94 +463,6 @@ function toEntry(obj) {
 	
 	return entry // Not necessary, since entry is global in the Connector context - I just like doing it :)
 }
-
-// CallReply function
-function queryReply() {
-	var params = refreshParameters();
-	var usePath = __schema.replaceEmbeddedUID(params.path, entry)
-
-	var queryString = craftQueryString({
-		path: usePath,
-		parameters: __schema.getParameters(params.path, params.action),
-		action: params.action,
-		entry: entry
-	});
-	
-	// If there is a queryString, prepend it with ?
-	queryString = queryString ? "?" + queryString : "";
-	
-	// Make the REST call @@TODO Only does GET for now
-	var reply = __http.makeRequest({
-			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
-			url: usePath + queryString,
-			ctype: "application/json",
-			where: "queryReply()"
-	});
-
-	toEntry(reply);
-	return entry
-}
-
-function getNextEntry() {
-	if (__counter > 0) {
-		result.setStatus(0);
-		return null;
-	}
-	__counter++;
-
-	return entry
-}
-
-function putEntry() {}
-
-function modEntry() {}
-
-function deleteEntry() {}
-
-function findEntry() {}
-
-function querySchema() {
-	var params = refreshParameters();
-	var path = params.path;
-	var action = params.action;
-	
-	if (params.queryMode == "Data schema") {
-		var e = system.newEntry();
-		e.name = "!TODO! Read from REST service";
-		list.add(e);
-		return list
-	}
-
-	var parameters = __schema.getParameters(path, action);
-
-	var embeddedParameter = __schema.getEmbeddedUID(path);
-	if (embeddedParameter) {
-		var e = system.newEntry();
-		e.name = embeddedParameter;
-		e.syntax = "MUST/uid";
-		e.required = true;
-		e.mandatory = true;
-		list.add(e)
-	}
-
-	for (var i in parameters) {
-		var param = parameters[i];
-   
-		if (param.name == "CSRFToken") continue;
-		
-		var e = system.newEntry();
-		e.name = param.name;
-		e.syntax = "MUST/" + param.schema.type;
-		e.required = true;
-		e.mandatory = true;
-		list.add(e)
-	}
-	result.setStatus(1);
-
-	return list
-}
-
-// --------------- library with f.ex. OpenAPI parsing
 
 function debugMsg(msg) {
 	if (__debug) {
@@ -644,16 +528,181 @@ function parseSchema() {
 
 	//debugMsg("Got it!");
 	return __schema
+}
+
+function refreshParameters() {
+	var path = connector.getParam("path");
+	//if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
+	var action = connector.getParam("action");
+	// if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+
+	__parameters = {};
+	
+	for (var paramName in __paramNames) {
+		//java.lang.System.out.println("> " + paramName);
+		__parameters[paramName] = connector.getParam(paramName);
+	}
+	
+	return __parameters
+}
+
+
+
+
+
+//
+// -------  Standard Connector functions 
+//
+function initialize() {
+	refreshParameters();
+	resetConnector();
+	parseSchema()
+}
+
+function terminate() {
+	resetConnector()
+}
+
+// CallReply function
+function queryReply() {
+	var params = refreshParameters();
+	var usePath = __schema.replaceEmbeddedUID(params.path, entry)
+
+	var queryString = craftQueryString({
+		path: usePath,
+		parameters: __schema.getParameters(params.path, params.action),
+		action: params.action,
+		entry: entry
+	});
+	
+	// If there is a queryString, prepend it with ?
+	queryString = queryString ? "?" + queryString : "";
+	
+	// Make the REST call @@TODO Only does GET for now
+	var reply = __http.makeRequest({
+			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+			url: usePath + queryString,
+			ctype: "application/json",
+			where: "queryReply()"
+	});
+
+	toEntry(reply);
+	return entry
+}
+
+function selectEntries() {
+	var params = refreshParameters();
+	var personId = params.searchCrit;
+	
+	if (!personId) throw java.lang.Exception("Search criteria (personId) must be configured for this Connector")
+	
+	var usePath = __schema.replaceEmbeddedUID(params.path, personId);
+
+	var queryString = craftQueryString({
+		path: usePath,
+		parameters: __schema.getParameters(params.path, params.action),
+		action: params.action,
+		entry: entry
+	});
+	
+	// If there is a queryString, prepend it with ?
+	queryString = queryString ? "?" + queryString : "";
+	
+	// Make the REST call @@TODO Only does GET for now
+	var reply = __http.makeRequest({
+			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+			url: usePath + queryString,
+			ctype: "application/json",
+			where: "queryReply()"
+	});
+
+	// Update the global 'entry' variable with these values
+	toEntry(reply);
+	// A little fancy footwork here for this test AL. In the Connector script, entry is made available by the AL
+	var resultEntry = system.newEntry();
+	resultEntry.merge(entry);
+	__resultSet.add(resultEntry);
+	return entry	
+}
+
+function getNextEntry() {
+	if (__resultSet.size() == 0) {
+		result.setStatus(0);
+		return null;
+	}
+
+	entry.removeAllAttributes();
+	entry.merge(__resultSet.remove(0)); // Grab an entry from the global __resultSet array
+	result.setStatus(1);
+	return entry
+}
+
+function putEntry() {}
+
+function modEntry() {}
+
+function deleteEntry() {}
+
+function findEntry() {}
+
+function querySchema() {
+	var params = refreshParameters();
+	var path = params.path;
+	var action = params.action;
+	
+	if (params.queryMode == "Data schema") {
+		var e = system.newEntry();
+		e.name = "!TODO! Read from REST service";
+		list.add(e);
+		return list
+	}
+
+	var parameters = __schema.getParameters(path, action);
+
+	var embeddedParameter = __schema.getEmbeddedUID(path);
+	if (embeddedParameter) {
+		var e = system.newEntry();
+		e.name = embeddedParameter;
+		e.syntax = "MUST/uid";
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+
+	for (var i in parameters) {
+		var param = parameters[i];
+   
+		if (param.name == "CSRFToken") continue;
+		
+		var e = system.newEntry();
+		e.name = param.name;
+		e.syntax = "MUST/" + param.schema.type;
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+	result.setStatus(1);
+
+	return list
 }]]></parameter>
                 </Script>
                 <Script name="Test Connector Script">
-                    <ModTime>1737981374714</ModTime>
+                    <ModTime>1738074062792</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[initialize();
+
+selectEntries();
+
+getNextEntry()
+main.logmsg(entry);
+getNextEntry()
+main.logmsg(entry);
+
 querySchema();
+
 entry.personId = "NO12345";
 main.logmsg(__http.httpEntry(queryReply()));
-selectEntries();
+
 main.logmsg(__http.httpEntry(getNextEntry()));
 
 
@@ -3915,6 +3964,950 @@ querySchema();
 entry.personId = "NO12345";
 main.logmsg(__http.httpEntry(queryReply()));
 selectEntries();
+main.logmsg(__http.httpEntry(getNextEntry()));
+
+
+i = 42]]></parameter>
+                </Script>
+                <Script name="Connector Form Event Script_1">
+                    <ModTime>1737914686188</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[// 20250104 1959 Initial
+// 20250121 1154 Created RESTCLIENT class and used that instead of lots of functions
+// 20250121 2047 Copied back test Event Script after _testScriptConnectorCode succeeded in testing Form code
+// 20250121 2103 Form Working! Now to look at Mode ops (putEntry, findEntry, ...)
+// 20250126 1901 Adding queryMode for querySchema to return either params, or schema of data
+//
+//						GLOBAL VARIABLES
+//
+var __schema = null;
+var __initialized = false;
+//var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function debug() {
+	return false;
+	return form.getControl("debug").getText()
+}
+
+function alert(msg) {
+	if (debug()) alert(msg);
+	main.logmsg(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	//eval(system.getScriptText("RESTIFY library class")); // Load script library class
+	//__lib = new RESTIFY();
+
+	eval(system.getScriptText("RESTCLIENT class")); // Load HTTP Client class
+	
+	// Recreate in case parameters are changed
+	__http = new RESTCLIENT({
+						baseUrl:  form.getControl("url").getText(),
+						authUrl:  form.getControl("authUrl").getText(),
+						apikey:   form.getControl("apikey").getText(),
+						username: form.getControl("username").getText(),
+						password: form.getControl("password").getText(),
+						schemaUrl: form.getControl("schema").getText(),
+						debug: debug() // true => debug output
+				})		
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	initialize();
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: "/schema",
+			authUrl: form.getControl("authUrl").getText(),
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with paths
+function fetchItems() {
+	//alert("---> fetchItems");
+    //var path = form.getControl("PathToObjects").getText();
+
+	initialize();
+
+	path = "paths";
+
+    updateDropdown("path",
+        [path],
+        "Cannot fetch actions for Path");
+        
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected path
+function fetchActions() {
+	initialize();
+	
+    var selectedItem = form.getControl("path").getText() || "";
+	// alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for Path: " + selectedItem)
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) {
+        	alert("updateDropdown() - Path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arrList = java.util.ArrayList();
+        for (var propName in subtree) {
+        	arrList.add(propName);
+        }
+        var arr = arrList.toArray();
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+
+        alert("drop-down updated!");
+
+        combo.select(0)
+
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("path").removeAll();
+	form.getControl("action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]></parameter>
+                </Script>
+                <Connector name="RestClientConnector">
+                    <InheritFrom>/Connectors/RestClientConnector</InheritFrom>
+                    <ModTime>1737997172378</ModTime>
+                    <ConnectorMode>CallReply</ConnectorMode>
+                    <ConnectorState>Disabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1737982106197</ModTime>
+                        <AttributeMapItem>
+                            <Name>personId</Name>
+                            <Type>advanced</Type>
+                            <Script>"NO12345"</Script>
+                            <Simple>personId</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <ModTime>1737982073881</ModTime>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1737997172378</ModTime>
+                        <SchemaItem>
+                            <Name>CSRFToken</Name>
+                            <NativeSyntax>MUST/string</NativeSyntax>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>assignmentId</Name>
+                            <NativeSyntax>MUST/string</NativeSyntax>
+                        </SchemaItem>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    <AssemblyLine name="_testScriptConnectorCode 20250128 1503 selectEntries and getNextEntry implemented">
+            <ModTime>1738075847388</ModTime>
+            <Settings>
+                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
+                <parameter name="automapattributes">false</parameter>
+                <parameter name="createTombstones">false</parameter>
+                <parameter name="includeGlobalPrologs">true</parameter>
+                <parameter name="includePrologs"><![CDATA[RESTIFY library class
+SCHEMA class
+RESTCLIENT class
+]]></parameter>
+                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
+            </Settings>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="SpoofLib" state="Enabled"/>
+                    <Component name="Connector Form Event Script" state="Enabled"/>
+                    <Component name="Test Form Event Script" state="Enabled"/>
+                    <Component name="Connector Script" state="Enabled"/>
+                    <Component name="Test Connector Script" state="Enabled"/>
+                    <Component name="Connector Form Event Script_1" state="Enabled"/>
+                    <Component name="RestClientConnector" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1738075847388</ModTime>
+                <Script name="SpoofLib">
+                    <ModTime>1738073114381</ModTime>
+                    <parameter name="script"><![CDATA[function control(val) {
+	this.val = val;
+	
+	this.getText = function() {
+		return this.val
+	}
+	
+	this.removeAll = function() {
+		
+	}
+	
+	this.add = function(arg) {
+		
+	}
+	
+	this.select = function(arg) {
+		
+	}
+	
+	return this
+}
+
+form = {
+	getControl: function(pname) {
+		switch (pname.toLowerCase()) {
+			case "action": 	 	return control("get");
+			case "apikey": 	 	return control("xyzzy");
+			case "schema":	 	return control("/schema");
+			case "authurl":  	return control("/v1.0/endpoint/default/token");
+			case "debug": 	 	return control(true);
+			case "path": 	 	return control("/people/{personId}");
+			case "password": 	return control("R0kz");
+			case "url": 	 	return control("http://localhost:8080");
+			case "username": 	return control("edbird");
+			case "item": 		return new control("/people");
+			case "action": 		return new control("post");	
+			case "searchcrit": 	return new control("NO12345");
+			case "querymode" : 	return new control("Available parameters"); // Available parameters or Data from REST call
+			default: 		 	return control("*Invalid param: " + pname + "*")
+		}
+	},
+	alert: function(msg) {
+		main.logmsg(msg)
+	}
+}
+
+
+connector = {
+	getParam: function(pname) {
+		var ctrl = form.getControl(pname);
+		return ctrl.getText();
+	}	
+}
+
+/*
+combo = {
+	text: "",
+	getText: function() { return txt },
+	removeAll: function() {},
+	add: function() {},
+	select: function() {}
+}	
+*/
+COMBO = function(value) {
+	this.value = string = value;
+	this.getText = function() {return this.value};
+	this.add = function() {};
+	this.select = function() {};
+	this.removeAll = function() {}
+}
+
+list = new java.util.ArrayList();
+
+entry = system.newEntry();]]></parameter>
+                </Script>
+                <Script name="Connector Form Event Script">
+                    <ModTime>1738000447743</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[// 20250104 1959 Initial
+// 20250121 1154 Created RESTCLIENT class and used that instead of lots of functions
+// 20250121 2047 Copied back test Event Script after _testScriptConnectorCode succeeded in testing Form code
+// 20250121 2103 Form Working! Now to look at Mode ops (putEntry, findEntry, ...)
+//
+//						GLOBAL VARIABLES
+//
+var __schema = null;
+var __initialized = false;
+//var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function debug() {
+	return false;
+	return form.getControl("debug").getText()
+}
+
+function alert(msg) {
+	if (debug()) alert(msg);
+	main.logmsg(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	//eval(system.getScriptText("RESTIFY library class")); // Load script library class
+	//__lib = new RESTIFY();
+
+	eval(system.getScriptText("RESTCLIENT class")); // Load HTTP Client class
+	
+	// Recreate in case parameters are changed
+	__http = new RESTCLIENT({
+						baseUrl:  form.getControl("url").getText(),
+						authUrl:  form.getControl("authUrl").getText(),
+						apikey:   form.getControl("apikey").getText(),
+						username: form.getControl("username").getText(),
+						password: form.getControl("password").getText(),
+						schemaUrl: form.getControl("schema").getText(),
+						debug: debug() // true => debug output
+				})		
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	initialize();
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: "/schema",
+			authUrl: form.getControl("authUrl").getText(),
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with paths
+function fetchItems() {
+	//alert("---> fetchItems");
+    //var path = form.getControl("PathToObjects").getText();
+
+	initialize();
+
+	path = "paths";
+
+    updateDropdown("path",
+        [path],
+        "Cannot fetch actions for Path");
+        
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected path
+function fetchActions() {
+	initialize();
+	
+    var selectedItem = form.getControl("path").getText() || "";
+	// alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for Path: " + selectedItem)
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) {
+        	alert("updateDropdown() - Path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arrList = java.util.ArrayList();
+        for (var propName in subtree) {
+        	arrList.add(propName);
+        }
+        var arr = arrList.toArray();
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+
+        alert("drop-down updated!");
+
+        combo.select(0)
+
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("path").removeAll();
+	form.getControl("action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]></parameter>
+                </Script>
+                <Script name="Test Form Event Script">
+                    <ModTime>1737914831075</ModTime>
+                    <parameter name="enabled">false</parameter>
+                    <parameter name="script"><![CDATA[//initialize();
+fetchSchema();
+fetchItems();
+fetchActions();
+
+i = 42;]]></parameter>
+                </Script>
+                <Script name="Connector Script">
+                    <ModTime>1738075847388</ModTime>
+                    <parameter name="enabled">true</parameter>
+                    <parameter name="script"><![CDATA[// 20250104 2008 Initial
+// 20250111 1915 Handling queryParameters in url
+// 20250126 1901 Adding queryMode for querySchema to return either params, or schema of data
+// 20250127 1346 initialize(), terminate(), selectEntries() and a test queryReply() in place
+// 20250127	1854 maded querySchema drop the token in the parameters returned
+// 20250128 1503 selectEntries and getNextEntry implemented - ready for more testing I'm sure :)
+
+//
+//						GLOBAL VARIABLES
+//
+var __parameters = {};						// params for the chosen path and action
+var __debug = connector.getParam("debug");	// debug output?
+var __schema = null;						// shared openAPI schema object (SCHEMA class)
+var __initialized = false;					// Do I need this?
+var __emptyEntry = system.newEntry();		// for craftQueryString
+var __http = null; 							// for the RESTCLIENT we will use for the calls
+var __resultSet = null;						// A container for returned entries (selectEntries/findEntry)
+
+var __paramNames = {
+	action: true,
+	apikey: true,
+	schema: true,
+	authUrl: true,
+	debug: true,
+	path: true,
+	password: true,
+	url: true,
+	username: true,
+	item: true,
+	action: true,
+	queryMode: true,
+	searchCrit: true
+}
+
+//var __baseUrl = connector.|etParam("url");	// the service domain and port
+//var __requestEntry = system.newEntry();		// global shared to limit memory usage
+//var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
+//var __token = "";							// returned OAuth token
+//var __sessionId = "";						// current session id
+
+//
+//							FUNCTIONS
+//
+
+
+
+
+function fixQueryParam(qp, value) {
+	var retval = qp.name + "=";
+	var value = (value || value == "") ? value : "<" + qp.description + ">"
+
+	if (qp.schema.type == "string") {
+		retval += "\"" + value + "\""
+	} else {
+		retval += value
+	}
+
+	return retval
+}
+
+function craftQueryString(args) {
+	var path = args.path;
+	var action = args.action;
+	var parameters = args.parameters || {};
+	var entry = args.entry || __emptyEntry;
+	
+	var embeddedUID = __schema.getEmbeddedUID(path);
+	
+	var queryParams = [];
+	for (var param in parameters) {
+		if (param != embeddedUID) {
+			paramValue = entry[param];
+			if (paramValue != null) {
+				queryParams.push(param + "=" + paramValue)
+			}
+		}	
+	}	
+	
+	return queryParams.join("&")
+}
+
+function fixUrl(url) {
+	if (!url.endsWith("/")) {
+		return url + "/";
+	} else {
+		return url;
+	}
+}
+
+function debug() {
+	return __debug;
+}
+
+// Rest the connector and re-initialize it in case parameters have changed
+function resetConnector() {
+	__initialized = false;
+	__entryFound = null;
+	
+	// Now zero out the __resultSet global ArrayList
+	__resultSet = new java.util.ArrayList();
+
+	if (typeof list != "undefined") list.clear(); // so it works while spoofing
+	if (__http != null) __http.terminate();
+	
+	// Renew the RESTCLIENT with the currently set parameters
+	if (!RESTCLIENT) eval(system.getScriptText("RESTCLIENT class"));
+	__http = new RESTCLIENT({
+						baseUrl:   __parameters.url,
+						authUrl:   __parameters.authUrl,
+						apikey:    __parameters.apikey,
+						username:  __parameters.username,
+						password:  __parameters.password,
+						schemaUrl: __parameters.schema,
+						debug: 	   debug() // true => debug output		
+					})
+}
+
+// Change the URL path so the UID placeholder is replace with the Attribute value
+function replaceUID(path, entry) {
+	
+}
+
+// Turn the JS object returned from a call into the global entry object
+function toEntry(obj) {
+	entry.removeAllAttributes();
+	
+	for (var propName in obj) {
+		var prepend = (propName == "_links") ? propName + "_" : "";
+		
+		for (var subPropName in obj[propName]) {
+			entry[prepend + subPropName] = obj[propName][subPropName]
+		}
+	}
+	
+	return entry // Not necessary, since entry is global in the Connector context - I just like doing it :)
+}
+
+function debugMsg(msg) {
+	if (__debug) {
+//		task.logmsg(msg);
+//		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	debugMsg("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	debugMsg(arr.toString())
+}
+
+// Return the openAPI schema
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: __parameters.schema,
+			authUrl: __parameters.authUrl,
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Parse the openAPI schema
+function parseSchema() {
+	if (__schema) return __schema;
+
+	// @@TODO Make actual call
+	debugMsg("Fetching schema...")
+	//var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	//var schemaJSON = fetchSchema();
+
+	//debugMsg("Creating SCHEMA object");
+	__schema = fetchSchema();
+
+	//var toplvl = "";
+	//for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+	//debugMsg("SCHEMA -> " + toplvl)
+
+	//debugMsg("Got it!");
+	return __schema
+}
+
+function refreshParameters() {
+	var path = connector.getParam("path");
+	//if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
+	var action = connector.getParam("action");
+	// if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+
+	__parameters = {};
+	
+	for (var paramName in __paramNames) {
+		//java.lang.System.out.println("> " + paramName);
+		__parameters[paramName] = connector.getParam(paramName);
+	}
+	
+	return __parameters
+}
+
+
+
+
+
+//
+// -------  Standard Connector functions 
+//
+function initialize() {
+	refreshParameters();
+	resetConnector();
+	parseSchema()
+}
+
+function terminate() {
+	resetConnector()
+}
+
+// CallReply function
+function queryReply() {
+	var params = refreshParameters();
+	var usePath = __schema.replaceEmbeddedUID(params.path, entry)
+
+	var queryString = craftQueryString({
+		path: usePath,
+		parameters: __schema.getParameters(params.path, params.action),
+		action: params.action,
+		entry: entry
+	});
+	
+	// If there is a queryString, prepend it with ?
+	queryString = queryString ? "?" + queryString : "";
+	
+	// Make the REST call @@TODO Only does GET for now
+	var reply = __http.makeRequest({
+			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+			url: usePath + queryString,
+			ctype: "application/json",
+			where: "queryReply()"
+	});
+
+	toEntry(reply);
+	return entry
+}
+
+function selectEntries() {
+	var params = refreshParameters();
+	var personId = params.searchCrit;
+	
+	if (!personId) throw java.lang.Exception("Search criteria (personId) must be configured for this Connector")
+	
+	var usePath = __schema.replaceEmbeddedUID(params.path, personId);
+
+	var queryString = craftQueryString({
+		path: usePath,
+		parameters: __schema.getParameters(params.path, params.action),
+		action: params.action,
+		entry: entry
+	});
+	
+	// If there is a queryString, prepend it with ?
+	queryString = queryString ? "?" + queryString : "";
+	
+	// Make the REST call @@TODO Only does GET for now
+	var reply = __http.makeRequest({
+			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+			url: usePath + queryString,
+			ctype: "application/json",
+			where: "queryReply()"
+	});
+
+	// Update the global 'entry' variable with these values
+	toEntry(reply);
+	// A little fancy footwork here for this test AL. In the Connector script, entry is made available by the AL
+	var resultEntry = system.newEntry();
+	resultEntry.merge(entry);
+	__resultSet.add(resultEntry);
+	return entry	
+}
+
+function getNextEntry() {
+	if (__resultSet.size() == 0) {
+		result.setStatus(0);
+		return null;
+	}
+
+	entry.removeAllAttributes();
+	entry.merge(__resultSet.remove(0)); // Grab an entry from the global __resultSet array
+	result.setStatus(1);
+	return entry
+}
+
+function putEntry() {}
+
+function modEntry() {}
+
+function deleteEntry() {}
+
+function findEntry() {}
+
+function querySchema() {
+	var params = refreshParameters();
+	var path = params.path;
+	var action = params.action;
+	
+	if (params.queryMode == "Data schema") {
+		var e = system.newEntry();
+		e.name = "!TODO! Read from REST service";
+		list.add(e);
+		return list
+	}
+
+	var parameters = __schema.getParameters(path, action);
+
+	var embeddedParameter = __schema.getEmbeddedUID(path);
+	if (embeddedParameter) {
+		var e = system.newEntry();
+		e.name = embeddedParameter;
+		e.syntax = "MUST/uid";
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+
+	for (var i in parameters) {
+		var param = parameters[i];
+   
+		if (param.name == "CSRFToken") continue;
+		
+		var e = system.newEntry();
+		e.name = param.name;
+		e.syntax = "MUST/" + param.schema.type;
+		e.required = true;
+		e.mandatory = true;
+		list.add(e)
+	}
+	result.setStatus(1);
+
+	return list
+}]]></parameter>
+                </Script>
+                <Script name="Test Connector Script">
+                    <ModTime>1738074062792</ModTime>
+                    <parameter name="enabled">true</parameter>
+                    <parameter name="script"><![CDATA[initialize();
+
+selectEntries();
+
+getNextEntry()
+main.logmsg(entry);
+getNextEntry()
+main.logmsg(entry);
+
+querySchema();
+
+entry.personId = "NO12345";
+main.logmsg(__http.httpEntry(queryReply()));
+
 main.logmsg(__http.httpEntry(getNextEntry()));
 
 
@@ -13340,10 +14333,11 @@ components:
     
     
     <Script name="SCHEMA class">
-            <ModTime>1738000209197</ModTime>
+            <ModTime>1738075977976</ModTime>
             <parameter name="enabled">true</parameter>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
+// 20250128 1552 Updated replaceEmbeddedUID() to accept either an Entry or a string value as the criteria argument
 
 function SCHEMA(schema, format) {
 	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
@@ -13408,8 +14402,9 @@ function SCHEMA(schema, format) {
 
 	/*
 		Replaces the uid placeholder in the URL path with the uid value passed
+ 		The criteria argument is either an Entry or a string value
 	*/
-	this.replaceEmbeddedUID = function(path, entry) {
+	this.replaceEmbeddedUID = function(path, criteria) {
 		var parts = system.splitString(path, "/");
 		var newPath = [parts[0]];
 		
@@ -13418,7 +14413,10 @@ function SCHEMA(schema, format) {
 			if (part.startsWith("{") && part.endsWith("}")) {
 				// Found an embedded uid
 				var embeddedUID = part.substring(1, part.length-1);
-				var uidValue = entry[embeddedUID] || null;
+				
+				// If criteria is an Entry then grab the attribute value, else use the parameter value itself
+				var uidValue = (criteria instanceof com.ibm.di.entry.Entry) ? entry[embeddedUID] : criteria;
+				
 				if (!uidValue) {
 					throw new java.lang.Exception("UID attribute not mapped out or is null: " + embeddedUID)
 				}	
@@ -29338,6 +30336,163 @@ function SCHEMA(schema, format) {
 				// Found an embedded uid
 				var embeddedUID = part.substring(1, part.length-1);
 				var uidValue = entry[embeddedUID] || null;
+				if (!uidValue) {
+					throw new java.lang.Exception("UID attribute not mapped out or is null: " + embeddedUID)
+				}	
+				newPath.push(uidValue)
+			} else {
+				newPath.push(part)
+			}
+		}
+		return newPath.join("/")
+	}
+	
+	/*
+		Uses .getChildren() to return the parameters array for the chosen path and action.
+	*/
+	this.getParameters = function(path, action) {
+		var params = this.getChildren(["paths", path, action, "parameters"])
+		return params
+	}
+	
+    /* Returns the child elements (JS Obj) of the specified path
+       Root level if no argument or blank text passed. Always return a JS object
+    */
+    this.getChildren = function(path) { 
+        //var children = {};
+        var subtree;
+        
+        if (!path) {
+        	path = []
+        }
+        else 
+        if (!(path instanceof Array)) {
+        	path = [path]	
+        }
+        
+        subtree = this.schemaObj[path[0]];
+        for (var i = 1; i < path.length && subtree; i++) {
+        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
+        		if (subtree instanceof Array) {
+	        		for (var j = 0; j < subtree.length; j++) {
+	        			if (subtree[j][path[i]]) {
+	        				subtree = subtree[j][path[i]];
+	        				break
+	        			}
+	        		}
+        		}
+        		
+        		// subtree does not exist
+        		subtree = {}; // return empty
+        	} else {
+        		subtree = subtree[path[i]]
+        	}
+        }
+        
+        if (subtree instanceof Array) { // If it is an array, then it is parameters, so retrun as an object
+        	// Make an object
+        	var retTree = {};
+        	for (var i = 0; i < subtree.length; i++) {
+        		var param = subtree[i];
+        		retTree[param.name] = param
+        	}
+        	return retTree
+        }
+
+        return subtree;
+    }
+    
+    /* Main init logic */
+    this.schemaArg = schema;
+    this.format = format || "YAML";
+    this.schemaObj = this.parseOpenAPIschema(schema)
+}]]></parameter>
+        </Script>
+    <Script name="SCHEMA class 20250128 1552 replaceEmbeddedUID() working as desired">
+            <ModTime>1738073864858</ModTime>
+            <parameter name="enabled">true</parameter>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
+// 20250128 1452 Updated replaceEmbeddedUID() to accept either an Entry or a string value as the criteria argument
+
+function SCHEMA(schema, format) {
+	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
+	this.name = "SCHEMA";
+	this.schemaObj = {};
+	
+	/* Main init logic after method definitions
+
+       The name says it all. Returns a JS Obj */
+       
+    this.parseOpenAPIschema = function(openApiSchema) {
+    	if (typeof(openApiSchema) != "string") return openApiSchema;
+    	
+        openApiSchema = openApiSchema.trim();
+        var jsonString = "";
+
+        /* Load Jackson libraries */
+        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
+        var objectMapper = new ObjectMapper();
+
+		if (openApiSchema.startsWith("{") && openApiSchema.endsWith("}")) {
+			// overriding above arguments - for now
+			this.format = "JSON"
+		} else {
+			this.format = "YAML"
+		}
+
+        /* Check if YAML and if so, convert to Json */
+        if ("YAML".equalsIgnoreCase(this.format)) {
+            /* Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read */
+            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
+            /* Create instances of Yaml and ObjectMapper */
+            var yaml = new Yaml();
+            /* Parse YAML into a Java Map */
+            var map = yaml.load(openApiSchema);
+
+            /* Convert Java Map to JSON string */
+            jsonString = objectMapper.writeValueAsString(map)
+        } else {
+            jsonString = openApiSchema;
+        }
+
+        this.schemaObj = fromJson(jsonString);
+        return this.schemaObj
+    }
+
+	/*
+		Parses the path and returns the name of the embedded UID attribute in the URL
+	*/
+	this.getEmbeddedUID = function(path) {
+		var parts = system.splitString(path, "/");
+		
+		for (var i = 0; i < parts.length; i++) {
+			var part = parts[i].trim();
+			if (part.startsWith("{") && part.endsWith("}")) {
+				// Found an embedded uid
+				return part.substring(1, part.length-1)
+			}
+		}
+		return null
+	}
+
+	/*
+		Replaces the uid placeholder in the URL path with the uid value passed
+ 		The criteria argument is either an Entry or a string value
+	*/
+	this.replaceEmbeddedUID = function(path, criteria) {
+		var parts = system.splitString(path, "/");
+		var newPath = [parts[0]];
+		
+		for (var i = 1; i < parts.length; i++) {
+			var part = parts[i].trim();
+			if (part.startsWith("{") && part.endsWith("}")) {
+				// Found an embedded uid
+				var embeddedUID = part.substring(1, part.length-1);
+				
+				// If criteria is an Entry then grab the attribute value, else use the parameter value itself
+				var uidValue = (criteria instanceof com.ibm.di.entry.Entry) ? entry[embeddedUID] : criteria;
+				
 				if (!uidValue) {
 					throw new java.lang.Exception("UID attribute not mapped out or is null: " + embeddedUID)
 				}	
