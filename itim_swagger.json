@@ -593,7 +593,7 @@
                     "schema": {
                         "type": "string"
                     }
-                }, {
+                 }, {
                     "name": "attributes",
                     "in": "query",
                     "description": "Specifies the comma-separated attributes to return for the user. The specified attributes are returned in the \"_attributes\" section of the response. Specifying a value of \"*\" returns all attributes. By default, all the attributes are returned. Example - ?attributes=mail,telephoneNumber",

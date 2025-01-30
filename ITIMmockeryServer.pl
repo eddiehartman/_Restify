@@ -1,184 +1,115 @@
 #!/usr/bin/env perl
 use Mojolicious::Lite;
+use JSON;
 
-# Middleware to log all requests and responses
-hook before_dispatch => sub {
-    my $c = shift;
+# Load the OpenAPI schema file
+my $schema_file = 'FULL_itim_schema.json';
+my $schema_data;
 
-    # Log request details
-    my $method  = $c->req->method;
-    my $url     = $c->req->url->to_abs;
-    my $headers = $c->req->headers->to_hash;
-    my $params  = $c->req->params->to_hash;
-    my $body    = $c->req->body;
+# Read and parse JSON schema
+if (-e $schema_file) {
+    open my $fh, '<', $schema_file or die "Could not open file '$schema_file' $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh;
+    eval { $schema_data = decode_json($json_text) };
+    die "Error parsing JSON: $@" if $@;
+} else {
+    die "Schema file '$schema_file' not found!";
+}
 
-    app->log->info("==== Incoming Request ====");
-    app->log->info("Method: $method");
-    app->log->info("URL: $url");
-    app->log->info("Headers: " . join(", ", map { "$_ => $headers->{$_}" } keys %$headers));
-    app->log->info("Query Params: " . join(", ", map { "$_ => $params->{$_}" } keys %$params));
-    app->log->info("Body: $body");
-};
+# Ensure 'paths' key exists in schema
+die "Invalid schema: Missing 'paths' key" unless exists $schema_data->{paths} && ref $schema_data->{paths} eq 'HASH';
 
-hook after_dispatch => sub {
-    my $c = shift;
-
-    # Log response details
-    my $status  = $c->res->code;
-    my $headers = $c->res->headers->to_hash;
-    my $body    = $c->res->body;
-
-    app->log->info("==== Outgoing Response ====");
-    app->log->info("Status: $status");
-    app->log->info("Headers: " . join(", ", map { "$_ => $headers->{$_}" } keys %$headers));
-    app->log->info("Body: $body");
-};
-
-# Route for /v1.0/endpoint/default/token
-post '/v1.0/endpoint/default/token' => sub {
-    my $c = shift;
-
-    # Define the response
-    my $response = {
-        csrftoken  => "token-xyz",
-        sessionId  => "session-xyz",
-        user       => {
-            id   => "12345",
-            name => "Edbird"
+# Reduce schema: Keep only parameters except for /people/{personId} and /v1.0/endpoint/default/token
+my %filtered_paths;
+foreach my $path (keys %{ $schema_data->{paths} }) {
+    if ($path eq "/people/{personId}" || $path eq "/v1.0/endpoint/default/token") {
+        # Keep full details for these paths
+        $filtered_paths{$path} = $schema_data->{paths}{$path};
+    } else {
+        # Only retain parameters for all other paths
+        my %methods;
+        foreach my $method (keys %{ $schema_data->{paths}{$path} }) {
+            if (ref $schema_data->{paths}{$path}{$method} eq 'HASH') {
+                $methods{$method} = {
+                    parameters => $schema_data->{paths}{$path}{$method}{parameters} // []  # Keep only parameters, default to empty array
+                };
+            } else {
+                $methods{$method} = {};  # Fallback for unexpected structure
+            }
         }
-    };
+        $filtered_paths{$path} = \%methods;
+    }
+}
 
-    # Render the JSON response
-    $c->render(json => $response);
+# Construct the reduced OpenAPI schema
+my $reduced_schema = {
+    openapi => $schema_data->{openapi} // "3.0.3",
+    info    => $schema_data->{info} // { title => "No title", version => "Unknown" },
+    paths   => \%filtered_paths,
 };
 
-# Route for /person/NO12345
-get '/people/NO12345' => sub {
+# Route for /schema - Returns the reduced OpenAPI spec
+get '/schema' => sub {
     my $c = shift;
+    $c->render(json => $reduced_schema);
+};
 
-    # Define the response
+# Route for /people/{personId} - Returns person details
+get '/people/:personId' => sub {
+    my $c        = shift;
+    my $personId = $c->param('personId');    
+
+    # Define response payload
     my $response = {
         _links => {
-            formTemplate => { href => "/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0zMjg3NTk3Njg0MDU0MDg0MTYsb3U9MCxvdT1wZW9wbGUsZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t&filterId=formSearch" },
-            manager      => { href => "/itim/rest/people/ZXJnbG9iYWxpZD0zMjg3NTk3NjYzMjY3Njc5MDksb3U9MCxvdT1wZW9wbGUsZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t" },
-            self         => { href => "/itim/rest/people/ZXJnbG9iYWxpZD0zMjg3NTk3Njg0MDU0MDg0MTYsb3U9MCxvdT1wZW9wbGUsZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t", title => "Alan Smith" },
-            erparent     => { href => "/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t" }
+            self      => { href => "/itim/rest/people/$personId", title => "Alan Smith" },
+            manager   => { href => "/itim/rest/people/$personId/manager" },
+            erparent  => { href => "/itim/rest/organizationcontainers/organizations/$personId" }
         },
         _attributes => {
             uid             => "asmith",
             ercustomdisplay => "Smith",
-            ersupervisor    => "erglobalid=328759766326767909,ou=0,ou=people,erglobalid=00000000000000000000,ou=org,dc=com",
-            mail            => "asmit\@ibm.com",
-            manager         => "erglobalid=328759766326767909,ou=0,ou=people,erglobalid=00000000000000000000,ou=org,dc=com",
             givenname       => "Alan",
             erpersonstatus  => "ACTIVE",
             name            => "Alan Smith",
             sn              => "Smith",
             cn              => "Alan Smith",
             personType      => "Person",
+            mail            => "asmith\@ibm.com",
+            manager         => "erglobalid=328759766326767909,ou=0,ou=people,erglobalid=00000000000000000000,ou=org,dc=com",
             erparent        => "erglobalid=00000000000000000000,ou=org,dc=com"
         }
     };
 
-    # Render the JSON response
+    # Log the request
+    app->log->info("GET /people/$personId requested.");
+
+    # Send response
     $c->render(json => $response);
 };
 
-# Route for /schema
-get '/schema' => sub {
+# Route for /v1.0/endpoint/default/token - Returns auth token
+post '/v1.0/endpoint/default/token' => sub {
     my $c = shift;
 
-    # Define the OpenAPI schema response
+    # Define token response
     my $response = {
-        openapi => "3.0.3",
-        info    => {
-            title   => "Merged documentation",
-            version => "1.0"
-        },
-        servers => [{
-            url => "https://192.168.2.39:30943"
-        }],
-        tags => [
-            { name => "Access Administration Batch Submit" },
-            { name => "Access Management" },
-            { name => "Activity Management" },
-            { name => "Delegation Management" },
-            { name => "Entitlement Assignments" },
-            { name => "Entitlement Management" },
-            { name => "Identity Policy Management" },
-            { name => "LifecycleRule Management" },
-            { name => "Organizational Management API" },
-            { name => "Password Management" },
-            { name => "Password Policy Management" },
-            { name => "Person Management" },
-            { name => "Search" },
-            { name => "Service Management" },
-            { name => "System User Management" },
-            { name => "ARC Statistics APIs" },
-            { name => "ARC User APIs" },
-            { name => "Activity Folder APIs" },
-            { name => "Business Activity APIs" },
-            { name => "Business Activity Bulk APIs" },
-            { name => "Business Activity Group Bulk APIs" },
-            { name => "Mitigation APIs" },
-            { name => "Mitigation Bulk APIs" },
-            { name => "Permission Group Bulk APIs" },
-            { name => "Risk APIs" },
-            { name => "Risk Bulk APIs" }
-        ],
-        paths => {
-            "/people/{personId}" => {
-                get => {
-                    tags        => ["Person Management"],
-                    summary     => "Person Lookup",
-                    description => "Returns information about the specified user.",
-                    parameters  => [
-                        {
-                            name        => "personId",
-                            in          => "path",
-                            description => "Unique Identifier for a user.",
-                            required    => \1,
-                            schema      => { type => "string" }
-                        }
-                    ],
-                    responses => {
-                        "200" => {
-                            description => "OK. The request was successful.",
-                            content     => {
-                                "application/vnd.ibm.isim-v1+json" => {
-                                    example => {
-                                        _links => {
-                                            self => {
-                                                href  => "/itim/rest/people/{personId}",
-                                                title => "Alan Smith"
-                                            }
-                                        },
-                                        _attributes => {
-                                            uid             => "asmith",
-                                            ercustomdisplay => "Smith"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            # Include all other paths but without any details
-            "/activities/quicksearches" => {},
-            "/entitlements/assignments/search" => {},
-            "/organizationcontainers/{category}/{orgContainerId}" => {},
-            "/workitems" => {},
-            "/lifecyclerule/{lifecycleRuleIdentifier}" => {}
+        csrftoken => "token-xyz",
+        sessionId => "session-xyz",
+        user      => {
+            id   => "12345",
+            name => "Edbird"
         }
     };
 
-    # Render the JSON response
+    # Log the request
+    app->log->info("GET /v1.0/endpoint/default/token requested.");
+
+    # Send response
     $c->render(json => $response);
 };
-
-# Set logging level to debug
-app->log->level('debug');
 
 # Start the Mojolicious application
 app->start;
