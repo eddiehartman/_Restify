@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sun Feb 02 14:08:45 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sun Feb 02 14:09:39 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -5319,12 +5319,12 @@ function write(fname, str) {
     
     <Connector name="RestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1738501665529</ModTime>
+            <ModTime>1738501778293</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1738501665529</ModTime>
+                <ModTime>1738501778293</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="640" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sun Feb 02 13:35:01 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1738499699708</ModTime>
@@ -5757,7 +5757,7 @@ function write(fname, str) {
 RESTCLIENT class]]></parameter>
                 <parameter name="includeUIDs">false</parameter>
                 <parameter name="item">/people</parameter>
-                <parameter encrypted="true" name="password">b2v5T/g8AspLXqN54aXxhyT7T7IpJRd6ql12FHTuEYfBr3DEcTvtvt2LPzTRqf/m40YtrQuPRacvCs6Ncn7ylDWTkr8PBnESm7Lk1KsO7tp/RgRlqURN16qIY+gltM1vJdYP6mq7mPTQYDAdndNYd5bM8/XmQbdsAfKcizqYNrc=</parameter>
+                <parameter encrypted="true" name="password">MPgDm3BKsFHjvjj+wm/aMeIYIn88UN9S5Q+HwvkUPY6tfkb1Qbw4iCVHkKUioZQdsOb5ML/A03MrW1eU0lwNchTWg60GlybSpoCDYRdFNwGwz7thILfJnCtBJbemUMQXgT28PMP2YPedHIkzrvIwOpw2d4jfulVG2kt6NLHfHec=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Parameters</parameter>
                 <parameter name="schema">/schema</parameter>
@@ -5775,7 +5775,7 @@ RESTCLIENT class]]></parameter>
 // 20250131 2009 Now looking at getNextEntry() so I can return parameter descriptions with Connect + Next if querySchemaMode == Parameters
 // 20250131 2033 Something still not right - alas, tomorrow
 // 20250202 1313 Looking for my "entry not found" error when Connect while queryMode == Data
-// 20250202 1407 Connect working for both settings!!!!
+// 20250202 1407 Connect working for both settings!!!! 
 //
 //						GLOBAL VARIABLES
 //
