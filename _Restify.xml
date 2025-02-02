@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sun Feb 02 14:09:39 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sun Feb 02 14:55:47 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -1058,7 +1058,7 @@ function write(fname, str) {
     
     
     <AssemblyLine name="__testService">
-            <ModTime>1737731821189</ModTime>
+            <ModTime>1738503303908</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -1074,12 +1074,12 @@ function write(fname, str) {
             </SimulationConfig>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer">
-                <ModTime>1737731821189</ModTime>
+                <ModTime>1738503303908</ModTime>
                 <Connector name="HTTPServerConnector">
                     <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
-                    <ModTime>1737731821189</ModTime>
+                    <ModTime>1738503303908</ModTime>
                     <ConnectorMode>Server</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
+                    <ConnectorState>Disabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
                         <parameter name="tcpPort">8080</parameter>
@@ -5319,12 +5319,12 @@ function write(fname, str) {
     
     <Connector name="RestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1738501778293</ModTime>
+            <ModTime>1738504546732</ModTime>
             <ConnectorMode>Iterator</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1738501778293</ModTime>
+                <ModTime>1738504546732</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="640" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sun Feb 02 13:35:01 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1738499699708</ModTime>
@@ -5757,7 +5757,7 @@ function write(fname, str) {
 RESTCLIENT class]]></parameter>
                 <parameter name="includeUIDs">false</parameter>
                 <parameter name="item">/people</parameter>
-                <parameter encrypted="true" name="password">MPgDm3BKsFHjvjj+wm/aMeIYIn88UN9S5Q+HwvkUPY6tfkb1Qbw4iCVHkKUioZQdsOb5ML/A03MrW1eU0lwNchTWg60GlybSpoCDYRdFNwGwz7thILfJnCtBJbemUMQXgT28PMP2YPedHIkzrvIwOpw2d4jfulVG2kt6NLHfHec=</parameter>
+                <parameter encrypted="true" name="password">DphcCXy8cmBiwMvGbtRkuI6wtteivVMLF//TvNjoZTjLZ0PBRbrw6QODlLfMjOKrBj0vBB7y2V9dwPp97kmrlwlBYpxgh8HPqHVhqHmMc/W57uj3QmU8hNzm7RqT5Hp6CuktCsZt4SkMR08R3plVJ90jxxcHrLRo39iWavvsO/s=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Parameters</parameter>
                 <parameter name="schema">/schema</parameter>
@@ -5776,6 +5776,7 @@ RESTCLIENT class]]></parameter>
 // 20250131 2033 Something still not right - alas, tomorrow
 // 20250202 1313 Looking for my "entry not found" error when Connect while queryMode == Data
 // 20250202 1407 Connect working for both settings!!!! 
+// 20250202 1453 getNextEntry for Connect + Next now it's working!
 //
 //						GLOBAL VARIABLES
 //
@@ -5786,6 +5787,7 @@ var __initialized = false;					// Do I need this?
 var __emptyEntry = system.newEntry();		// for craftQueryString
 var __http = null; 							// for the RESTCLIENT we will use for the calls
 var __resultSet = null;						// A container for returned entries (selectEntries/findEntry)
+var __resultSetIndex = 0;					// Index into the result set
 var __forceQueryMode = "";
 
 var spoofing = false;
@@ -5870,7 +5872,8 @@ function debug() {
 // Rest the connector and re-initialize it in case parameters have changed
 function resetConnector() {
 	__initialized = false;
-	__entryFound = null;
+	__resultSetIndex = 0;
+	
 	
 	// Now zero out the __resultSet global ArrayList
 	__resultSet = new java.util.ArrayList();
@@ -5900,6 +5903,8 @@ function replaceUID(path, entry) {
 function toEntry(obj) {
 	var entry = system.newEntry();
 	var params = refreshParameters();
+
+	main.logmsg("toEntry() - includeUIDs: " + connector.getParam("includeUIDs"))
 	
 	for (var propName in obj) {
 		// skip _links
@@ -5915,15 +5920,18 @@ function toEntry(obj) {
 				// For _links we must prepend the propName to the Attribute name
 				subPropName = prepend + subPropName;
 				*/
-				if (newVal.toLowerCase().startsWith("erglobalid=") && !params.includeUIDs) continue;
+				if (newVal.toLowerCase().startsWith("erglobalid=")) {
+					main.logmsg("FOUND erglobalid value for " + subPropName)
+					if (!params.includeUIDs) continue;	
+				}
 				
-				main.logmsg("toEntry() - adding " + subPropName + " - " + obj[propName][subPropName]);
+				//main.logmsg("toEntry() - adding " + subPropName + " - " + obj[propName][subPropName]);
 				entry[subPropName] = newVal
 			}
 		}
 	}
 	
-	main.logmsg("toEntry - Complete: \n" + entry)
+	//main.logmsg("toEntry - Complete: \n" + entry)
 	
 	return entry // Not necessary, since entry is global in the Connector context - I just like doing it :)
 }
@@ -6011,10 +6019,18 @@ function refreshParameters() {
 }
 
 function beautifyValue(val) {
+	//main.logmsg("beautifyValue() - " + val);
 	if (typeof(val) != "object") return val;
 	
 	try {
 		var newVal = toJson(val);
+		
+		main.logmsg("!!! It IS JSON !!!");
+		for (var propName in val) {
+			main.logmsg("        > " + propName + ": " + val[propName]);
+		}
+		if (val.description) newVal = val.description;
+		//main.logmsg("--- Returning: '" + newVal + "'");
 		return newVal;
 	} catch (ex) {
 		return val
@@ -6066,7 +6082,8 @@ function queryReply() {
 // Since this function is being double-purposed, to also retrieve parameters for the Schema pane
 // I have to add more logic that is not necessary for normal connector operations.
 function selectEntries() {
-	main.logmsg("@@selectEntries()...")
+	//main.logmsg("@@selectEntries()...")
+	__resultSetIndex = 0;
 	var params = refreshParameters();
 	if (typeof(entry) == "undefined") var entry = system.newEntry();
 	
@@ -6075,11 +6092,11 @@ function selectEntries() {
 		
 		for (var i in restParams) {
 			var paramName = restParams[i].name;
-			main.logmsg("getNextEntry() - " + paramName + " - " + beautifyValue(restParams[i]))
+			//main.logmsg("getNextEntry() - " + paramName + " - " + beautifyValue(restParams[i]))
 			entry[paramName] = beautifyValue(restParams[i]);
 		}
 		
-		__resultSet.add(e)
+		__resultSet.add(entry)
 	} else {
 		// Otherwise, normal functioning for this method
 		var personId = params.searchCrit;
@@ -6098,7 +6115,7 @@ function selectEntries() {
 		// If there is a queryString, prepend it with ?
 		queryString = queryString ? "?" + queryString : "";
 		
-		main.logmsg("selectEntries for Data - making call");
+		//main.logmsg("selectEntries for Data - making call");
 		
 		// Make the REST call @@TODO Only does GET for now
 		var reply = __http.makeRequest({
@@ -6108,12 +6125,12 @@ function selectEntries() {
 				where: "queryReply()"
 		});
 	
-		main.logmsg("selectEntries for Data - Reply: " + com.ibm.di.entry.Entry.fromJSON(toJson(reply)));
+		//main.logmsg("selectEntries for Data - Reply: " + com.ibm.di.entry.Entry.fromJSON(toJson(reply)));
 
 		// Update the global 'entry' variable with these values
 		var entry = toEntry(reply);
 		
-		main.logmsg("selectEntries for Data - toEntry(): " + entry);
+		//main.logmsg("selectEntries for Data - toEntry(): " + entry);
 
 		var resultEntry = system.newEntry();
 		resultEntry.merge(entry);
@@ -6124,17 +6141,20 @@ function selectEntries() {
 }
 
 function getNextEntry() {
-	main.logmsg("@@getNextEntry...");
-	if (__resultSet.size() == 0) {
+	main.logmsg("@@getNextEntry - remaining in buffer: " + __resultSet.size());
+	if (__resultSetIndex >= __resultSet.size()) {
 		result.setStatus(0);
 		return null;
 	}
 
-	var entry = system.newEntry();
-	entry.merge(__resultSet.remove(0));
+	if (typeof(entry) == "undefined") entry = system.newEntry(); // only for testing
+	
+	main.logmsg("getNextEntry() - getting index " + __resultSetIndex);
+	entry.merge(__resultSet.get(__resultSetIndex));
+	__resultSetIndex++;
 
 	result.setStatus(1);
-	main.logmsg("@@getNextEntry: " + entry);
+	//main.logmsg("@@getNextEntry: " + entry);
 	return entry
 }
 
@@ -6147,7 +6167,7 @@ function deleteEntry() {}
 function findEntry() {}
 
 function querySchema() {
-	main.logmsg("@@querySchema...");
+	//main.logmsg("@@querySchema...");
 	var params = refreshParameters();
 	var path = params.path;
 	var action = params.action;
@@ -6178,12 +6198,15 @@ function querySchema() {
 			e.syntax = "MUST/" + param.schema.type;
 			e.required = true;
 			e.mandatory = true;
-			main.logmsg("@@adding " + param.name);
+			//main.logmsg("@@adding " + param.name);
 			list.add(e)
 		}
 	} else { // queryMode is "Data"
 		selectEntries();
 		var dataEntry = getNextEntry();
+		// Remember to reset the index to the result set for any getNextEntry() called after
+		__resultSetIndex = Math.min(0, __resultSetIndex - 1);
+		
 		
 		for (var att in dataEntry) {
 			if (att instanceof com.ibm.di.entry.Entry) { // This is one of the links
@@ -6193,8 +6216,8 @@ function querySchema() {
 				var name = att.getName();
 				var val = att.getValue(0);
 				
-				main.logmsg("querySchema() adding " + name + " - " + val);
-
+				//main.logmsg("querySchema() adding " + name + " - " + val);
+				
 				e = system.newEntry();
 				e.name = name;
 				e.syntax = typeof(val);
@@ -6215,12 +6238,7 @@ function querySchema() {
             </Parser>
             <AttributeMap name="Input">
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1738501378782</ModTime>
-                <AttributeMapItem>
-                    <Name>CSRFToken</Name>
-                    <Type>simple</Type>
-                    <Simple>CSRFToken</Simple>
-                </AttributeMapItem>
+                <ModTime>1738503245654</ModTime>
             </AttributeMap>
             <AttributeMap name="Output">
                 <InheritFrom>[parent]</InheritFrom>
@@ -6233,26 +6251,31 @@ function querySchema() {
             </DeltaSettings>
             <Schema name="Input">
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1738501601908</ModTime>
+                <ModTime>1738504413685</ModTime>
                 <SchemaItem>
                     <Name>attributes</Name>
+                    <Syntax>java.lang.String</Syntax>
                     <NativeSyntax>MUST/string</NativeSyntax>
                 </SchemaItem>
                 <SchemaItem>
                     <Name>embedded</Name>
+                    <Syntax>java.lang.String</Syntax>
                     <NativeSyntax>MUST/string</NativeSyntax>
                 </SchemaItem>
                 <SchemaItem>
                     <Name>forms</Name>
+                    <Syntax>java.lang.String</Syntax>
                     <NativeSyntax>MUST/string</NativeSyntax>
                 </SchemaItem>
                 <SchemaItem>
                     <Name>personId</Name>
+                    <Syntax>java.lang.String</Syntax>
                     <NativeSyntax>MUST/string</NativeSyntax>
                 </SchemaItem>
             </Schema>
             <Schema name="Output">
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738504413685</ModTime>
                 <SchemaItem>
                     <Name>_links_erparent</Name>
                     <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
@@ -6270,12 +6293,20 @@ function querySchema() {
                     <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
                 </SchemaItem>
                 <SchemaItem>
+                    <Name>attributes</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
                     <Name>cn</Name>
                     <Syntax>java.lang.String</Syntax>
                 </SchemaItem>
                 <SchemaItem>
                     <Name>counter</Name>
                     <Syntax>java.lang.Integer</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>embedded</Name>
+                    <Syntax>java.lang.String</Syntax>
                 </SchemaItem>
                 <SchemaItem>
                     <Name>ercustomdisplay</Name>
@@ -6291,6 +6322,10 @@ function querySchema() {
                 </SchemaItem>
                 <SchemaItem>
                     <Name>ersupervisor</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>forms</Name>
                     <Syntax>java.lang.String</Syntax>
                 </SchemaItem>
                 <SchemaItem>
@@ -6310,7 +6345,15 @@ function querySchema() {
                     <Syntax>java.lang.String</Syntax>
                 </SchemaItem>
                 <SchemaItem>
+                    <Name>personId</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
                     <Name>personType</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>self</Name>
                     <Syntax>java.lang.String</Syntax>
                 </SchemaItem>
                 <SchemaItem>
@@ -9202,6 +9245,1145 @@ function querySchema() {
                 </SchemaItem>
                 <SchemaItem>
                     <Name>personType</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>sn</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>uid</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+            </Schema>
+            <LinkCriteria>
+                <InheritFrom>[parent]</InheritFrom>
+            </LinkCriteria>
+            <Hooks>
+                <InheritFrom>[parent]</InheritFrom>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <Reconnect>
+                <InheritFrom>[parent]</InheritFrom>
+                <ReconnectRules/>
+            </Reconnect>
+            <Operations/>
+            <PoolDefinition>
+                <InheritFrom>[parent]</InheritFrom>
+                <Enabled>false</Enabled>
+                <MinPoolSize>0</MinPoolSize>
+                <MaxPoolSize>0</MaxPoolSize>
+                <PurgeInterval>0</PurgeInterval>
+                <InitializeAttempts>1</InitializeAttempts>
+                <InitializeSleepInterval>0</InitializeSleepInterval>
+            </PoolDefinition>
+            <PoolInstance/>
+        </Connector>
+        <Connector name="ScriptConnector">
+            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
+            <ModTime>1738502926671</ModTime>
+            <ConnectorMode>AddOnly</ConnectorMode>
+            <ConnectorState>Enabled</ConnectorState>
+            <Configuration>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738502518395</ModTime>
+                <parameter name="includeFiles"/>
+            </Configuration>
+            <Parser>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738502516932</ModTime>
+            </Parser>
+            <AttributeMap name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738502516932</ModTime>
+            </AttributeMap>
+            <AttributeMap name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738502516932</ModTime>
+            </AttributeMap>
+            <DeltaSettings/>
+            <Schema name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738502926671</ModTime>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                </SchemaItem>
+            </Schema>
+            <Schema name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738502926671</ModTime>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                    <NativeSyntax>Number</NativeSyntax>
+                </SchemaItem>
+            </Schema>
+            <LinkCriteria>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738502516932</ModTime>
+            </LinkCriteria>
+            <Hooks>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738502516932</ModTime>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <Reconnect>
+                <InheritFrom>[parent]</InheritFrom>
+                <ReconnectRules/>
+            </Reconnect>
+            <Operations/>
+            <PoolDefinition>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738502518522</ModTime>
+                <Enabled>false</Enabled>
+                <MinPoolSize>0</MinPoolSize>
+                <MaxPoolSize>0</MaxPoolSize>
+                <PurgeInterval>0</PurgeInterval>
+                <InitializeAttempts>1</InitializeAttempts>
+                <InitializeSleepInterval>0</InitializeSleepInterval>
+            </PoolDefinition>
+            <PoolInstance/>
+        </Connector>
+        <Connector name="RestClientConnector 20250202 1453 getNextEntry for Connect + Next now it's working!">
+            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
+            <ModTime>1738504437449</ModTime>
+            <ConnectorMode>Iterator</ConnectorMode>
+            <ConnectorState>Enabled</ConnectorState>
+            <Configuration>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738504437449</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="640" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sun Feb 02 13:35:01 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+    <Form name="Form">
+        <ModTime>1738499699708</ModTime>
+        <FormItemNames>
+            <ListItem>$GLOBAL.script</ListItem>
+            <ListItem>keepGlobalState</ListItem>
+            <ListItem>$GLOBAL.includeFiles</ListItem>
+            <ListItem>includePrologs</ListItem>
+            <ListItem>$GLOBAL.debug</ListItem>
+            <ListItem>$GLOBAL.help</ListItem>
+            <ListItem>PathToObjects</ListItem>
+            <ListItem>Clear</ListItem>
+            <ListItem>apikey</ListItem>
+            <ListItem>action</ListItem>
+            <ListItem>username</ListItem>
+            <ListItem>password</ListItem>
+            <ListItem>authUrl</ListItem>
+            <ListItem>path</ListItem>
+            <ListItem>schema</ListItem>
+            <ListItem>url</ListItem>
+            <ListItem>debug</ListItem>
+            <ListItem>searchCrit</ListItem>
+            <ListItem>queryMode</ListItem>
+            <ListItem>includeUIDs</ListItem>
+        </FormItemNames>
+        <FormSectionNames>
+            <ListItem>General</ListItem>
+            <ListItem>Advanced</ListItem>
+        </FormSectionNames>
+        <FormItem name="APIKey"/>
+        <FormItem name="Action">
+            <ModTime>1735050078962</ModTime>
+            <parameter name="description">Operation to apply to the selected Item</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchActions</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="Clear">
+            <ModTime>1737024086705</ModTime>
+            <parameter name="label"/>
+            <parameter name="noLabel">true</parameter>
+            <parameter name="script">clearDropdowns</parameter>
+            <parameter name="scriptLabel">Clear Path and Action</parameter>
+            <parameter name="syntax">static</parameter>
+        </FormItem>
+        <FormItem name="Item">
+            <ModTime>1734098635211</ModTime>
+            <parameter name="description">The resource item to operation on</parameter>
+            <parameter name="label">Item</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="script2"/>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="scriptLabel2"/>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="Object">
+            <ModTime>1733572441046</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Item to perform operations on</parameter>
+            <parameter name="label">	formdata.items = formdata.items || {};</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel"/>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="Operation">
+            <ModTime>1733750352248</ModTime>
+            <parameter name="description">Operation to apply to the selected Object</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchOperations</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="PathToObjects">
+            <ModTime>1733398344461</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">The openAPIschema is hierarchical, so at what level in the tree do resource items appear. Separate tree branches by pipe symbol (|)</parameter>
+            <parameter name="label">Path to Items</parameter>
+            <parameter name="script"/>
+            <parameter name="scriptLabel"/>
+        </FormItem>
+        <FormItem name="Show">
+            <ModTime>1733312883681</ModTime>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="action">
+            <ModTime>1736017096799</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Operation to apply to the selected path (resource item)</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchActions</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="apikey">
+            <ModTime>1737489711326</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">API Key provided for access to the service</parameter>
+            <parameter name="label">API Key</parameter>
+            <parameter name="syntax">password</parameter>
+        </FormItem>
+        <FormItem name="authUrl">
+            <ModTime>1736012659868</ModTime>
+            <parameter name="label">Auth URL</parameter>
+        </FormItem>
+        <FormItem name="baseUrl">
+            <ModTime>1737024040596</ModTime>
+            <parameter name="description">The first part of the URL, http://&lt;domain&gt;:&lt;port&gt;, with colon and port number required only if not port 80</parameter>
+            <parameter name="label">var __emptyEntry = system.newEntry();</parameter>
+        </FormItem>
+        <FormItem name="dashes">
+            <ModTime>1734099205004</ModTime>
+            <parameter name="label">_________________________________________________________________________________</parameter>
+            <parameter name="script"/>
+            <parameter name="scriptLabel"/>
+            <parameter name="syntax">static</parameter>
+        </FormItem>
+        <FormItem name="debug">
+            <ModTime>1737459130079</ModTime>
+            <parameter name="description">Yes or no</parameter>
+            <parameter name="label">Debug output</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="dropdown"/>
+        <FormItem name="includePrologs">
+            <parameter name="description">pro_desc</parameter>
+            <parameter name="label">pro_label</parameter>
+            <parameter name="script">selectGlobalProlog</parameter>
+            <parameter name="scriptLabel">pro_script_label</parameter>
+            <parameter name="scripthelp">pro_script_help</parameter>
+            <parameter name="syntax">textarea</parameter>
+        </FormItem>
+        <FormItem name="includeUIDs">
+            <ModTime>1738499699708</ModTime>
+            <parameter name="description">Should UIDs for the entry and associated data be included in the returned data</parameter>
+            <parameter name="label">Include UIDs</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="item">
+            <ModTime>1735050022484</ModTime>
+            <parameter name="description">The resource to act on</parameter>
+            <parameter name="label">Item</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="keepGlobalState">
+            <parameter name="description">SCRIPT_CONN_KEEP_GLOBAL_STATE_DESC</parameter>
+            <parameter name="label">SCRIPT_CONN_KEEP_GLOBAL_STATE_LABEL</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="password">
+            <ModTime>1736017137163</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Authorization password</parameter>
+            <parameter name="label">Password</parameter>
+            <parameter name="syntax">password</parameter>
+        </FormItem>
+        <FormItem name="path">
+            <ModTime>1737024268372</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">The URL path representing the resource item to work with</parameter>
+            <parameter name="label">Path</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="queryMode">
+            <ModTime>1738076543539</ModTime>
+            <Values>
+                <ListItem>Parameters</ListItem>
+                <ListItem>Data</ListItem>
+            </Values>
+            <parameter name="description">Pressing Next in the Attribute Schema pane will either return available parameters for the selected Path, or the schema of the data</parameter>
+            <parameter name="label">Query Schema mode</parameter>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="schema">
+            <ModTime>1737024188497</ModTime>
+            <parameter name="description">The REST endpoint that returns the schema for this API</parameter>
+            <parameter name="label">Schema</parameter>
+            <parameter name="script">fetchSchema</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+        </FormItem>
+        <FormItem name="searchCrit">
+            <ModTime>1737544048218</ModTime>
+            <parameter name="description">The Id of the Resource Item you want to retrieve</parameter>
+            <parameter name="label">Search for ID</parameter>
+        </FormItem>
+        <FormItem name="url">
+            <ModTime>1737024046822</ModTime>
+            <parameter name="description">The first part of the URL, http://&lt;domain&gt;:&lt;port&gt;, with colon and port number required only if not port 80</parameter>
+            <parameter name="label">Base URL</parameter>
+        </FormItem>
+        <FormItem name="username">
+            <ModTime>1736017120599</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Authorization username</parameter>
+            <parameter name="label">Username</parameter>
+        </FormItem>
+        <FormSection name="Advanced">
+            <FormSectionNames>
+                <ListItem>$GLOBAL.userComment</ListItem>
+                <ListItem>$GLOBAL.script</ListItem>
+                <ListItem>authUrl</ListItem>
+                <ListItem>Clear</ListItem>
+                <ListItem>includeUIDs</ListItem>
+            </FormSectionNames>
+            <parameter name="initiallyExpanded">false</parameter>
+            <parameter name="title">Advanced</parameter>
+        </FormSection>
+        <FormSection name="Debug">
+            <FormSectionNames>
+                <ListItem>Clear</ListItem>
+            </FormSectionNames>
+        </FormSection>
+        <FormSection name="General">
+            <FormSectionNames>
+                <ListItem>apikey</ListItem>
+                <ListItem>username</ListItem>
+                <ListItem>password</ListItem>
+                <ListItem>url</ListItem>
+                <ListItem>schema</ListItem>
+                <ListItem>path</ListItem>
+                <ListItem>action</ListItem>
+                <ListItem>searchCrit</ListItem>
+                <ListItem>queryMode</ListItem>
+            </FormSectionNames>
+        </FormSection>
+        <parameter name="formevents"><![CDATA[// 20250104 1959 Initial
+// 20250121 1154 Created RESTCLIENT class and used that instead of lots of functions
+// 20250121 2047 Copied back test Event Script after _testScriptConnectorCode succeeded in testing Form code
+// 20250121 2103 Form Working! Now to look at Mode ops (putEntry, findEntry, ...)
+// 20250128 1608 Hardened the fetchActions and fetchItems so it checks for schema first
+//
+//						GLOBAL VARIABLES
+//
+var __schema = null;
+var __initialized = false;
+//var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function debug() {
+	return false;
+	return form.getControl("debug").getText()
+}
+
+function alert(msg) {
+	if (debug()) alert(msg);
+	main.logmsg(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	//eval(system.getScriptText("RESTIFY library class")); // Load script library class
+	//__lib = new RESTIFY();
+
+	eval(system.getScriptText("RESTCLIENT class")); // Load HTTP Client class
+	
+	// Recreate in case parameters are changed
+	__http = new RESTCLIENT({
+						baseUrl:  form.getControl("url").getText(),
+						authUrl:  form.getControl("authUrl").getText(),
+						apikey:   form.getControl("apikey").getText(),
+						username: form.getControl("username").getText(),
+						password: form.getControl("password").getText(),
+						schemaUrl: form.getControl("schema").getText(),
+						debug: debug() // true => debug output
+				})		
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	initialize();
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: "/schema",
+			authUrl: form.getControl("authUrl").getText(),
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with paths
+function fetchItems() {
+	if (!__schema) throw java.lang.Exception("You must request the Schema first")
+	//alert("---> fetchItems");
+
+	initialize();
+
+	path = "paths";
+
+    updateDropdown("path",
+        [path],
+        "Cannot fetch actions for Path");
+        
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected path
+function fetchActions() {
+	if (!__schema) throw java.lang.Exception("You must request the Schema first")
+	
+	initialize();
+	
+    var selectedItem = form.getControl("path").getText() || "";
+	// alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for Path: " + selectedItem)
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) {
+        	alert("updateDropdown() - Path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arrList = java.util.ArrayList();
+        for (var propName in subtree) {
+        	arrList.add(propName);
+        }
+        var arr = arrList.toArray();
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+
+        alert("drop-down updated!");
+
+        combo.select(0)
+
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("path").removeAll();
+	form.getControl("action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]]]><![CDATA[></parameter>
+        <parameter name="formscript"/>
+        <parameter name="title">CONN_TITLE</parameter>
+        <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
+    </Form>
+</MetamergeConfig>]]></parameter>
+                <parameter name="Action"/>
+                <parameter name="Item"/>
+                <parameter name="Object"/>
+                <parameter name="Operation">servers</parameter>
+                <parameter name="PathToObjects">paths</parameter>
+                <parameter name="action">get</parameter>
+                <parameter name="apikey">xyzzy</parameter>
+                <parameter name="authUrl">/v1.0/endpoint/default/token</parameter>
+                <parameter name="debug">false</parameter>
+                <parameter name="includeFiles"/>
+                <parameter name="includePrologs"><![CDATA[SCHEMA class
+RESTCLIENT class]]></parameter>
+                <parameter name="includeUIDs">false</parameter>
+                <parameter name="item">/people</parameter>
+                <parameter encrypted="true" name="password">pbR6Q3rUV0Bg+Cn98qNC13e9raZLAc+RolSxB8KgwL9MP0508RJNKDDeJmy/TPH5lFCwKDgen7ViUsk1793rwLdoOSPilgYmNcGljlG7Y4D2ywtfjiqs1l/6adPMup7LJpD8Z9Ffl7OHSmgTRCl0EgWdcFkk0c4EUf1W7pjeqsU=</parameter>
+                <parameter name="path">/people/{personId}</parameter>
+                <parameter name="queryMode">Parameters</parameter>
+                <parameter name="schema">/schema</parameter>
+                <parameter name="script"><![CDATA[// 20250104 2008 Initial
+// 20250111 1915 Handling queryParameters in url
+// 20250126 1901 Adding queryMode for querySchema to return either params, or schema of data
+// 20250127 1346 initialize(), terminate(), selectEntries() and a test queryReply() in place
+// 20250127	1854 maded querySchema drop the token in the parameters returned
+// 20250128 1503 selectEntries and getNextEntry implemented - ready for more testing I'm sure :)
+// 20250128 1705 Added the check for spoofing
+// 20250128 2136 querySchema() can now return either parameters or data when you press Connect and Next in the Schema pane
+// 20250130 1207 Hopefully now
+// 20250130 1221 Fixing it in place in the Connector
+// 20250131 1928 Gonna get querySchema to work right
+// 20250131 2009 Now looking at getNextEntry() so I can return parameter descriptions with Connect + Next if querySchemaMode == Parameters
+// 20250131 2033 Something still not right - alas, tomorrow
+// 20250202 1313 Looking for my "entry not found" error when Connect while queryMode == Data
+// 20250202 1407 Connect working for both settings!!!! 
+// 20250202 1453 Fixing getNextEntry for Connecto + Next and now it's working
+//
+//						GLOBAL VARIABLES
+//
+var __parameters = {};						// params for the chosen path and action
+var __debug = connector.getParam("debug");	// debug output?
+var __schema = null;						// shared openAPI schema object (SCHEMA class)
+var __initialized = false;					// Do I need this?
+var __emptyEntry = system.newEntry();		// for craftQueryString
+var __http = null; 							// for the RESTCLIENT we will use for the calls
+var __resultSet = null;						// A container for returned entries (selectEntries/findEntry)
+var __resultSetIndex = 0;					// Index into the result set
+var __forceQueryMode = "";
+
+var spoofing = false;
+
+var __paramNames = {
+	action: true,
+	apikey: true,
+	schema: true,
+	authUrl: true,
+	debug: true,
+	path: true,
+	password: true,
+	url: true,
+	username: true,
+	item: true,
+	action: true,
+	queryMode: true,
+	searchCrit: true,
+	includeUIDs: true
+}
+
+//var __baseUrl = connector.|etParam("url");	// the service domain and port
+//var __requestEntry = system.newEntry();		// global shared to limit memory usage
+//var __http = system.getConnector("ibmdi.HTTPClient"); // HTTP Client connector
+//var __token = "";							// returned OAuth token
+//var __sessionId = "";						// current session id
+
+//
+//							FUNCTIONS
+//
+
+
+
+
+function fixQueryParam(qp, value) {
+	var retval = qp.name + "=";
+	var value = (value || value == "") ? value : "<" + qp.description + ">"
+
+	if (qp.schema.type == "string") {
+		retval += "\"" + value + "\""
+	} else {
+		retval += value
+	}
+
+	return retval
+}
+
+function craftQueryString(args) {
+	var path = args.path;
+	var action = args.action;
+	var parameters = args.parameters || {};
+	var entry = args.entry || __emptyEntry;
+	
+	var embeddedUID = __schema.getEmbeddedUID(path);
+	
+	var queryParams = [];
+	for (var i in parameters) {
+		var param = parameters[i]
+		if (param["in"] == "query") {
+			paramValue = entry[param];
+			if (paramValue != null) {
+				queryParams.push(param + "=" + paramValue)
+			}
+		}	
+	}	
+	
+	return queryParams.join("&")
+}
+
+function fixUrl(url) {
+	if (!url.endsWith("/")) {
+		return url + "/";
+	} else {
+		return url;
+	}
+}
+
+function debug() {
+	return __debug;
+}
+
+// Rest the connector and re-initialize it in case parameters have changed
+function resetConnector() {
+	__initialized = false;
+	__resultSetIndex = 0;
+	
+	
+	// Now zero out the __resultSet global ArrayList
+	__resultSet = new java.util.ArrayList();
+
+	if (typeof list != "undefined") list.clear(); // so it works while spoofing
+	if (__http != null) __http.terminate();
+	
+	// Renew the RESTCLIENT with the currently set parameters
+	if (!RESTCLIENT) eval(system.getScriptText("RESTCLIENT class"));
+	__http = new RESTCLIENT({
+						baseUrl:   __parameters.url,
+						authUrl:   __parameters.authUrl,
+						apikey:    __parameters.apikey,
+						username:  __parameters.username,
+						password:  __parameters.password,
+						schemaUrl: __parameters.schema,
+						debug: 	   debug() // true => debug output		
+					})
+}
+
+// Change the URL path so the UID placeholder is replace with the Attribute value
+function replaceUID(path, entry) {
+	
+}
+
+// Turn the JS object returned from a call into the global entry object
+function toEntry(obj) {
+	var entry = system.newEntry();
+	var params = refreshParameters();
+
+	main.logmsg("toEntry() - includeUIDs: " + connector.getParam("includeUIDs"))
+	
+	for (var propName in obj) {
+		// skip _links
+		if (propName.equalsIgnoreCase("_links") && !params.includeUIDs) continue;
+		for (var subPropName in obj[propName]) {
+			if (typeof(subPropName) != "string") {
+				//main.logmsg("toEntry() - !!!!!!!! subPropName not string: " + subPropName);
+			} else {
+				var newVal = beautifyValue(obj[propName][subPropName]);
+				/*
+				var prepend = (propName.equalsIgnoreCase("_links") ? propName + "_" : "");
+				
+				// For _links we must prepend the propName to the Attribute name
+				subPropName = prepend + subPropName;
+				*/
+				if (newVal.toLowerCase().startsWith("erglobalid=")) {
+					main.logmsg("FOUND erglobalid value for " + subPropName)
+					if (!params.includeUIDs) continue;	
+				}
+				
+				//main.logmsg("toEntry() - adding " + subPropName + " - " + obj[propName][subPropName]);
+				entry[subPropName] = newVal
+			}
+		}
+	}
+	
+	//main.logmsg("toEntry - Complete: \n" + entry)
+	
+	return entry // Not necessary, since entry is global in the Connector context - I just like doing it :)
+}
+
+function debugMsg(msg) {
+	if (__debug) {
+//		task.logmsg(msg);
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	debugMsg("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	debugMsg(arr.toString())
+}
+
+// Return the openAPI schema
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: __parameters.schema,
+			authUrl: __parameters.authUrl,
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Parse the openAPI schema
+function parseSchema() {
+	if (__schema) return __schema;
+
+	// @@TODO Make actual call
+	debugMsg("Fetching schema...")
+	//var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	//var schemaJSON = fetchSchema();
+
+	//debugMsg("Creating SCHEMA object");
+	__schema = fetchSchema();
+
+	//var toplvl = "";
+	//for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+	//debugMsg("SCHEMA -> " + toplvl)
+
+	//debugMsg("Got it!");
+	return __schema
+}
+
+function refreshParameters() {
+	var path = connector.getParam("path");
+	//if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
+	var action = connector.getParam("action");
+	// if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+
+	__parameters = {};
+	
+	for (var paramName in __paramNames) {
+		//java.lang.System.out.println("> " + paramName);
+		__parameters[paramName] = connector.getParam(paramName);
+	}
+	
+	return __parameters
+}
+
+function beautifyValue(val) {
+	//main.logmsg("beautifyValue() - " + val);
+	if (typeof(val) != "object") return val;
+	
+	try {
+		var newVal = toJson(val);
+		
+		main.logmsg("!!! It IS JSON !!!");
+		for (var propName in val) {
+			main.logmsg("        > " + propName + ": " + val[propName]);
+		}
+		if (val.description) newVal = val.description;
+		//main.logmsg("--- Returning: '" + newVal + "'");
+		return newVal;
+	} catch (ex) {
+		return val
+	}
+}
+
+
+
+//
+// -------  Standard Connector functions 
+//
+function initialize() {
+	refreshParameters();
+	resetConnector();
+	parseSchema()
+}
+
+function terminate() {
+	resetConnector()
+}
+
+// CallReply function
+function queryReply() {
+	var params = refreshParameters();
+	var usePath = __schema.replaceEmbeddedUID(params.path, entry)
+
+	var queryString = craftQueryString({
+		path: usePath,
+		parameters: __schema.getParameters(params.path, params.action),
+		action: params.action,
+		entry: entry
+	});
+	
+	// If there is a queryString, prepend it with ?
+	queryString = queryString ? "?" + queryString : "";
+	
+	// Make the REST call @@TODO Only does GET for now
+	var reply = __http.makeRequest({
+			verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+			url: usePath + queryString,
+			ctype: "application/json",
+			where: "queryReply()"
+	});
+
+	toEntry(reply);
+	return entry
+}
+
+// Since this function is being double-purposed, to also retrieve parameters for the Schema pane
+// I have to add more logic that is not necessary for normal connector operations.
+function selectEntries() {
+	//main.logmsg("@@selectEntries()...")
+	__resultSetIndex = 0;
+	var params = refreshParameters();
+	if (typeof(entry) == "undefined") var entry = system.newEntry();
+	
+	if (params.queryMode == "Parameters" || typeof(task) == "undefined") {
+		var restParams = __schema.getParameters(params.path, params.action);
+		
+		for (var i in restParams) {
+			var paramName = restParams[i].name;
+			//main.logmsg("getNextEntry() - " + paramName + " - " + beautifyValue(restParams[i]))
+			entry[paramName] = beautifyValue(restParams[i]);
+		}
+		
+		__resultSet.add(entry)
+	} else {
+		// Otherwise, normal functioning for this method
+		var personId = params.searchCrit;
+		
+		if (!personId) throw java.lang.Exception("Search criteria (personId) must be configured for this Connector")
+		
+		var usePath = __schema.replaceEmbeddedUID(params.path, personId);
+	
+		var queryString = craftQueryString({
+			path: usePath,
+			parameters: __schema.getParameters(params.path, params.action),
+			action: params.action,
+			entry: entry
+		});
+		
+		// If there is a queryString, prepend it with ?
+		queryString = queryString ? "?" + queryString : "";
+		
+		//main.logmsg("selectEntries for Data - making call");
+		
+		// Make the REST call @@TODO Only does GET for now
+		var reply = __http.makeRequest({
+				verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+				url: usePath + queryString,
+				ctype: "application/json",
+				where: "queryReply()"
+		});
+	
+		//main.logmsg("selectEntries for Data - Reply: " + com.ibm.di.entry.Entry.fromJSON(toJson(reply)));
+
+		// Update the global 'entry' variable with these values
+		var entry = toEntry(reply);
+		
+		//main.logmsg("selectEntries for Data - toEntry(): " + entry);
+
+		var resultEntry = system.newEntry();
+		resultEntry.merge(entry);
+		__resultSet.add(resultEntry);
+	}
+
+	return __resultSet	
+}
+
+function getNextEntry() {
+	main.logmsg("@@getNextEntry - remaining in buffer: " + __resultSet.size());
+	if (__resultSetIndex >= __resultSet.size()) {
+		result.setStatus(0);
+		return null;
+	}
+
+	if (typeof(entry) == "undefined") entry = system.newEntry(); // only for testing
+	
+	main.logmsg("getNextEntry() - getting index " + __resultSetIndex);
+	entry.merge(__resultSet.get(__resultSetIndex));
+	__resultSetIndex++;
+
+	result.setStatus(1);
+	//main.logmsg("@@getNextEntry: " + entry);
+	return entry
+}
+
+function putEntry() {}
+
+function modEntry() {}
+
+function deleteEntry() {}
+
+function findEntry() {}
+
+function querySchema() {
+	//main.logmsg("@@querySchema...");
+	var params = refreshParameters();
+	var path = params.path;
+	var action = params.action;
+	
+	list.clear(); // For use in the _testScriptConnectorCode
+	
+	if (params.queryMode == "Parameters" || typeof(task) == "undefined") {
+/* don't think this is needed
+		var embeddedParameter = __schema.getEmbeddedUID(path);
+		if (embeddedParameter) {
+			var e = system.newEntry();
+			e.name = embeddedParameter;
+			e.syntax = "MUST/uid";
+			e.required = true;
+			e.mandatory = true;
+			list.add(e)
+		}
+*/
+		var parameters = __schema.getParameters(path, action);
+	
+		for (var i in parameters) {
+			var param = parameters[i];
+	   
+			if (param.name.equalsIgnoreCase("CSRFToken")) continue;
+			
+			var e = system.newEntry();
+			e.name = param.name;
+			e.syntax = "MUST/" + param.schema.type;
+			e.required = true;
+			e.mandatory = true;
+			//main.logmsg("@@adding " + param.name);
+			list.add(e)
+		}
+	} else { // queryMode is "Data"
+		selectEntries();
+		var dataEntry = getNextEntry();
+		// Remember to reset the index to the result set for any getNextEntry() called after
+		__resultSetIndex = Math.min(0, __resultSetIndex - 1);
+		
+		
+		for (var att in dataEntry) {
+			if (att instanceof com.ibm.di.entry.Entry) { // This is one of the links
+				var name = "link_";
+				throw "OOOOOOPS!! Connector Script line 373"
+			} else {
+				var name = att.getName();
+				var val = att.getValue(0);
+				
+				//main.logmsg("querySchema() adding " + name + " - " + val);
+				
+				e = system.newEntry();
+				e.name = name;
+				e.syntax = typeof(val);
+				list.add(e)
+			}	
+		}
+	}
+
+	result.setStatus(1);
+	return list
+}]]></parameter>
+                <parameter name="searchCrit">NO12345</parameter>
+                <parameter name="url">http://localhost:8080</parameter>
+                <parameter name="username">edbird</parameter>
+            </Configuration>
+            <Parser>
+                <InheritFrom>[parent]</InheritFrom>
+            </Parser>
+            <AttributeMap name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738503245654</ModTime>
+            </AttributeMap>
+            <AttributeMap name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <DeltaSettings>
+                <UniqueAttribute/>
+                <WhenToCommit>After every database operation</WhenToCommit>
+                <RowLocking>SERIALIZABLE</RowLocking>
+                <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+            </DeltaSettings>
+            <Schema name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738504413685</ModTime>
+                <SchemaItem>
+                    <Name>attributes</Name>
+                    <Syntax>java.lang.String</Syntax>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>embedded</Name>
+                    <Syntax>java.lang.String</Syntax>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>forms</Name>
+                    <Syntax>java.lang.String</Syntax>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>personId</Name>
+                    <Syntax>java.lang.String</Syntax>
+                    <NativeSyntax>MUST/string</NativeSyntax>
+                </SchemaItem>
+            </Schema>
+            <Schema name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1738504413685</ModTime>
+                <SchemaItem>
+                    <Name>_links_erparent</Name>
+                    <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>_links_formTemplate</Name>
+                    <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>_links_manager</Name>
+                    <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>_links_self</Name>
+                    <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>attributes</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>cn</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>embedded</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>ercustomdisplay</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>erparent</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>erpersonstatus</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>ersupervisor</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>forms</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>givenname</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>mail</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>manager</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>name</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>personId</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>personType</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>self</Name>
                     <Syntax>java.lang.String</Syntax>
                 </SchemaItem>
                 <SchemaItem>
@@ -27855,7 +29037,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1738348976090</ModTime>
+            <ModTime>1738502181190</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -28051,8 +29233,9 @@ function RESTCLIENT(args) {
 		this.sessionId = null
 	}
 	
-	// Handle alerting
+	// Handle alerting - @@ DISABLED for now
 	this.alert = function(msg) {
+		if (!this.debug) continue;
 		main.logmsg(msg);
 		java.lang.System.out.println(msg)
 	}	
@@ -28094,6 +29277,8 @@ function RESTCLIENT(args) {
 		var verb = params.verb;
 		var ctype = params.ctype; 
 		var where = params.where;
+		
+		if (!this.debug) continue;
 		
 		if (msg == null) {
 			msg = "*unknown entry*";
