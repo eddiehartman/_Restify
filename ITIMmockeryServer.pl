@@ -61,6 +61,12 @@ get '/people/:personId' => sub {
     my $c        = shift;
     my $personId = $c->param('personId');    
 
+     # Ensure CSRF token is present
+    my $csrf_token = $c->req->headers->header('CSRFToken') || '';
+    unless ($csrf_token) {
+        return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
+    }
+    
     # Define response payload
     my $response = {
         _links => {
@@ -88,6 +94,72 @@ get '/people/:personId' => sub {
 
     # Send response
     $c->render(json => $response);
+};
+
+# PUT /people/{personId} - Modify a person
+put '/people/:personId' => sub {
+    my $c        = shift;
+    my $personId = $c->param('personId');
+
+    # Extract JSON request body
+    my $body = $c->req->json || {};
+
+    # Ensure CSRF token is present
+    my $csrf_token = $c->req->headers->header('CSRFToken') || '';
+    unless ($csrf_token) {
+        return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
+    }
+
+    # Handle optional method override (e.g., suspend, restore)
+    my $method_override = $c->req->headers->header('X-HTTP-Method-Override') || '';
+
+    # Response format
+    my $response = {
+        requestId      => "2565810057541954463",
+        changeComplete => \0,  # Boolean false in Perl
+        status         => 0,
+        methodOverride => $method_override,
+        personId       => $personId
+    };
+
+    app->log->info("PUT /people/$personId requested with X-HTTP-Method-Override: $method_override");
+
+    $c->render(status => 202, json => $response);
+};
+
+# DELETE /people/{personId} - Delete a person
+del '/people/:personId' => sub {
+    my $c        = shift;
+    my $personId = $c->param('personId');
+
+    # Ensure CSRF token is present
+    my $csrf_token = $c->req->headers->header('CSRFToken') || '';
+    unless ($csrf_token) {
+        return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
+    }
+
+    # Response
+    my $response = {
+        message  => "User $personId deleted successfully.",
+        status   => 202,
+        personId => $personId
+    };
+
+    app->log->info("DELETE /people/$personId requested.");
+
+    $c->render(status => 202, json => $response);
+};
+
+# Serve API base URLs dynamically
+my @server_urls = (
+    { url => "/itim/rest" },
+    { url => "/itim/rest/v1.2" }
+);
+
+# Route for /servers - Lists all base servers
+get '/servers' => sub {
+    my $c = shift;
+    $c->render(json => { servers => \@server_urls });
 };
 
 # Route for /v1.0/endpoint/default/token - Returns auth token
