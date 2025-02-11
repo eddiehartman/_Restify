@@ -8,7 +8,7 @@ my $schema_data;
 
 # Read and parse JSON schema
 if (-e $schema_file) {
-    open my $fh, '<', $schema_file or die "Could not open file '$schema_file': $!";
+    open my $fh, '<', $schema_file or die "Could not open file '$schema_file' $!";
     local $/;
     my $json_text = <$fh>;
     close $fh;
@@ -19,14 +19,12 @@ if (-e $schema_file) {
 }
 
 # Ensure 'paths' key exists in schema
-unless (exists $schema_data->{paths} && ref $schema_data->{paths} eq 'HASH') {
-    die "Invalid schema: Missing or malformed 'paths' key in JSON file.";
-}
+die "Invalid schema: Missing 'paths' key" unless exists $schema_data->{paths} && ref $schema_data->{paths} eq 'HASH';
 
-# Reduce schema: Keep full details for specified endpoints, parameters only for others
+# Reduce schema: Keep only parameters except for /people/{personId} and /v1.0/endpoint/default/token
 my %filtered_paths;
 foreach my $path (keys %{ $schema_data->{paths} }) {
-    if ($path eq "/schema" || $path eq "/v1.0/endpoint/default/token" || $path eq "/people/{personId}") {
+    if ($path eq "/people/{personId}" || $path eq "/v1.0/endpoint/default/token") {
         # Keep full details for these paths
         $filtered_paths{$path} = $schema_data->{paths}{$path};
     } else {
@@ -35,10 +33,10 @@ foreach my $path (keys %{ $schema_data->{paths} }) {
         foreach my $method (keys %{ $schema_data->{paths}{$path} }) {
             if (ref $schema_data->{paths}{$path}{$method} eq 'HASH') {
                 $methods{$method} = {
-                    parameters => $schema_data->{paths}{$path}{$method}{parameters} // []
+                    parameters => $schema_data->{paths}{$path}{$method}{parameters} // []  # Keep only parameters, default to empty array
                 };
             } else {
-                $methods{$method} = {};
+                $methods{$method} = {};  # Fallback for unexpected structure
             }
         }
         $filtered_paths{$path} = \%methods;
@@ -63,17 +61,33 @@ get '/people/:personId' => sub {
     my $c        = shift;
     my $personId = $c->param('personId');    
 
-    app->log->info("GET /people/$personId requested.");
-
-    # Ensure CSRF token is present
-    #my $csrf_token = $c->req->headers->header('CSRFToken') || '';
-    #unless ($csrf_token) {
-    #    return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
-    #}
-
-    # Fetch response from OpenAPI schema safely
-    my $response = $schema_data->{paths}{"/people/{personId}"}{get}{responses}{200}{content}{"application/vnd.ibm.isim-v1+json"}{example} 
-        || { error => "Mock response not found in OpenAPI schema" };
+     # Ensure CSRF token is present
+    my $csrf_token = $c->req->headers->header('CSRFToken') || '';
+    unless ($csrf_token) {
+        return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
+    }
+    
+    # Define response payload
+    my $response = {
+        _links => {
+            self      => { href => "/itim/rest/people/$personId", title => "Alan Smith" },
+            manager   => { href => "/itim/rest/people/$personId/manager" },
+            erparent  => { href => "/itim/rest/organizationcontainers/organizations/$personId" }
+        },
+        _attributes => {
+            uid             => "asmith",
+            ercustomdisplay => "Smith",
+            givenname       => "Alan",
+            erpersonstatus  => "ACTIVE",
+            name            => "Alan Smith",
+            sn              => "Smith",
+            cn              => "Alan Smith",
+            personType      => "Person",
+            mail            => "asmith\@ibm.com",
+            manager         => "erglobalid=328759766326767909,ou=0,ou=people,erglobalid=00000000000000000000,ou=org,dc=com",
+            erparent        => "erglobalid=00000000000000000000,ou=org,dc=com"
+        }
+    };
 
     # Log the request
     app->log->info("GET /people/$personId requested.");
@@ -136,6 +150,18 @@ del '/people/:personId' => sub {
     $c->render(status => 202, json => $response);
 };
 
+# Serve API base URLs dynamically
+my @server_urls = (
+    { url => "/itim/rest" },
+    { url => "/itim/rest/v1.2" }
+);
+
+# Route for /servers - Lists all base servers
+get '/servers' => sub {
+    my $c = shift;
+    $c->render(json => { servers => \@server_urls });
+};
+
 # Route for /v1.0/endpoint/default/token - Returns auth token
 post '/v1.0/endpoint/default/token' => sub {
     my $c = shift;
@@ -156,6 +182,7 @@ post '/v1.0/endpoint/default/token' => sub {
     # Send response
     $c->render(json => $response);
 };
+
 
 # Start the Mojolicious application
 app->start;
