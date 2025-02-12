@@ -83,7 +83,7 @@ get '/people/:personId' => sub {
 };
 
 # PUT /people/{personId} - Modify a person
-put '/people/:personId' => sub {
+post '/people/:personId' => sub {
     my $c        = shift;
     my $personId = $c->param('personId');
 
@@ -91,10 +91,10 @@ put '/people/:personId' => sub {
     my $body = $c->req->json || {};
 
     # Ensure CSRF token is present
-    my $csrf_token = $c->req->headers->header('CSRFToken') || '';
-    unless ($csrf_token) {
-        return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
-    }
+    #my $csrf_token = $c->req->headers->header('CSRFToken') || '';
+    #unless ($csrf_token) {
+    #    return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
+    #}
 
     # Handle optional method override (e.g., suspend, restore)
     my $method_override = $c->req->headers->header('X-HTTP-Method-Override') || '';
@@ -102,7 +102,7 @@ put '/people/:personId' => sub {
     # Response format
     my $response = {
         requestId      => "2565810057541954463",
-        changeComplete => \0,  # Boolean false in Perl
+        changeComplete => \1,  # Boolean true in Perl
         status         => 0,
         methodOverride => $method_override,
         personId       => $personId
