@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Wed Feb 12 12:24:36 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Wed Feb 12 12:58:38 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -21,7 +21,7 @@
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1739359475772</ModTime>
+            <ModTime>1739361416713</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -55,7 +55,7 @@ RESTCLIENT class
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1739359475772</ModTime>
+                <ModTime>1739361416713</ModTime>
                 <Script name="SpoofLib">
                     <ModTime>1739287846076</ModTime>
                     <parameter name="script"><![CDATA[function spoofing(args) {
@@ -344,7 +344,7 @@ fetchActions();
 i = 42;]]></parameter>
                 </Script>
                 <Script name="Connector Script">
-                    <ModTime>1739359475772</ModTime>
+                    <ModTime>1739361416713</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[// 20250104 2008 Initial
 // 20250111 1915 Handling queryParameters in url
@@ -636,25 +636,29 @@ function beautifyValue(val) {
 function extractUID(entry, epParams) {
 	// If epParams is not passed in, look it up yourself
 	epParams = epParams || __schema.getParameters(connParams.path, connParams.action);
+
 	var uid = null;
-	
-	var entryUIDAttName = null;
+	var uidAttName = null;
+
 	for (var i in epParams) {
 		var param = epParams[i];
 		if (param["in"] == "path") {
-			entryUIDAttName = param.name;
+			uidAttName = param.name;
 			break
 		}
 	}
 	
-	if (entryUIDAttName) {
-		var uidAtt = entry[entryUIDAttName];
+	if (uidAttName) {
+		var uidAtt = entry[uidAttName];
 		if (uidAtt) uid = uidAtt.getValue(0)
 	}
 	
-	if (!uid) throw new java.lang.Exception("The UID attribute must be mapped out: " + entryUIDAttName)
+	if (!uid) throw new java.lang.Exception("The UID attribute must be mapped out: " + uidAttName)
 	
-	return uid
+	return {
+		value: uid,
+		name: uidAttName
+	}
 }
 
 
@@ -679,7 +683,7 @@ function queryReply() {
 	
 	// Embed mapped parameters into the path
 	java.lang.System.out.println("queryReply() - entry: " + entry);
-	main.logmsg("queryReply() - entry: " + entry);
+	// main.logmsg("queryReply() - entry: " + entry);
 	
 	var usePath = __schema.replaceEmbeddedUID(connParams.path, entry);
 
@@ -822,7 +826,10 @@ function putEntry(entry) {
 	});
 	
 	// Check parameters for the one in the path(base) - the UID
-	entryUID = extractUID(entry, epParams);
+	var uidObj = extractUID(entry, epParams);
+	
+	var entryUID = uidObj.value;
+	var entryUIDattName = uidObj.name;
 	
 	// If there is a queryString, prepend it with ?
 	queryString = queryString ? "?" + queryString : "";
@@ -837,14 +844,14 @@ function putEntry(entry) {
 			verb: "POST",
 			url: usePath + queryString,
 			ctype: "application/json",
-			where: "queryReply()",
+			where: "putEntry()",
 			body: entry.toJSON()
 	});
 
 	//main.logmsg("selectEntries for Data - Reply: " + com.ibm.di.entry.Entry.fromJSON(toJson(reply)));
 
 	//var resultEntry = toEntry(reply);
-	task.logmsg("putEntry() - " + entry.fromJSON(toJson(reply)));
+	//task.logmsg("putEntry() - " + entry.fromJSON(toJson(reply)));
 	
 	return entry
 }
@@ -853,7 +860,54 @@ function modEntry() {}
 
 function deleteEntry() {}
 
-function findEntry() {}
+// Finding an entry only works as direct read using the UID
+function findEntry(searchCriteria) {
+	// Always refresh connParams to catch any user changes
+	var connParams = refreshParameters();
+	var crit = searchCriteria.getCriteria(0);
+	
+	// Now for queryParameters
+	var epParams = __schema.getParameters(connParams.path, connParams.action);
+	
+	var queryString = craftQueryString({
+		connParams: connParams,
+		path: usePath,
+		epParams: epParams,
+		action: connParams.action,
+		entry: entry
+	});
+	
+	// Check parameters for the one in the path(base) - the UID
+	uidObj = extractUID(entry, epParams);
+	if (!crit.name.equalsIgnoreCase(uidObj.name)) {
+		throw new java.lang.Exception("Search criteria is not an exact match with the UID attribute: " + uidObj.name)
+	}
+	
+	entryUID = crit.value;
+	
+	// If there is a queryString, prepend it with ?
+	queryString = queryString ? "?" + queryString : "";
+	
+	// Get the path and replace id's as required
+	var usePath = __schema.replaceEmbeddedUID(connParams.path, entryUID);
+
+	//main.logmsg("putEntry - making call");
+	
+	// Make the REST call 
+	var reply = __http.makeRequest({
+			verb: "GET",
+			url: usePath + queryString,
+			ctype: "application/json",
+			where: "findEntry()"
+	});
+
+	//main.logmsg("selectEntries for Data - Reply: " + com.ibm.di.entry.Entry.fromJSON(toJson(reply)));
+
+	//var resultEntry = toEntry(reply);
+	//task.logmsg("putEntry() - " + entry.fromJSON(toJson(reply)));
+	
+	return entry
+}
 
 function querySchema() {
 	//main.logmsg("@@querySchema...");
@@ -920,7 +974,7 @@ function querySchema() {
 }]]></parameter>
                 </Script>
                 <Script name="Test Connector Script">
-                    <ModTime>1739358718402</ModTime>
+                    <ModTime>1739361366014</ModTime>
                     <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[initialize();
 
@@ -938,7 +992,13 @@ entry.erpersonstatus = "ACTIVE";
 entry.cn = "Alan Smith";
 entry.ersupervisor = "erglobalid=328759766326767909,ou=0,ou=people,erglobalid=00000000000000000000,ou=org,dc=com";
 
-putEntry(entry);]]></parameter>
+entry = putEntry(entry);
+
+sc = system.newSearchCriteria();
+sc.addCriteria("personId", sc.EXACT, "NO12345");
+
+entry = findEntry(sc);
+task.logmsg("findEntry: " + entry);]]></parameter>
                 </Script>
                 <Script name="Test Connector Script INITIAL">
                     <ModTime>1739358643124</ModTime>
@@ -29504,7 +29564,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1739278900209</ModTime>
+            <ModTime>1739361460656</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
