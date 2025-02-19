@@ -65,7 +65,11 @@ get '/people/:personId' => sub {
 
     app->log->info("GET /people/$personId requested.");
 
-    # Ensure CSRF token is present
+     if ($personId ne "NO12345") {
+        app->log->warn("GET request for unknown personId: $personId. Returning 404.");
+        return $c->render(status => 404, json => { error => "Person not found" });
+    }
+   # Ensure CSRF token is present
     #my $csrf_token = $c->req->headers->header('CSRFToken') || '';
     #unless ($csrf_token) {
     #    return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
@@ -118,21 +122,26 @@ del '/people/:personId' => sub {
     my $c        = shift;
     my $personId = $c->param('personId');
 
+    # Ensure the personId is "NO12345", otherwise return 404
+    if ($personId ne "NO12345") {
+        app->log->warn("DELETE request for unknown personId: $personId. Returning 404.");
+        return $c->render(status => 404, json => { error => "Person not found" });
+    }
+
     # Ensure CSRF token is present
     my $csrf_token = $c->req->headers->header('CSRFToken') || '';
     unless ($csrf_token) {
         return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
     }
 
-    # Response
+    # Response for successful deletion
     my $response = {
-        message  => "User $personId deleted successfully.",
+        message  => "Person $personId deleted successfully.",
         status   => 202,
         personId => $personId
     };
 
-    app->log->info("DELETE /people/$personId requested.");
-
+    app->log->info("DELETE /people/$personId - User deleted successfully.");
     $c->render(status => 202, json => $response);
 };
 
