@@ -146,7 +146,7 @@ del '/people/:personId' => sub {
 };
 
 # Route for /v1.0/endpoint/default/token - Returns auth token
-post '/v1.0/endpoint/default/token' => sub {
+get '/itim/restlogin/login.jsp' => sub {
     my $c = shift;
 
     # Define token response
@@ -159,8 +159,56 @@ post '/v1.0/endpoint/default/token' => sub {
         }
     };
 
+    $c->res->headers->header('Set-Cookie' => 'sessionId=sess42');
+
     # Log the request
-    app->log->info("GET /v1.0/endpoint/default/token requested.");
+    app->log->info("GET /itim/restlogin/login.jsp requested.");
+
+    # Send response
+    $c->render(json => $response);
+};
+
+# Route for /v1.0/endpoint/default/token - Returns auth token
+post '/itim/j_security_check' => sub {
+    my $c = shift;
+
+    # Define token response
+    my $response = {
+        csrftoken => "token-xyz",
+        sessionId => "session-xyz",
+        user      => {
+            id   => "12345",
+            name => "Edbird"
+        }
+    };
+
+    $c->res->headers->header('Set-Cookie' => 'LTPAToken2=tok42');
+
+    # Log the request
+    app->log->info("POST /itim/j_security_check requested.");
+
+    # Send response
+    $c->render(json => $response);
+};
+
+# Route for /v1.0/endpoint/default/token - Returns auth token
+get '/itim/rest/systemusers/me' => sub {
+    my $c = shift;
+
+    # Define token response
+    my $response = {
+        csrftoken => "token-xyz",
+        sessionId => "session-xyz",
+        user      => {
+            id   => "12345",
+            name => "Edbird"
+        }
+    };
+
+    $c->res->headers->header('Set-Cookie' => 'CSRFToken=csrf42');
+
+    # Log the request
+    app->log->info("GET /itim/rest/systemusers/me requested.");
 
     # Send response
     $c->render(json => $response);
