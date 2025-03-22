@@ -205,7 +205,7 @@ get '/itim/rest/systemusers/me' => sub {
         }
     };
 
-    $c->res->headers->header('Set-Cookie' => 'CSRFToken=csrf42');
+    $c->res->headers->header('CSRFToken' => 'csrf42');
 
     # Log the request
     app->log->info("GET /itim/rest/systemusers/me requested.");

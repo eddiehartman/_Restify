@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sat Mar 22 14:34:47 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sat Mar 22 14:45:16 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -6213,15 +6213,13 @@ task.logmsg(retEntry)]]></parameter>
     
     <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1742588076383</ModTime>
+            <ModTime>1742650975089</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
-                <UserComment><![CDATA[attributes=name,rank,serialnumber
-security=max]]></UserComment>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1742588076383</ModTime>
-                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="807" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Mar 21 21:14:36 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
+                <ModTime>1742650975089</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="808" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Sat Mar 22 14:37:24 CET 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1742563224992</ModTime>
         <FormItemNames>
@@ -6722,7 +6720,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">a9E2jwhIjwjcUa+clz0kdOV9fjVwk1ElA1Q00KBhx64KVkdIWX7IdDJixO9a92i9j4ASVMBMme+ghEq6PH+7HRY/XphhQ5emZoY3tPO31L0Zvd3j2LOFzblA1a2AQBwPLoWoN8kfLHFXgIECah1TarLUDKsxaFI1kqEBvM4wR9A=</parameter>
+                <parameter encrypted="true" name="apikey">Nqwv9+F/DEMjWubbNnWLG7v2vzR/ynEHS7OZg+kz5freaCh6lMBeEc04G1309DNQwOcjarMbC8nCz9V60/r2PitKIkPNRXd7wo5tqxcNsqzka4X7o0Bc+e7sDQRuF5Uvwib0iIhi+d+B7l8oY6NHrE7X49HfRzQqvSAXv6ttXCs=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="debug">false</parameter>
                 <parameter name="includeFiles"/>
@@ -6730,12 +6728,9 @@ function write(fname, str) {
 RESTCLIENT class]]></parameter>
                 <parameter name="includeUIDs">true</parameter>
                 <parameter name="item">/people</parameter>
-                <parameter name="parameters"><![CDATA[attributes=name,rank,serialnumber
-embedded=Specifies the comma-separated attributes to return for reference attributes of a user (eg manager)
-forms=Specifies the boolean If true, then the form is returned for the user
-security=max
+                <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">PBQ/NcZJGbYJcmdTe3MGPHJQt49e1u9AmPdcmtEM6pMdhjATU89+ICsSyzwfOx8zimrvhFrhJkDzt8ewBCD0xt2TXdLc+WfC7KkSs/QHKoZgyB1oxWxTQJdN8G4geLick6/cHbxhAOp1NNH9kKieSKz1AhOuVr/vBpQRe8Pm0FY=</parameter>
+                <parameter encrypted="true" name="password">ftdhqPNy0WBcaz82QlDbzK+V03yF9oNnO2FbwLW8S4rDjzlfVWs3Ug8/992O3P2xu4XLZRdl7XxXwP6t/0bUapi1pXlUKBkPVmvEdcUs6S+DN+SbJrbiJkwrXor1JXXmIs0YZWelmL0bBluIw32pN+VLvu6otwrZW61zqBXeYAI=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/schema</parameter>
@@ -31555,7 +31550,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1742650193469</ModTime>
+            <ModTime>1742651077191</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -31566,11 +31561,12 @@ function RESTCLIENT(args) {
 // 20250131 1942 Made this.logmsg() write to both System.out and main.logmsg
 // 20250319 1452 Franz and I made some changes to makeRequest(), adding support for redirection
 // 20250321 2041 Still working on it
-
+// 20250322 1443 Working now! Added Franz's code, plus made cookie handling better
+//
 // This is the class that provides methods for making HTTP requests
 //
 // NOTES:
-//			* this.logmsg() for more control over logging
+//			* It uses its own this.logmsg() for more control over logging
 
 function RESTCLIENT(args) {
 	this.baseUrl = (args.baseUrl || "").trim();
@@ -31738,7 +31734,7 @@ function RESTCLIENT(args) {
 
 				// Grab the CSRFToken if found
 				if (retEntry.getString("http.CSRFToken")) {
-					this.CSRFToken = httpReply.getString("http.CSRFToken");
+					this.CSRFToken = retEntry.getString("http.CSRFToken");
 				}	
 				
 				// Now to decide what to return, based on the returnValue argument passed in
