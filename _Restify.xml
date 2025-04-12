@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sat Apr 12 17:49:42 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sat Apr 12 19:09:33 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -1393,254 +1393,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
     
     
     
-    <AssemblyLine name="__testService">
-            <ModTime>1743617163402</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="Script lib" state="Enabled"/>
-                    <Component name="Handle call" state="Enabled"/>
-                    <Component name="Log it" state="Enabled"/>
-                    <Component name="HTTPServerConnector" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <Connector name="HTTPServerConnector">
-                    <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
-                    <ModTime>1738503303908</ModTime>
-                    <ConnectorMode>Server</ConnectorMode>
-                    <ConnectorState>Disabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="tcpPort">8080</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings/>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="before_reply">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_reply</Name>
-                            <Script>task.logmsg("&gt;&gt;&gt; Making response: \n" + conn.toJSON());</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-            </ContainerEF>
-            <ContainerDF name="DataFlowContainer">
-                <Script name="Script lib">
-                    <ModTime>1737731706881</ModTime>
-                    <parameter name="enabled">true</parameter>
-                    <parameter name="script"><![CDATA[var authReturn = {
-  csrftoken: "token-xyz",
-  sessionId: "session-xyz",
-  user: {
-    id: "12345",
-    name: "Edbird"
-  }	
-}
-
-// Returns a string with legible listing of important attributes and their values
-function httpEntry(entry, sent) {
-	sent = sent || false;
-	var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
-
-	for (var att in entry) {
-		var name = att.getName();
-		var val = att.getValue();
-		if (val && name.indexOf("tcp.") < 0 
-			&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
-			&& !(val instanceof Array) && !val.startsWith("[B@")) {
-			txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
-		}
-	}
-	
-	return txt
-}
-
-
-function getString(e, attname) {
-	return e.getString(attname) || "** " + attname + " not specified **"
-}
-
-function bodyHas(req, props) {
-	var body = req.getString("http.bodyAsString");
-	try {
-		var creds = fromJson(body);		
-	} catch (ex) {
-		task.logmsg("ERROR", "Cannot parse http.body - " + e + ": " + body);
-		return false
-	}
-
-	for (var p in props) {
-		if (!req[p] == props[p]) {
-			task.logmsg("ERROR", "Credentials " + p + " does not match: " + req[p]);
-			return false	
-		}
-	}
-	
-	return true
-}
-
-function fail(msg) {
-	task.logmsg("FATAL", msg);
-	work.removeAllAttributes();
-	work["http.responseCode"] = 400;
-	work["http.responseMsg"] = msg;
-	work["http.body"] = toJson({
-		error: msg,
-		base_received: base
-	})
-	system.exitFlow()
-}
-
-// Left justified text
-function LJ(txt, len) {
-	txt = txt || "";
-	len = len || txt.length;
-	return (txt + "                                                       ").substring(0, len)
-}
-
-function httpEntry(entry, sent) {
-	sent = sent || false;
-	var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
-
-	for (var att in entry) {
-		var name = att.getName();
-		var val = att.getValue();
-		if (val && name.indexOf("tcp.") < 0 
-			&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
-			&& !(val instanceof Array) && !val.startsWith("[B@")) {
-			txt += "  " + LJ(name + ": ", 25) + val + "\n"
-		}
-	}
-	
-	return txt
-}
-
-function handleAuth(req) {
-	if (getString(req, "http.method") != "POST") {
-		fail("You must POST an auth request, instead of " + getString(req, "http.method"))
-	} else
-	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
-		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
-	} else
-	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyz") < 0) {
-		fail("Authorization code is wrong: " + request.getString("http.authorization"))
-	} else
-	if (!bodyHas(req, {username: "edbird", password: "R0kz"})) {
-		fail("Username/password invalid: " + getString("http.bodyAsString"))
-	}
-
-	req["http.body"] = toJson(authReturn);
-	req["http.responseCode"] = 200
-}
-
-function handleGetAccounts(req) {
-	if (getString(req, "http.method") != "GET") {
-		fail("You must GET person accounts, instead of " + req["http.method"])
-	} else
-	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
-		fail("Request type must be application/json but is instead '" + req["http.content-type"])
-	} /* else
-	if (getString(req, "http.X-CRF-TOKEN").toLowerCase().indexOf("xyz") < 0) {
-		fail("Access token is wrong: " + req["http.X-CRF-TOKEN"])
-	} */
-
-	req["http.body"] = system.getScriptText("__testService_getReturn");
-	req["http.responseCode"] = 200
-}
-
-function handleSchema(req) {
-	req.removeAllAttributes();
-	req["http.responseCode"] = 200;
-	req["http.responseMsg"] = "OK"
-	req["http.Content-Type"] = "YAML or JSON OpenAPI Schema, I presume ";
-	req["http.body"] = system.getScriptText("itim_swagger.json");
-	req["http.responseCode"] = 200
-}]]></parameter>
-                </Script>
-                <Script name="Handle call">
-                    <ModTime>1737731618683</ModTime>
-                    <parameter name="enabled">false</parameter>
-                    <parameter name="script"><![CDATA[// Dump the work entry
-task.logmsg("\n<<<<<--- Request: " + httpEntry(work));
-
-base = work.getString("http.base");
-
-if (base.endsWith("/schema")) {
-	task.logmsg("Schema request...");
-	handleSchema(work);
-	task.logmsg("Schema sent!");
-} else
-if (base.endsWith("/token")) {
-	task.logmsg("Authorizing...");
-	handleAuth(work);
-	task.logmsg("Authorized!")
-} else
-if (base.indexOf("/accounts") > 0) {
-	task.logmsg("Returning accounts...");
-	handleGetAccounts(work);
-	task.logmsg("Accounts returned!")
-}
-
-task.logmsg("\n--->>>> Reply: " + httpEntry(work));]]></parameter>
-                </Script>
-                <Script name="Log it">
-                    <ModTime>1737731753884</ModTime>
-                    <parameter name="script"><![CDATA[java.lang.System.out.println("\n\nRECEIVED: " + httpEntry(work));
-task.logmsg("\n\nRECEIVED: " + httpEntry(work))]]></parameter>
-                </Script>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
+    
         
     
         
@@ -1650,208 +1403,7 @@ task.logmsg("\n\nRECEIVED: " + httpEntry(work))]]></parameter>
     
         
     
-    <AssemblyLine name="__testService 20250114 1546 hopefully fixed spoofing data">
-            <ModTime>1743617163531</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="Script lib" state="Enabled"/>
-                    <Component name="Handle call" state="Enabled"/>
-                    <Component name="HTTPServerConnector" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <Connector name="HTTPServerConnector">
-                    <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
-                    <ModTime>1736797108027</ModTime>
-                    <ConnectorMode>Server</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="tcpPort">8080</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings/>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="before_reply">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_reply</Name>
-                            <Script><![CDATA[task.logmsg(">>> Making response: \n" + conn.toJSON());
-
-
-// Check if this call was handled
-var statusCode = conn["http.responseCode"];
-// If not, then fix the return
-if (!statusCode) {
-	conn.removeAllAttributes();
-	conn["http.responseCode"] = "400";
-	conn["http.responseMsg"] = "Bad request";
-	conn["http.body"] = toJson({
-		error: "Bad request",
-		base_received: base
-	})
-}]]></Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-            </ContainerEF>
-            <ContainerDF name="DataFlowContainer">
-                <Script name="Script lib">
-                    <ModTime>1736797642804</ModTime>
-                    <parameter name="script"><![CDATA[var authReturn = {
-  csrftoken: "token-xyz",
-  sessionId: "session-xyz",
-  user: {
-    id: "12345",
-    name: "Edbird"
-  }	
-}
-
-function getString(e, attname) {
-	return e.getString(attname) || "** " + attname + " not specified **"
-}
-
-function bodyHas(req, props) {
-	var body = req.getString("http.bodyAsString");
-	try {
-		var creds = fromJson(body);		
-	} catch (ex) {
-		task.logmsg("ERROR", "Cannot parse http.body - " + e + ": " + body);
-		return false
-	}
-
-	for (var p in props) {
-		if (!req[p] == props[p]) {
-			task.logmsg("ERROR", "Credentials " + p + " does not match: " + req[p]);
-			return false	
-		}
-	}
-	
-	return true
-}
-
-function fail(msg) {
-	task.logmsg("FATAL", msg);
-	work.removeAllAttributes();
-	work["http.responseCode"] = 400;
-	work["http.responseMsg"] = msg;
-	work["http.body"] = toJson({
-		error: msg,
-		base_received: base
-	})
-	system.exitFlow()
-}
-
-function handleAuth(req) {
-	if (getString(req, "http.method") != "POST") {
-		fail("You must POST an auth request, instead of " + getString(req, "http.method"))
-	} else
-	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
-		fail("Request type must be application/json but is instead '" + requ.getString("http.content-type"))
-	} else
-	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyzzy") < 0) {
-		fail("Authorization code is wrong: " + request.getString("http.authorization"))
-	} else
-	if (!bodyHas(req, {username: "edbird", password: "R0kz"})) {
-		fail("Username/password invalid: " + getString("http.bodyAsString"))
-	}
-
-	req["http.body"] = toJson(authReturn);
-	req["http.responseCode"] = 200
-}
-
-function handleGetAccounts(req) {
-	if (getString(req, "http.method") != "GET") {
-		fail("You must GET person accounts, instead of " + req["http.method"])
-	} else
-	if (getString(req, "http.content-type").equalsIgnoreCase("appliation/json")) {
-		fail("Request type must be application/json but is instead '" + req["http.content-type"])
-	} else
-	if (getString(req, "http.Authorization").toLowerCase().indexOf("xyzzy") < 0) {
-		fail("Authorization code is wrong: " + req["http.authorization"])
-	} else
-	if (getString(req, "http.X-CRF-TOKEN").toLowerCase().indexOf("xyzzy") < 0) {
-		fail("Access token is wrong: " + req["http.X-CRF-TOKEN"])
-	}
-
-	req["http.body"] = system.getScriptText("__testService_getReturn");
-	req["http.responseCode"] = 200
-}]]></parameter>
-                </Script>
-                <Script name="Handle call">
-                    <ModTime>1736797062891</ModTime>
-                    <parameter name="script"><![CDATA[// Dump the work entry
-task.logmsg("====== Request: "
-	+ work.getString("http.method")
-	+ " " + work.getString("http.base")
-	+ "\n" + work.getString("http.body"));
-
-base = work.getString("http.base");
-
-if (base.endsWith("/auth")) {
-	task.logmsg("Authorizing...");
-	handleAuth(work);
-	task.logmsg("Authorized!")
-} else
-if (base.indexOf("/accounts") > 0) {
-	task.logmsg("Returning accounts");
-	handleGetAccounts(work)
-}
-
-task.logmsg("\n------ Reply: " + work);]]></parameter>
-                </Script>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
+    
         
     
     
@@ -3165,7 +2717,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
     
         
     <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1744472844038</ModTime>
+            <ModTime>1744477641443</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -3257,10 +2809,10 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1744472844038</ModTime>
+                <ModTime>1744477641443</ModTime>
                 <Connector name="ITIMRestClientConnector_add">
                     <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744472142886</ModTime>
+                    <ModTime>1744476993899</ModTime>
                     <ConnectorMode>AddOnly</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -3305,10 +2857,11 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1744476993899</ModTime>
                         <Hook name="addonly_ok">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>addonly_ok</Name>
-                            <Script>task.logmsg("---- Add Successful: " + conn)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- Add Successful: " + conn)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                     </Hooks>
@@ -3326,7 +2879,7 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
                 <Connector name="ITIMRestClientConnector_delete">
                     <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744377441939</ModTime>
+                    <ModTime>1744477003912</ModTime>
                     <ConnectorMode>Delete</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -3370,10 +2923,11 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1744477003912</ModTime>
                         <Hook name="after_delete">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_delete</Name>
-                            <Script>task.logmsg("---- After Delete: " + conn)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After Delete: " + conn)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                     </Hooks>
@@ -3391,7 +2945,7 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
                 <Connector name="ITIMRestClientConnector_lookup">
                     <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744377452465</ModTime>
+                    <ModTime>1744477009876</ModTime>
                     <ConnectorMode>Lookup</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -3431,10 +2985,11 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1744477009876</ModTime>
                         <Hook name="after_lookup">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_lookup</Name>
-                            <Script>task.logmsg("---- After Lookup: " + conn)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After Lookup: " + conn)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                     </Hooks>
@@ -3452,7 +3007,7 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
                 <Connector name="ITIMRestClientConnector_update_add">
                     <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744472844038</ModTime>
+                    <ModTime>1744477641443</ModTime>
                     <ConnectorMode>Update</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -3496,30 +3051,31 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1744477641443</ModTime>
                         <LinkCriteriaItem>
                             <Key>1951e434bee</Key>
                             <Attribute>personId</Attribute>
                             <Operator>equals</Operator>
-                            <Value>itim manager</Value>
+                            <Value>johnny nobody</Value>
                         </LinkCriteriaItem>
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744472844038</ModTime>
+                        <ModTime>1744477563671</ModTime>
                         <Hook name="after_add">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_add</Name>
-                            <Script>task.logmsg("---- update_add After Add: " + conn)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add After Add: " + conn)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                         <Hook name="after_lookup">
                             <Name>after_lookup</Name>
-                            <Enabled>false</Enabled>
+                            <Enabled>true</Enabled>
                         </Hook>
                         <Hook name="before_add">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>before_add</Name>
-                            <Script>task.logmsg("---- update_add After Lookup: " + conn)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add After Lookup: " + conn)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                         <Hook name="before_modify">
@@ -3533,7 +3089,7 @@ task.logmsg("---- After GetNext: " + conn);
                         <Hook name="default_fail">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>default_fail</Name>
-                            <Script>task.logmsg("!!!! Error: " + error)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " !!!! Error: " + error)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                     </Hooks>
@@ -3551,7 +3107,7 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
                 <Connector name="ITIMRestClientConnector_update_modify_fails_as_not_supported_yet">
                     <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744472262287</ModTime>
+                    <ModTime>1744477051116</ModTime>
                     <ConnectorMode>Update</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -3602,22 +3158,23 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1744477051116</ModTime>
                         <Hook name="after_modify">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_modify</Name>
-                            <Script>task.logmsg("---- After Modify: " + conn)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After Modify: " + conn)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                         <Hook name="before_modify">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>before_modify</Name>
-                            <Script>task.logmsg("---- update_modify Before Lookup: " + conn)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_modify Before Lookup: " + conn)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                         <Hook name="default_fail">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>default_fail</Name>
-                            <Script>task.logmsg("---- update_add Default On Error: " + error)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add Default On Error: " + error)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                     </Hooks>
@@ -3635,7 +3192,7 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
                 <Connector name="ITIMRestClientConnector_callReply">
                     <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744377473985</ModTime>
+                    <ModTime>1744477137700</ModTime>
                     <ConnectorMode>CallReply</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -3679,16 +3236,18 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1744477137700</ModTime>
                         <Hook name="after_reply">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_reply</Name>
-                            <Script>task.logmsg("---- After CallReply: " + conn)</Script>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After CallReply: " + conn)</Script>
                             <Enabled>true</Enabled>
                         </Hook>
                         <Hook name="before_call">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>before_call</Name>
-                            <Script>conn.merge(saveWork)</Script>
+                            <Script><![CDATA[conn.merge(saveWork);
+task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Script>
                             <Enabled>true</Enabled>
                         </Hook>
                     </Hooks>
@@ -3835,616 +3394,9 @@ task.logmsg("---- After GetNext: " + conn);
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
-        <AssemblyLine name="_makeRequestSimple">
-            <ModTime>1743617163056</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="http" state="Simulated"/>
-                    <Component name="test it" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer"/>
-            <ContainerDF name="DataFlowContainer">
-                <Connector name="http">
-                    <InheritFrom>system:/Connectors/ibmdi.HTTPClient</InheritFrom>
-                    <ModTime>1742587575228</ModTime>
-                    <ConnectorMode>AddOnly</ConnectorMode>
-                    <ConnectorState>Passive</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="url">http://localhost:8080</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings/>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Script name="test it">
-                    <ModTime>1742587695109</ModTime>
-                    <parameter name="script"><![CDATA[http = http.getConnector();
-
-reqEntry = system.newEntry();
-reqEntry.method = "POST";
-reqEntry["http.url"] = "http://localhost:8080/itim/j_security_check";
-
-retEntry = http.queryReply(reqEntry);
-
-task.logmsg(retEntry)]]></parameter>
-                </Script>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
+        
     
-    <AssemblyLine name="_testITIMRestConnector_Save_Before_Conn_Reuse">
-            <ModTime>1743617163635</ModTime>
-            <Settings>
-                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
-                <parameter name="automapattributes">false</parameter>
-                <parameter name="createTombstones">false</parameter>
-                <parameter name="includeGlobalPrologs">true</parameter>
-                <parameter name="includePrologs"><![CDATA[RESTCLIENT class
-SCHEMA class]]></parameter>
-                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
-            </Settings>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="ITIMRestClientConnector_add" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_delete" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_lookup" state="Enabled"/>
-                    <Component name="ITIMRestClientConnector_update_add" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_update_modify_fails" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_callReply" state="Enabled"/>
-                    <Component name="ITIMRestClientConnector_iterate" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <Connector name="ITIMRestClientConnector_iterate">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1743598227360</ModTime>
-                    <ConnectorMode>Iterator</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <UniqueAttribute/>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_getnext">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_getnext</Name>
-                            <Script><![CDATA[saveWork = system.newEntry();
-saveWork.merge(conn);
-
-task.logmsg("---- After GetNext: " + conn);
-
-// pass work on to add connector]]></Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-            </ContainerEF>
-            <ContainerDF name="DataFlowContainer">
-                <Connector name="ITIMRestClientConnector_add">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1743598085312</ModTime>
-                    <ConnectorMode>AddOnly</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Script>"NO12345"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="addonly_ok">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>addonly_ok</Name>
-                            <Script>task.logmsg("---- Add Successful: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_delete">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1743598074593</ModTime>
-                    <ConnectorMode>Delete</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <LinkCriteriaItem>
-                            <Key>1951e416282</Key>
-                            <Attribute>personId</Attribute>
-                            <Operator>equals</Operator>
-                            <Value>itim manager</Value>
-                        </LinkCriteriaItem>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_delete">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_delete</Name>
-                            <Script>task.logmsg("---- After Delete: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_lookup">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1743598064765</ModTime>
-                    <ConnectorMode>Lookup</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AdvancedLinkMode>true</AdvancedLinkMode>
-                        <Script>"itim manager"</Script>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_lookup">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_lookup</Name>
-                            <Script>task.logmsg("---- After Lookup: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_update_add">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1743598057687</ModTime>
-                    <ConnectorMode>Update</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Enabled>true</Enabled>
-                            <Add>true</Add>
-                            <Modify>true</Modify>
-                            <Script>"itim manager"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <LinkCriteriaItem>
-                            <Key>1951e434bee</Key>
-                            <Attribute>personId</Attribute>
-                            <Operator>equals</Operator>
-                            <Value>itim manager</Value>
-                        </LinkCriteriaItem>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_add">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_add</Name>
-                            <Script>task.logmsg("---- update_add After Add: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="after_lookup">
-                            <Name>after_lookup</Name>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_add">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_add</Name>
-                            <Script>task.logmsg("---- update_add After Lookup: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_modify">
-                            <Name>before_modify</Name>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_update">
-                            <Name>before_update</Name>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="default_fail">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>default_fail</Name>
-                            <Script>task.logmsg("!!!! Error: " + ex)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_update_modify_fails">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1743598048453</ModTime>
-                    <ConnectorMode>Update</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Script>"NO12345"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <LinkCriteriaItem>
-                            <Key>1951e850c0a</Key>
-                            <Attribute>personId</Attribute>
-                            <Operator>equals</Operator>
-                            <Value>itim manager</Value>
-                        </LinkCriteriaItem>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_modify">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_modify</Name>
-                            <Script>task.logmsg("---- After Modify: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_modify">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_modify</Name>
-                            <Script>task.logmsg("---- update_modify Before Lookup: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="default_fail">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>default_fail</Name>
-                            <Script>task.logmsg("---- update_add Default On Error: " + error)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_callReply">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1743598032453</ModTime>
-                    <ConnectorMode>CallReply</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Script>"itim manager"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_reply">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_reply</Name>
-                            <Script>task.logmsg("---- After CallReply: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_call">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_call</Name>
-                            <Script>conn.merge(saveWork)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
+    
     </Folder>
     <Folder name="Connectors">
         
