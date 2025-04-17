@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Wed Apr 16 14:18:56 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Apr 17 19:33:21 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -21,7 +21,7 @@
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1743617163830</ModTime>
+            <ModTime>1744908280153</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -1419,7 +1419,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
         
     
     <AssemblyLine name="_testScriptConnectorCode 20250212 1224 putEntry() working">
-            <ModTime>1743617163731</ModTime>
+            <ModTime>1744908280378</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -2717,7 +2717,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
     
         
     <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1744477641443</ModTime>
+            <ModTime>1744908280243</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -2745,8 +2745,8 @@ SCHEMA class]]></parameter>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer">
                 <Connector name="ITIMRestClientConnector_iterate">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
-                    <ModTime>1744377710791</ModTime>
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1744806213549</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -2809,7 +2809,6 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1744477641443</ModTime>
                 <Connector name="ITIMRestClientConnector_add">
                     <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
                     <ModTime>1744476993899</ModTime>
@@ -2828,7 +2827,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </AttributeMap>
                     <AttributeMap name="Output">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744472142886</ModTime>
                         <AttributeMapItem>
                             <Name>*</Name>
                             <Type>simple</Type>
@@ -2857,7 +2855,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744476993899</ModTime>
                         <Hook name="addonly_ok">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>addonly_ok</Name>
@@ -2923,7 +2920,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744477003912</ModTime>
                         <Hook name="after_delete">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_delete</Name>
@@ -2985,7 +2981,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744477009876</ModTime>
                         <Hook name="after_lookup">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_lookup</Name>
@@ -3051,7 +3046,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744477641443</ModTime>
                         <LinkCriteriaItem>
                             <Key>1951e434bee</Key>
                             <Attribute>personId</Attribute>
@@ -3061,7 +3055,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744477563671</ModTime>
                         <Hook name="after_add">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_add</Name>
@@ -3128,7 +3121,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </AttributeMap>
                     <AttributeMap name="Output">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744472204687</ModTime>
                         <AttributeMapItem>
                             <Name>personId</Name>
                             <Type>advanced</Type>
@@ -3158,7 +3150,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744477051116</ModTime>
                         <Hook name="after_modify">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_modify</Name>
@@ -3236,7 +3227,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1744477137700</ModTime>
                         <Hook name="after_reply">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>after_reply</Name>
@@ -3271,7 +3261,7 @@ task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Scr
             </InitParams>
         </AssemblyLine>
     <AssemblyLine name="ISVG_LCR_TEST">
-            <ModTime>1743617163441</ModTime>
+            <ModTime>1744908280297</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -3286,13 +3276,13 @@ task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Scr
             <ContainerEF name="EntryFeedContainer">
                 <Connector name="ITIMRestClientConnector">
                     <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1742305281964</ModTime>
+                    <ModTime>1744807342429</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
                         <parameter name="action">GET</parameter>
-                        <parameter encrypted="true" name="password">bY68RiMblgNXo4EwlGMyICfYyu6IdFUpCTI3uigRreFydirdxilMObdQ9EyvSlw7ZnJThoivnravN6GAJxDkArT6xoACPRm5hAO8yCv6KJ4cxfCgYfOWIgGGVbPbNL0XBKIcUhBEvLpocRCwkfTPrNb5sf4sc7cR6GrQOvQZ1uo=</parameter>
+                        <parameter encrypted="true" name="password">Ym5CDsKutz9hgHww0DtqBn9u0k4n0e3kNld2MRscEAuQNpFR6wZMrSseddSrHnIVdyL+rb/73osDNx52NPNyjG54Z+Z3xhhTria9QJZvts2X2115KNmL0F5QiOaCy3GKl8AFMWZRs8/ge3Sl3vVBUzkbKtGfuf2DRsPZiBl77Zc=</parameter>
                         <parameter name="path">/lifecyclerule</parameter>
                         <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
                         <parameter name="username">itim manager</parameter>
@@ -3353,7 +3343,7 @@ task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Scr
 	httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
 	httpcall.setAttribute("http.Cookie",JSESSIONID);
 	//Set body to userid/password
-	httpcall.setAttribute("http.body","j_username=itim manager&j_password=Passw0rd");
+	httpcall.setAttribute("http.body","j_username=itim manager&j_password=secret");
 	//Perform call
 	httpReply = myHttpConn.queryReply(httpcall);
 	//Retrieve LTPAToken2
@@ -4869,12 +4859,11 @@ function querySchema(queryMode) {
         </Connector>
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1744472456066</ModTime>
+            <ModTime>1744908280008</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1744472456066</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="816" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Apr 11 16:29:01 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1744381739943</ModTime>
@@ -5384,9 +5373,9 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">aTXJXB3JGPBniKY5XtsjKHo8F2ypaOIEk+XCI/WrL8tH0Rqr6edd5ZEFRrcr/CxT+ppPMv83qgIzi7BiiDafKSpEJvvmGz2+SLIoBR1YEaE7ApUVxwQKk3fvjk7r9V9Kw7RUQp+m8uU8NFHJN3zeiPCUK9rPBmENu3JmNZKn+xc=</parameter>
+                <parameter encrypted="true" name="apikey">sticqZRieZuIUrqS7hspE4eoQXAoAptOZ7rcmi/8TGSJaKoL3rfhwsDiFU/nicqzPrKR5JUx3qU9l8HrMOF6pPfPipLuTudYG6SsC/yn0jTt0VhScRHN5AkyuA8D73EVPfQR+A0ucW+ni32zF4OQrXpPYfu3ZpaCPypdUc6bvQk=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
-                <parameter name="contextRoot">/itim/api</parameter>
+                <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
                 <parameter name="includeFiles"/>
                 <parameter name="includePrologs"><![CDATA[SCHEMA class
@@ -5395,7 +5384,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">TMYjTlWwdgbpTYmtI/P4NjxQDNLLZBqHW3VWR8kL/EOvy31YGat1dzxbXNJGBjKquExYak8SN06xgf5JwmFnTCLKQi/+QJze69pyF4TobGD3jvT67qAS8NFtmbp19T+3GelZAQWawpdj8XJFZ5Bp7tv1WAVbeuBVl8SPHHX67Q8=</parameter>
+                <parameter encrypted="true" name="password">JvjGX4BHW5ZK3iVXq86y0UG2QKrQpXx9PXfjn/bggdZ6WqPL8KMjamOqqbOQmm6HQR9XHAIfWXgl8YmoLdK0FpJMjrqzDw0ty9Eucv3XZNyB26ttTjnB171MoJAazErLNUMGSr4FGV4mX8nTT9JtV3qeOy6wVhDJjhyZLCv7S1E=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
@@ -6351,7 +6340,7 @@ function querySchema(queryMode) {
     
     
     <Script name="SCHEMA class">
-            <ModTime>1743617162989</ModTime>
+            <ModTime>1744908279955</ModTime>
             <parameter name="enabled">true</parameter>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
@@ -6500,7 +6489,7 @@ function SCHEMA(schema, format) {
         </Script>
         
     <Script name="RESTIFY library class">
-            <ModTime>1743617163205</ModTime>
+            <ModTime>1744908279992</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20241127 2024 Created
 
@@ -6548,7 +6537,7 @@ function RESTIFY () {
         </Script>
     
         <Script name="OAuth Class">
-            <ModTime>1743617163021</ModTime>
+            <ModTime>1744908279924</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[var OAUTH = null; // Will be instantiated below
 
@@ -6711,7 +6700,7 @@ function fullStacktrace(e, delimArg) {
 }]]></parameter>
         </Script>
     <Script name="itim_swagger.json">
-            <ModTime>1743617163965</ModTime>
+            <ModTime>1744908279806</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[{
     "openapi": "3.0.3",
@@ -19703,7 +19692,7 @@ function fullStacktrace(e, delimArg) {
     
         
     <Script name="SCHEMA class 20250128 1552 replaceEmbeddedUID() working as desired">
-            <ModTime>1743617165576</ModTime>
+            <ModTime>1744908279661</ModTime>
             <parameter name="enabled">true</parameter>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
@@ -19876,6 +19865,1148 @@ function SCHEMA(schema, format) {
         
         
         <Script name="RESTCLIENT class">
+            <ModTime>1744911189620</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250116 1116 Created
+// 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
+// 20250121 2104 RestClientConnector form working! RESTCLIENT class doing its job both in the test AL and in the Form
+// 20250123 1819 Tightening up code
+// 20250128 2122 Fixing httpEntry() so it does not fail on argument = null
+// 20250130 1243 Making sure this class works both inside and outside a Connector
+// 20250131 1942 Made this.logmsg() write to both System.out and main.logmsg
+// 20250319 1452 Franz and I made some changes to makeRequest(), adding support for redirection
+// 20250321 2041 Still working on it
+// 20250322 1443 Working now! Added Franz's code, plus made cookie handling better
+// 20250402 1345 Added "accept" arg to makeRequest method, else default is 'application/json'
+// 20250402 1429 Added handling of Redirect for makeRequest method
+// 20250411 1538 Removing this.sessionId since it is a cookie and handled elsewhere. Also renaming .token to .csrftoken
+// 20250411 1626 Adding handling for contextRoot
+// 20250416 1512 Fixed broken code for retCode 302 and prevent only rootContext calls
+// 20250417 1914 makeRequest - if 404 and url endsWith("/itim") retry one more time with .../systemuser/me
+//
+// This is the class that provides methods for making HTTP requests
+//
+// NOTES:
+//			* It uses its own this.logmsg() for more control over logging
+
+function RESTCLIENT(args) {
+	this.baseUrl = (args.baseUrl || "").trim();
+//	this.authUrl = args.authUrl || ""; // not used
+	this.rootContext = args.rootContext || "";
+	this.apikey = args.apikey || "";
+	this.username = args.username || ""; 
+	this.password = args.password || "";
+	this.debug = true //args.debug || false;
+	this.cookieArrayList = new java.util.ArrayList();
+	
+	this.gettingToken = false;
+	
+	// The HTTP Client Connector to use
+	this.http = system.getConnector("ibmdi.HTTPClient");
+	
+	// Member variables
+	this.requestEntry = system.newEntry();
+	
+	this.csrftoken = null;
+	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
+	
+	// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
+	this.getToken = function() {
+		var retEntry;
+		
+		// Get rid of cookies
+		this.cookieArrayList.clear();
+		
+		// First get session id
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				verb: "GET",
+				url: "/itim/restlogin/login.jsp", // @@TODO Should make this a parameter under Connections
+				returnValue: "entry",
+				where: "getToken()"
+		});
+		
+		// Now for the LTPAToken2
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				verb: "POST",
+				url: "/itim/j_security_check", // @@TODO Should make this a parameter under Connections
+				ctype: "application/x-www-form-urlencoded",
+				headers: {
+					Authorization: "Bearer " + this.apikey
+				},
+				body: "j_username=" + this.username + "&j_password=" + this.password,
+				returnValue: "entry",
+				where: "getToken()"
+		});
+		
+		// Get CSRFToken
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				returnValue: "entry",
+				verb: "POST",
+				url: "/itim/rest/systemusers/me", // @@TODO Should make this a parameter under Connections
+				ctype: "application/json",
+				returnValue: "entry",
+				where: "getToken()"
+		});
+		this.csrftoken = retEntry.getString("http.CSRFToken")
+	}
+	
+	// Get the currently set Cookies
+	this.getCookies = function() {
+		return this.cookieArrayList.toArray().join("; ")
+	}
+	
+	// Put together a URL from an array of parts
+	this.assembleUrl = function(partsArray) {
+		if (!(partsArray instanceof Array)) partsArray = [partsArray];
+		var url = "";
+		
+		for (var i = 0; i < partsArray.length; i++) {
+			var part = (partsArray[i] || "").trim();
+			if (!part) continue; // skip empty string
+			
+			// Remove starting and/or ending slashes
+			if (part.startsWith("/")) 
+			{
+				part = part.substring(1)
+			}	
+			else
+			if (part.endsWith("/"))
+			{
+				part = part.substring(0, part.length-1)
+			}
+			
+			// Assemble the url
+			url += ((i > 0) ? "/" : "") + part	
+		}
+		
+		return url
+	}	
+	
+	// REST Client http-call method. The first lines of code show you the parameters you can send in the 'param' JS object
+	this.makeRequest = function(params) {
+		// Get token if necessary
+		if (!this.csrftoken && !this.gettingToken) {
+			this.gettingToken = true;
+			this.getToken();
+			this.gettingToken = false
+		} 
+		
+		//if (form && this.debug) this.alert("RESTCLIENT.makeRequest(" + toJson(params) + "}");
+			
+		// Here come the various local variables set from parameters passed OR default values
+		var verb = params.verb || "GET";
+		var url = params.url || this.throwException("makeRequest called with no URL");
+		var body = params.body || null;
+		var ctype = params.ctype || "application/json";
+		var where = params.where || "";
+		var headers = params.headers || {};
+		var accept = params.accept || "application/json";
+		var gettingToken = params.gettingToken || false;
+		var username = params.username || "";
+		var password = params.password || "";
+		var contextRoot = params.contextRoot || "";
+		
+		var returnValue = params.returnValue || "JS object";
+		
+		var alreadyImportedCert = false;
+		
+		// Empty out the requestEntry before setting it up for the call
+		this.requestEntry.removeAllAttributes();
+		
+		// Prepare the url
+		var origUrl = url;
+		if (gettingToken) {
+			url = this.assembleUrl([this.baseUrl, url]) // Skip the context root for these calls
+		} else {
+			url = this.assembleUrl([this.baseUrl, this.contextRoot, url])
+		}	
+
+		if (url == this.assembleUrl([this.baseUrl, this.contextRoot])){
+			url = this.assembleUrl([this.baseUrl, this.contextRoot, "me"])
+		}	
+				
+		// If a body is passed, this must be a POST (I think)
+		if (typeof body !== "undefined" && body !== null) {
+			verb = "POST";
+	
+			if (typeof body != "string") {
+				this.requestEntry["http.body"] = toJson(body);
+			} else {
+				this.requestEntry["http.body"] = body;
+			}
+		}	
+		
+		// Set up the global HTTP Connector
+		this.http.setParam("method", verb.toUpperCase());
+		this.http.setParam("url", url);
+		this.http.setParam("username", username);
+		this.http.setParam("password", password);
+	
+		// Now set up the request entry
+		this.requestEntry["http.url"] = url;
+		this.requestEntry["http.method"] = verb.toUpperCase();
+		this.requestEntry["http.Content-Type"] = ctype;
+		this.requestEntry["http.remote_user"] = username;
+		this.requestEntry["http.remote_password"] = password;
+		this.requestEntry["http.Accept"] = accept;
+		this.requestEntry["http.Connection"] = "keep-alive";
+				
+		for (var hdr in headers) {
+			this.requestEntry["http." + hdr] = headers[hdr]
+		}
+		
+		if (this.debug) {
+			this.logDetails({msg : "Request to itim", 
+						obj : this.httpEntry(this.requestEntry, true), 
+						url : url, 
+						verb : verb, 
+						ctype : ctype, 
+						where : where,
+						sent: true});
+		}
+	
+		// Reinitialize the HTTP Client connector so the updated parameters are applied
+		this.http.terminate();
+		this.http.initialize(null);
+	
+		alreadyImportedCert = false; 
+		var retry = false;
+		var reply = null;
+		var swappedURLalready = false;
+		// Keep making the call until something not handled happens
+		do { // while (retry)
+			try {	
+				this.alert("\nMaking call:" + this.requestEntry + "\n");
+				retry = false;
+				
+				// Set cookies
+				this.requestEntry["http.Cookie"] = this.getCookies(); // In case these have been changed since last time
+		
+				// *****************************************************************************************
+				// ****************         Make the actual request         ********************************
+				// *****************************************************************************************
+
+				var retEntry = this.http.queryReply(this.requestEntry);
+
+
+				// Grab any cookies if found
+				if (retEntry["http.Set-Cookie"]) {
+					this.cookieArrayList.add(retEntry.getString("http.Set-Cookie"));
+				}
+
+				// Grab the CSRFToken if found
+				if (retEntry.getString("http.CSRFToken")) {
+					this.csrftoken = retEntry.getString("http.CSRFToken");
+				}	
+				
+				var retCode = retEntry.getString("http.responseCode");
+				
+				if (retCode.startsWith("3")) {
+					var location = retEntry.getString("http.location");
+					this.requestEntry["http.url"] = location;
+					retry = true
+				} else
+				if (retCode.equals("404") && (this.requestEntry.getString("http.url") || "").toLowerCase().endsWith("/itim") && !swappedURLalready) {
+					this.requestEntry["http.utl"] = this.assembleUrl([this.baseUrl, this.contextRoot, "me"]); // @TODO Is this just a problem with our test server?
+					swappedURLalready = true;
+					retry = true
+				} else
+				// Else decide what to return, based on the returnValue argument passed in and continue processing this request
+				if (returnValue == "JS object") {
+					reply = this.parseReply(retEntry);
+				} else {
+					reply = retEntry
+				}	
+				
+			} catch (ex) {
+				//if (form && this.debug) this.alert("Exception: " + ex);
+				
+				// If the token has expired, get a new one
+				if (ex.toString().indexOf("Unauthorized") >= 0) {
+					this.getToken();
+					retry = true
+				} else
+				// Else if we first must import the client cert, then do so. The Server must be restarted after.
+				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+					if ((ex.toString().indexOf("Certificate chaining error") >= 0) && alreadyImportedCert) {
+						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+					}
+					this.getCertificate();
+					alreadyImportedCert = true;
+					retry = true
+				} 	
+				
+				// If we don't know how to handle this (i.e. retry is true) then throw the exception upwards
+				if (!retry) {
+					throw ex
+				}	
+			}
+		} while (retry);
+		
+		retEntry["http.url"] = "http://" + retEntry["http.host"] + retEntry["http.base"]; // demotes automatically from Attributes to getString value. Very handy
+		retEntry.removeAttribute("http.url");
+		retEntry.removeAttribute("http.base");
+		retEntry.removeAttribute("http.host");
+		retEntry.removeAttribute("http.method");
+		
+		if (this.debug) {
+			this.logDetails({msg : "Response from itim", 
+						obj : this.httpEntry(retEntry),
+						where: where,
+					    entry : retEntry});
+		}
+		
+		//if (form && this.debug) this.alert("reply: " + toJson(reply));
+		
+		return reply;
+	}
+	
+	// Handle terminate to close the connector
+	this.terminate = function() {
+		this.http.terminate();
+		this.csrftoken = null
+	}
+	
+	// Handle alerting - @@ DISABLED for now
+	this.alert = function(msg) {
+		if (!this.debug) continue;
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}	
+		
+	
+	// Get the client certificate from the server and import it to the TDI keystore
+	this.getCertificate = function() {
+		this.logmsg("! Getting client cert");
+		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(this.baseUrl, 443);
+		this.logmsg("! Result: " + msg)
+	}
+	
+	// Log specifics arguments passed to makeRequest()
+	this.logDetails = function(params, sent) {
+		sent = sent || false;
+		var msg = params.msg;
+		var obj = params.obj; 
+		var url = params.url;
+		var verb = params.verb;
+		var ctype = params.ctype; 
+		var where = params.where;
+		
+		if (!this.debug) continue;
+		
+		if (msg == null) {
+			msg = "*unknown entry*";
+		}
+	
+		var s = new java.lang.StringBuffer();
+		
+		if (where != null) {
+			s.append("\n<<" + where + ">> " + msg);
+		} else {
+			s.append("\n---------> " + msg);
+		}
+		
+		
+		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+		if (ctype != null) { s.append("   " + ctype); } 
+		if (url != null) { s.append("   " + url); } 
+		s.append("\n");
+	
+		if (obj != null) {
+			if (obj instanceof com.ibm.di.entry.Entry) {	
+				s.append(this.httpEntry(obj, sent))	
+			} else {
+				s.append(obj.toString());
+			}
+		}	
+	
+		this.logmsg(s.toString());
+	}
+
+	this.throwException = function(msg) {
+		throw new java.lang.Exception(msg);
+	}
+
+	// Checks the validity of the reply and sets up for Iteration
+	this.parseReply = function(replyEntry) {
+		if (replyEntry === null) { return } 
+		
+		var status = replyEntry.getString("http.responseCode");
+	
+		// Check the return status
+		if (status == "401") { // Unauthorized - time to renew the token
+			this.throwException("Unauthorized")
+		}
+		if (!status.startsWith("2")) {
+			this.throwException("Error response from ITIM. Response code: " 
+								+ status
+								+ "    Message: " + replyEntry.getString("http.responseMsg"));
+		}
+		
+		// Now parse the body
+		var body = replyEntry.getString("http.bodyAsString");
+	
+		try {
+			var reply = fromJson(body);
+		} catch (ex) {
+			this.throwException("Error parsing return payload from itim: " + ex.toString()
+							+ "\n*** dump of reply ***\n" 
+							+ replyEntry)
+		}
+			
+		return reply;
+	}
+	
+	// Left justified text
+	this.LJ = function(txt, len) {
+		txt = txt || "";
+		len = len || txt.length;
+		return (txt + "                                                       ").substring(0, len)
+	}
+	
+	// Returns a string with legible listing of important attributes and their values
+	this.httpEntry = function(entry, sent) {
+		if (!entry) return "";
+		
+		sent = sent || false;
+		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
+	
+		for (var att in entry) {
+			var name = att.getName();
+			var val = att.getValue();
+			if (val && name.indexOf("tcp.") < 0 
+				&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
+				&& !(val instanceof Array) && !val.startsWith("[B@")) {
+				txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
+			}
+		}
+		
+		return txt
+	}
+
+	// Own logmsg() to aid in debugging
+	this.logmsg = function(lvl, msg) {
+		if (!lvl) { // undefined, and allows just a call to this.logmsg() to log a carriage return
+			lvl = "INFO";
+			msg = ""
+		} else
+		if (!msg) {
+			msg = lvl;
+			lvl = "INFO"
+		}
+		
+		if ("DEBUG".equalsIgnoreCase(lvl)) {
+			// Write to console out also
+			java.lang.System.out.println("|" + this.LJ(lvl,5) + "| " + msg);
+		}
+		
+		//if (form && this.debug) this.alert("RESTCLIENT.logmsg: " + msg);
+		//this.alert("task: " + (typeof task) + " - " + (task instanceof com.ibm.di.server.AssemblyLine));
+		
+		// This to allow it to be used by Connector Form Event script
+		//if (task && task instanceof com.ibm.di.server.AssemblyLine) 	task.logmsg(lvl, msg)
+		main.logmsg(lvl, msg);
+		java.lang.System.out.println(((lvl == "INFO") ? "" : lvl) + msg)
+	}	
+}]]></parameter>
+        </Script>
+        
+        
+        <Script name="HTTPCLIENT class 20250119 2013 renaming to RESTCLIENT">
+            <ModTime>1744908279974</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250116 1116 Created
+
+// This is the class that provides methods for making HTTP requests
+
+function RESTCLIENT(args) {
+	this.baseUrl = args.baseUrl || throwException("HTTPClient constructor requires the baseUrl argument");
+	this.schemaUrl = args.schemaUrl || throwException("HTTPClient constructor requires the schemaUrl argument");
+	this.authUrl = args.authUrl || "";
+	this.apikey = args.apikey || "";
+	this.username = args.username || "";
+	this.password = args.password || "";
+	this.debug = args.debug || true;
+	
+	// The HTTP Client Connector to use
+	this.http = system.getConnector("ibmdi.HTTPClient");
+	
+	// Member variables
+	this.requestEntry = system.newEntry();
+	this.token = null;
+	this.sessionId = null;
+	
+	// HTTP Client call method. The first lines of code show you the parameters you can send
+	this.makeRequest = function(params) {
+		var verb = params.verb || "GET";
+		var url = params.url || this.throwException("makeRequest called with no URL");
+		var body = params.body || null;
+		var ctype = params.ctype || "application/json";
+		var where = params.where || "";
+		var headers = params.headers || {};
+		var gettingToken = params.token || false;
+		var username = params.username || "";
+		var password = params.password || "";
+		
+		this.requestEntry.removeAllAttributes();
+		
+		// Get token if necessary
+		if (!this.token && !gettingToken) {
+			this.getToken();
+		} 
+			
+		// Add auth artifacts
+		if (!gettingToken) {
+			this.requestEntry["http.X-CSRV-TOKEN"] = this.token;
+			if (this.sessionId) this.requestEntry["http.sessionId"] = this.sessionId;
+		}
+		
+		// Prepend the host (baseURL) if not already there
+		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
+			url = this.baseUrl + "/" + url;
+		}
+		
+		// If a body is passed, this must be a POST (I think)
+		if (typeof body !== "undefined" && body !== null) {
+			verb = "POST";
+	
+			if (typeof body != "string") {
+				this.requestEntry["http.body"] = toJson(body);
+			} else {
+				this.requestEntry["http.body"] = body;
+			}
+		}	
+		
+		// Set up the global HTTP Connector
+		this.http.setParam("method", verb.toUpperCase());
+		this.http.setParam("url", url);
+		this.http.setParam("username", username);
+		this.http.setParam("password", password);
+	
+		// Now set up the request entry
+		this.requestEntry["http.url"] = url;
+		this.requestEntry["http.method"] = verb.toUpperCase();
+		this.requestEntry["http.Content-Type"] = ctype;
+		this.requestEntry["http.remote_user"] = username;
+		this.requestEntry["http.remote_password"] = password;
+		
+		for (var hdr in headers) {
+			this.requestEntry["http." + hdr] = headers[hdr]
+		}
+		
+		if (this.debug) {
+			this.logDetails({msg : "Request to itim", 
+						obj : this.httpEntry(this.requestEntry, true), 
+						url : url, 
+						verb : verb, 
+						ctype : ctype, 
+						where : where,
+						sent: true});
+		}
+	
+		// Reinitialize the HTTP Client connector so the updated parameters are applied
+		this.http.terminate();
+		this.http.initialize(null);
+	
+		// Make the call
+		do {
+			var retry = false;
+			try {	
+				var retEntry = this.http.queryReply(this.requestEntry);
+				var reply = this.parseReply(retEntry);
+			} catch (ex) {
+				// If the token has expired, get a new one
+				if (ex.toString().indexOf("Unauthorized") >= 0) {
+					this.getToken();
+					retry = true
+				} else
+				// Else if we first must import the client cert, then do so. The Server must be restarted after.
+				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+					if (ex.toString().indexOf("Certificate chaining error") >= 0) {
+						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+					}
+					this.getCertificate();
+					retry = true;
+				} else {
+					throw ex;
+				}	
+			}
+		} while (retry);
+		
+		if (this.debug) {
+			this.logDetails({msg : "Response from itim", 
+						obj : this.httpEntry(retEntry),
+					    entry : retEntry});
+		}
+		
+		return reply;
+	}
+	
+	// Get the client certificate from the server and import it to the TDI keystore
+	this.getCertificate = function() {
+		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
+	}
+	
+	// Get the authentication token
+	this.getToken = function() {
+		var reply = this.makeRequest({
+				token: true, // Getting a token
+				verb: "POST",
+				url: this.authUrl,
+				ctype: "application/json",
+				where: "getToken()",
+				headers: {
+					Authorization: "Bearer " + this.apikey
+				},
+				body: {
+					username: this.username,
+					password: this.password
+				}
+		});
+		
+		this.token = reply.csrftoken || "";
+		this.sessionId = reply.sessionId || ""
+	}
+
+	this.logDetails = function(params, sent) {
+		sent = sent || false;
+		var msg = params.msg;
+		var obj = params.obj; 
+		var url = params.url;
+		var verb = params.verb;
+		var ctype = params.ctype; 
+		var where = params.where;
+		
+		if (msg == null) {
+			msg = "*unknown entry*";
+		}
+	
+		var s = new java.lang.StringBuffer();
+		
+		if (where != null) {
+			s.append("\n@@@------> (" + where + ") " + msg);
+		} else {
+			s.append("\n---------> " + msg);
+		}
+		
+		
+		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+		if (ctype != null) { s.append("   " + ctype); } 
+		if (url != null) { s.append("   " + url); } 
+		s.append("\n");
+	
+		if (obj != null) {
+			if (obj instanceof com.ibm.di.entry.Entry) {	
+				s.append(this.httpEntry(obj, sent))	
+			} else {
+				s.append(obj.toString());
+			}
+		}	
+	
+		this.logmsg(s.toString());
+	}
+
+	this.logmsg = function(lvl, msg) {
+		if (typeof(lvl) == "undefined") {
+			msg = ""
+			lvl = "INFO"
+		} else
+		if (typeof(msg) == "undefined") {
+			msg = lvl
+			lvl = "INFO"
+		}
+		
+		if (lvl.toLowerCase().startsWith("console")) {
+			java.lang.System.out.println(msg)
+			lvl = "INFO"
+			msg = "(CONSOLE) " + msg
+		}	
+		task.logmsg(lvl, msg)
+	}
+	
+	this.throwException = function(msg) {
+		throw new java.lang.IllegalArgumentException(msg);
+	}
+
+	// Checks the validity of the reply and sets up for Iteration
+	this.parseReply = function(replyEntry) {
+		if (replyEntry === null) { return } 
+		
+		var status = replyEntry.getString("http.responseCode");
+	
+		// Check the return status
+		if (status == "401") { // Unauthorized - time to renew the token
+			throwException("Unauthorized")
+		}
+		if (!status.startsWith("2")) {
+			throwException("Error response from ITIM. Response code: " 
+								+ status
+								+ "    Message: " + replyEntry.getString("http.responseMsg"));
+		}
+		
+		// Now parse the body
+		var body = replyEntry.getString("http.bodyAsString");
+	
+		try {
+			var reply = fromJson(body);
+		} catch (ex) {
+			throwException("Error parsing return payload from itim: " + ex.toString()
+							+ "\n*** dump of reply ***\n" 
+							+ replyEntry)
+		}
+			
+		return reply;
+	}
+	
+	// Left justified text
+	this.LJ = function(txt, len) {
+		txt = txt || "";
+		len = len || txt.length;
+		return (txt + "                                                       ").substring(0, len)
+	}
+	
+	this.httpEntry = function(entry, sent) {
+		sent = sent || false;
+		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
+	
+		for (var att in entry) {
+			var name = att.getName();
+			var val = att.getValue();
+			if (val && name.indexOf("tcp.") < 0 
+				&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
+				&& !(val instanceof Array) && !val.startsWith("[B@")) {
+				txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
+			}
+		}
+		
+		return txt
+	}
+}]]></parameter>
+        </Script>
+    <Script name="RESTCLIENT class 20250411 1529 Before fixing mock server to fit new getToken logic">
+            <ModTime>1744908280042</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250116 1116 Created
+// 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
+// 20250121 2104 RestClientConnector form working! RESTCLIENT class doing its job both in the test AL and in the Form
+// 20250123 1819 Tightening up code
+// 20250128 2122 Fixing httpEntry() so it does not fail on argument = null
+// 20250130 1243 Making sure this class works both inside and outside a Connector
+// 20250131 1942 Made this.logmsg() write to both System.out and main.logmsg
+// 20250319 1452 Franz and I made some changes to makeRequest(), adding support for redirection
+// 20250321 2041 Still working on it
+// 20250322 1443 Working now! Added Franz's code, plus made cookie handling better
+// 20250402 1345 Added "accept" arg to makeRequest method, else default is 'application/json'
+// 20250402 1429 Added handling of Redirect for makeRequest method
+//
+// This is the class that provides methods for making HTTP requests
+//
+// NOTES:
+//			* It uses its own this.logmsg() for more control over logging
+
+function RESTCLIENT(args) {
+	this.baseUrl = (args.baseUrl || "").trim();
+	this.authUrl = args.authUrl || "";
+	this.apikey = args.apikey || "";
+	this.username = args.username || ""; 
+	this.password = args.password || "";
+	this.debug = true //args.debug || false;
+	this.cookieArrayList = new java.util.ArrayList();
+	
+	// The HTTP Client Connector to use
+	this.http = system.getConnector("ibmdi.HTTPClient");
+	
+	// Member variables
+	this.requestEntry = system.newEntry();
+	
+	this.token = null;
+	this.sessionId = null;
+	
+	// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
+	this.getToken = function() {
+		this.cookies = ""; // empty out cookies
+		this.cookieArrayList.clear();
+		
+		// First get session id
+		this.sessionId = this.makeRequest({
+				token: true, // Getting a token
+				returnValue: "cookie",
+				verb: "GET",
+				url: "/itim/restlogin/login.jsp", // @@TODO Should make this a parameter under Connections
+				where: "getToken()"
+		});
+		
+		// Now for the LTPAToken2
+		this.token = this.makeRequest({
+				token: true, // Getting a token
+				returnValue: "cookie",
+				verb: "POST",
+				url: "/itim/j_security_check", // @@TODO Should make this a parameter under Connections
+				ctype: "application/x-www-form-urlencoded",
+				where: "getToken()",
+				headers: {
+					Authorization: "Bearer " + this.apikey
+				},
+				body: "j_username=" + this.username + "&j_password=" + this.password
+		});
+		
+		// Get CSRFToken
+		var reply = this.makeRequest({
+				token: true, // Getting a token - or at least part of the process
+				returnValue: "entry",
+				verb: "GET",
+				url: "/itim/rest/systemusers/me", // @@TODO Should make this a parameter under Connections
+				ctype: "application/json",
+				where: "getToken()",
+				cookies: this.sessionId + "\n" + this.token
+		});
+		this.CSRFToken = reply.getString("http.CSRFToken")
+	}
+	
+	// Get the currently set Cookies
+	this.getCookies = function() {
+		return this.cookieArrayList.toArray().join("; ")
+	}	
+	
+	// REST Client http-call method. The first lines of code show you the parameters you can send in the 'param' JS object
+	this.makeRequest = function(params) {
+		// Get token if necessary
+		if (!this.token && !params.token) {
+			this.getToken();
+		} 
+		
+		//if (form && this.debug) this.alert("RESTCLIENT.makeRequest(" + toJson(params) + "}");
+			
+		// Here come the various local variables set from parameters passed OR default values
+		var verb = params.verb || "GET";
+		var url = params.url || this.throwException("makeRequest called with no URL");
+		var body = params.body || null;
+		var ctype = params.ctype || "application/json";
+		var where = params.where || "";
+		var headers = params.headers || {};
+		var accept = params.accept || "application/json";
+		var gettingToken = params.token || false;
+		var username = params.username || "";
+		var password = params.password || "";
+		
+		var returnValue = params.returnValue || "JS object";
+		
+		var alreadyImportedCert = false;
+		
+		if (url && !url.startsWith("/")) url = "/" + url;
+		
+		// Empty out the requestEntry before setting it up for the call
+		this.requestEntry.removeAllAttributes();
+		
+		// Prepend the host (baseURL) if not already there
+		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
+			if (this.baseUrl.endsWith("/")) {
+				this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length-1) // remove / at end of baseUrl if found
+			}	
+			url = this.baseUrl + url;
+		}
+		
+		// If a body is passed, this must be a POST (I think)
+		if (typeof body !== "undefined" && body !== null) {
+			verb = "POST";
+	
+			if (typeof body != "string") {
+				this.requestEntry["http.body"] = toJson(body);
+			} else {
+				this.requestEntry["http.body"] = body;
+			}
+		}	
+		
+		// Set up the global HTTP Connector
+		this.http.setParam("method", verb.toUpperCase());
+		this.http.setParam("url", url);
+		this.http.setParam("username", username);
+		this.http.setParam("password", password);
+	
+		// Now set up the request entry
+		this.requestEntry["http.url"] = url;
+		this.requestEntry["http.method"] = verb.toUpperCase();
+		this.requestEntry["http.Content-Type"] = ctype;
+		this.requestEntry["http.remote_user"] = username;
+		this.requestEntry["http.remote_password"] = password;
+		this.requestEntry["http.Accept"] = accept;
+		this.requestEntry["http.Connection"] = "keep-alive";
+				
+		for (var hdr in headers) {
+			this.requestEntry["http." + hdr] = headers[hdr]
+		}
+		
+		if (this.debug) {
+			this.logDetails({msg : "Request to itim", 
+						obj : this.httpEntry(this.requestEntry, true), 
+						url : url, 
+						verb : verb, 
+						ctype : ctype, 
+						where : where,
+						sent: true});
+		}
+	
+		// Reinitialize the HTTP Client connector so the updated parameters are applied
+		this.http.terminate();
+		this.http.initialize(null);
+	
+		alreadyImportedCert = false; 
+		var reply = null;
+		// Make the call
+		do {
+			var retry = false;
+			try {	
+				this.alert("\nMaking call:" + this.requestEntry + "\n");
+				
+				// Set cookies
+				this.requestEntry["http.Cookie"] = this.getCookies(); // In case these have been changed since last time
+		
+				var retEntry = this.http.queryReply(this.requestEntry);
+
+				// Grab any cookies if found
+				if (retEntry["http.Set-Cookie"]) {
+					this.cookieArrayList.add(retEntry.getString("http.Set-Cookie"));
+				}
+
+				// Grab the CSRFToken if found
+				if (retEntry.getString("http.CSRFToken")) {
+					this.CSRFToken = retEntry.getString("http.CSRFToken");
+				}	
+				
+				var retCode = retEntry.getString("http.responseCode");
+				
+				if (retCode.startsWith("3")) {
+					this.requestEntry("http.url") = retEntry.getString("http.location");
+					retry = true
+				} else
+				// Else decide what to return, based on the returnValue argument passed in and continue processing this request
+				if (returnValue == "cookie") {
+					reply = retEntry
+				} else
+				if (returnValue == "JS object") {
+					reply = this.parseReply(retEntry);
+				} else {
+					reply = retEntry
+				}	
+				
+			} catch (ex) {
+				//if (form && this.debug) this.alert("Exception: " + ex);
+				
+				// If the token has expired, get a new one
+				if (ex.toString().indexOf("Unauthorized") >= 0) {
+					this.getToken();
+					retry = true
+				} else
+				// Else if we first must import the client cert, then do so. The Server must be restarted after.
+				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+					if ((ex.toString().indexOf("Certificate chaining error") >= 0) && alreadyImportedCert) {
+						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+					}
+					this.getCertificate();
+					alreadyImportedCert = true;
+					retry = true;
+				} else
+				// If a redirect - follow the redirect
+				if (retEntry && retEntry.getString("http.responseCode").startsWith("3")) {
+					this.requestEntry["http.url"] = retEntry.getString("http.Location");
+ 					retry = true;
+				} else {
+					throw ex;
+				}	
+			}
+		} while (retry);
+		
+		retEntry["http.url"] = "http://" + retEntry["http.host"] + retEntry["http.base"];
+		retEntry.removeAttribute("http.url");
+		retEntry.removeAttribute("http.base");
+		retEntry.removeAttribute("http.host");
+		retEntry.removeAttribute("http.method");
+		
+		if (this.debug) {
+			this.logDetails({msg : "Response from itim", 
+						obj : this.httpEntry(retEntry),
+					    entry : retEntry});
+		}
+		
+		//if (form && this.debug) this.alert("reply: " + toJson(reply));
+		
+		return reply;
+	}
+	
+	// Handle terminate to close the connector
+	this.terminate = function() {
+		this.http.terminate();
+		this.token = null;
+		this.sessionId = null
+	}
+	
+	// Handle alerting - @@ DISABLED for now
+	this.alert = function(msg) {
+		if (!this.debug) continue;
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}	
+		
+	
+	// Get the client certificate from the server and import it to the TDI keystore
+	this.getCertificate = function() {
+		this.logmsg("! Getting client cert");
+		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(this.baseUrl, 443);
+		this.logmsg("! Result: " + msg)
+	}
+	
+	this.getToken_OLD = function() {
+		var reply = this.makeRequest({
+				token: true, // Getting a token
+				verb: "POST",
+				url: this.authUrl,
+				ctype: "application/json",
+				where: "getToken()",
+				headers: {
+					Authorization: "Bearer " + this.apikey
+				},
+				body: {
+					username: this.username,
+					password: this.password
+				}
+		});
+		
+		this.token = reply.csrftoken || "";
+		this.sessionId = reply.sessionId || ""
+	}
+	
+	// Log specifics arguments passed to makeRequest()
+	this.logDetails = function(params, sent) {
+		sent = sent || false;
+		var msg = params.msg;
+		var obj = params.obj; 
+		var url = params.url;
+		var verb = params.verb;
+		var ctype = params.ctype; 
+		var where = params.where;
+		
+		if (!this.debug) continue;
+		
+		if (msg == null) {
+			msg = "*unknown entry*";
+		}
+	
+		var s = new java.lang.StringBuffer();
+/*		
+		if (where != null) {
+			s.append("\n<<" + where + ">> " + msg);
+		} else {
+			s.append("\n---------> " + msg);
+		}
+*/		
+		
+		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+		if (ctype != null) { s.append("   " + ctype); } 
+		if (url != null) { s.append("   " + url); } 
+		s.append("\n");
+	
+		if (obj != null) {
+			if (obj instanceof com.ibm.di.entry.Entry) {	
+				s.append(this.httpEntry(obj, sent))	
+			} else {
+				s.append(obj.toString());
+			}
+		}	
+	
+		this.logmsg(s.toString());
+	}
+
+	this.throwException = function(msg) {
+		throw new java.lang.Exception(msg);
+	}
+
+	// Checks the validity of the reply and sets up for Iteration
+	this.parseReply = function(replyEntry) {
+		if (replyEntry === null) { return } 
+		
+		var status = replyEntry.getString("http.responseCode");
+	
+		// Check the return status
+		if (status == "401") { // Unauthorized - time to renew the token
+			this.throwException("Unauthorized")
+		}
+		if (!status.startsWith("2")) {
+			this.throwException("Error response from ITIM. Response code: " 
+								+ status
+								+ "    Message: " + replyEntry.getString("http.responseMsg"));
+		}
+		
+		// Now parse the body
+		var body = replyEntry.getString("http.bodyAsString");
+	
+		try {
+			var reply = fromJson(body);
+		} catch (ex) {
+			this.throwException("Error parsing return payload from itim: " + ex.toString()
+							+ "\n*** dump of reply ***\n" 
+							+ replyEntry)
+		}
+			
+		return reply;
+	}
+	
+	// Left justified text
+	this.LJ = function(txt, len) {
+		txt = txt || "";
+		len = len || txt.length;
+		return (txt + "                                                       ").substring(0, len)
+	}
+	
+	// Returns a string with legible listing of important attributes and their values
+	this.httpEntry = function(entry, sent) {
+		if (!entry) return "";
+		
+		sent = sent || false;
+		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
+	
+		for (var att in entry) {
+			var name = att.getName();
+			var val = att.getValue();
+			if (val && name.indexOf("tcp.") < 0 
+				&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
+				&& !(val instanceof Array) && !val.startsWith("[B@")) {
+				txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
+			}
+		}
+		
+		return txt
+	}
+
+	// Own logmsg() to aid in debugging
+	this.logmsg = function(lvl, msg) {
+		if (!lvl) { // undefined, and allows just a call to this.logmsg() to log a carriage return
+			lvl = "INFO";
+			msg = ""
+		} else
+		if (!msg) {
+			msg = lvl;
+			lvl = "INFO"
+		}
+		
+		if ("DEBUG".equalsIgnoreCase(lvl)) {
+			// Write to console out also
+			java.lang.System.out.println("|" + this.LJ(lvl,5) + "| " + msg);
+		}
+		
+		//if (form && this.debug) this.alert("RESTCLIENT.logmsg: " + msg);
+		//this.alert("task: " + (typeof task) + " - " + (task instanceof com.ibm.di.server.AssemblyLine));
+		
+		// This to allow it to be used by Connector Form Event script
+		//if (task && task instanceof com.ibm.di.server.AssemblyLine) 	task.logmsg(lvl, msg)
+		main.logmsg(lvl, msg);
+		java.lang.System.out.println(((lvl == "INFO") ? "" : lvl) + msg)
+	}	
+}]]></parameter>
+        </Script>
+    <Script name="RESTCLIENT class 20250417 1843 Before importing from Franz">
             <ModTime>1744472400802</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
@@ -20214,699 +21345,6 @@ function RESTCLIENT(args) {
 			s.append("\n---------> " + msg);
 		}
 		
-		
-		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
-		if (ctype != null) { s.append("   " + ctype); } 
-		if (url != null) { s.append("   " + url); } 
-		s.append("\n");
-	
-		if (obj != null) {
-			if (obj instanceof com.ibm.di.entry.Entry) {	
-				s.append(this.httpEntry(obj, sent))	
-			} else {
-				s.append(obj.toString());
-			}
-		}	
-	
-		this.logmsg(s.toString());
-	}
-
-	this.throwException = function(msg) {
-		throw new java.lang.Exception(msg);
-	}
-
-	// Checks the validity of the reply and sets up for Iteration
-	this.parseReply = function(replyEntry) {
-		if (replyEntry === null) { return } 
-		
-		var status = replyEntry.getString("http.responseCode");
-	
-		// Check the return status
-		if (status == "401") { // Unauthorized - time to renew the token
-			this.throwException("Unauthorized")
-		}
-		if (!status.startsWith("2")) {
-			this.throwException("Error response from ITIM. Response code: " 
-								+ status
-								+ "    Message: " + replyEntry.getString("http.responseMsg"));
-		}
-		
-		// Now parse the body
-		var body = replyEntry.getString("http.bodyAsString");
-	
-		try {
-			var reply = fromJson(body);
-		} catch (ex) {
-			this.throwException("Error parsing return payload from itim: " + ex.toString()
-							+ "\n*** dump of reply ***\n" 
-							+ replyEntry)
-		}
-			
-		return reply;
-	}
-	
-	// Left justified text
-	this.LJ = function(txt, len) {
-		txt = txt || "";
-		len = len || txt.length;
-		return (txt + "                                                       ").substring(0, len)
-	}
-	
-	// Returns a string with legible listing of important attributes and their values
-	this.httpEntry = function(entry, sent) {
-		if (!entry) return "";
-		
-		sent = sent || false;
-		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
-	
-		for (var att in entry) {
-			var name = att.getName();
-			var val = att.getValue();
-			if (val && name.indexOf("tcp.") < 0 
-				&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
-				&& !(val instanceof Array) && !val.startsWith("[B@")) {
-				txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
-			}
-		}
-		
-		return txt
-	}
-
-	// Own logmsg() to aid in debugging
-	this.logmsg = function(lvl, msg) {
-		if (!lvl) { // undefined, and allows just a call to this.logmsg() to log a carriage return
-			lvl = "INFO";
-			msg = ""
-		} else
-		if (!msg) {
-			msg = lvl;
-			lvl = "INFO"
-		}
-		
-		if ("DEBUG".equalsIgnoreCase(lvl)) {
-			// Write to console out also
-			java.lang.System.out.println("|" + this.LJ(lvl,5) + "| " + msg);
-		}
-		
-		//if (form && this.debug) this.alert("RESTCLIENT.logmsg: " + msg);
-		//this.alert("task: " + (typeof task) + " - " + (task instanceof com.ibm.di.server.AssemblyLine));
-		
-		// This to allow it to be used by Connector Form Event script
-		//if (task && task instanceof com.ibm.di.server.AssemblyLine) 	task.logmsg(lvl, msg)
-		main.logmsg(lvl, msg);
-		java.lang.System.out.println(((lvl == "INFO") ? "" : lvl) + msg)
-	}	
-}]]></parameter>
-        </Script>
-        
-        
-        <Script name="HTTPCLIENT class 20250119 2013 renaming to RESTCLIENT">
-            <ModTime>1743617165671</ModTime>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[// 20250116 1116 Created
-
-// This is the class that provides methods for making HTTP requests
-
-function RESTCLIENT(args) {
-	this.baseUrl = args.baseUrl || throwException("HTTPClient constructor requires the baseUrl argument");
-	this.schemaUrl = args.schemaUrl || throwException("HTTPClient constructor requires the schemaUrl argument");
-	this.authUrl = args.authUrl || "";
-	this.apikey = args.apikey || "";
-	this.username = args.username || "";
-	this.password = args.password || "";
-	this.debug = args.debug || true;
-	
-	// The HTTP Client Connector to use
-	this.http = system.getConnector("ibmdi.HTTPClient");
-	
-	// Member variables
-	this.requestEntry = system.newEntry();
-	this.token = null;
-	this.sessionId = null;
-	
-	// HTTP Client call method. The first lines of code show you the parameters you can send
-	this.makeRequest = function(params) {
-		var verb = params.verb || "GET";
-		var url = params.url || this.throwException("makeRequest called with no URL");
-		var body = params.body || null;
-		var ctype = params.ctype || "application/json";
-		var where = params.where || "";
-		var headers = params.headers || {};
-		var gettingToken = params.token || false;
-		var username = params.username || "";
-		var password = params.password || "";
-		
-		this.requestEntry.removeAllAttributes();
-		
-		// Get token if necessary
-		if (!this.token && !gettingToken) {
-			this.getToken();
-		} 
-			
-		// Add auth artifacts
-		if (!gettingToken) {
-			this.requestEntry["http.X-CSRV-TOKEN"] = this.token;
-			if (this.sessionId) this.requestEntry["http.sessionId"] = this.sessionId;
-		}
-		
-		// Prepend the host (baseURL) if not already there
-		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
-			url = this.baseUrl + "/" + url;
-		}
-		
-		// If a body is passed, this must be a POST (I think)
-		if (typeof body !== "undefined" && body !== null) {
-			verb = "POST";
-	
-			if (typeof body != "string") {
-				this.requestEntry["http.body"] = toJson(body);
-			} else {
-				this.requestEntry["http.body"] = body;
-			}
-		}	
-		
-		// Set up the global HTTP Connector
-		this.http.setParam("method", verb.toUpperCase());
-		this.http.setParam("url", url);
-		this.http.setParam("username", username);
-		this.http.setParam("password", password);
-	
-		// Now set up the request entry
-		this.requestEntry["http.url"] = url;
-		this.requestEntry["http.method"] = verb.toUpperCase();
-		this.requestEntry["http.Content-Type"] = ctype;
-		this.requestEntry["http.remote_user"] = username;
-		this.requestEntry["http.remote_password"] = password;
-		
-		for (var hdr in headers) {
-			this.requestEntry["http." + hdr] = headers[hdr]
-		}
-		
-		if (this.debug) {
-			this.logDetails({msg : "Request to itim", 
-						obj : this.httpEntry(this.requestEntry, true), 
-						url : url, 
-						verb : verb, 
-						ctype : ctype, 
-						where : where,
-						sent: true});
-		}
-	
-		// Reinitialize the HTTP Client connector so the updated parameters are applied
-		this.http.terminate();
-		this.http.initialize(null);
-	
-		// Make the call
-		do {
-			var retry = false;
-			try {	
-				var retEntry = this.http.queryReply(this.requestEntry);
-				var reply = this.parseReply(retEntry);
-			} catch (ex) {
-				// If the token has expired, get a new one
-				if (ex.toString().indexOf("Unauthorized") >= 0) {
-					this.getToken();
-					retry = true
-				} else
-				// Else if we first must import the client cert, then do so. The Server must be restarted after.
-				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
-					if (ex.toString().indexOf("Certificate chaining error") >= 0) {
-						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
-					}
-					this.getCertificate();
-					retry = true;
-				} else {
-					throw ex;
-				}	
-			}
-		} while (retry);
-		
-		if (this.debug) {
-			this.logDetails({msg : "Response from itim", 
-						obj : this.httpEntry(retEntry),
-					    entry : retEntry});
-		}
-		
-		return reply;
-	}
-	
-	// Get the client certificate from the server and import it to the TDI keystore
-	this.getCertificate = function() {
-		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(baseurl, 443);
-	}
-	
-	// Get the authentication token
-	this.getToken = function() {
-		var reply = this.makeRequest({
-				token: true, // Getting a token
-				verb: "POST",
-				url: this.authUrl,
-				ctype: "application/json",
-				where: "getToken()",
-				headers: {
-					Authorization: "Bearer " + this.apikey
-				},
-				body: {
-					username: this.username,
-					password: this.password
-				}
-		});
-		
-		this.token = reply.csrftoken || "";
-		this.sessionId = reply.sessionId || ""
-	}
-
-	this.logDetails = function(params, sent) {
-		sent = sent || false;
-		var msg = params.msg;
-		var obj = params.obj; 
-		var url = params.url;
-		var verb = params.verb;
-		var ctype = params.ctype; 
-		var where = params.where;
-		
-		if (msg == null) {
-			msg = "*unknown entry*";
-		}
-	
-		var s = new java.lang.StringBuffer();
-		
-		if (where != null) {
-			s.append("\n@@@------> (" + where + ") " + msg);
-		} else {
-			s.append("\n---------> " + msg);
-		}
-		
-		
-		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
-		if (ctype != null) { s.append("   " + ctype); } 
-		if (url != null) { s.append("   " + url); } 
-		s.append("\n");
-	
-		if (obj != null) {
-			if (obj instanceof com.ibm.di.entry.Entry) {	
-				s.append(this.httpEntry(obj, sent))	
-			} else {
-				s.append(obj.toString());
-			}
-		}	
-	
-		this.logmsg(s.toString());
-	}
-
-	this.logmsg = function(lvl, msg) {
-		if (typeof(lvl) == "undefined") {
-			msg = ""
-			lvl = "INFO"
-		} else
-		if (typeof(msg) == "undefined") {
-			msg = lvl
-			lvl = "INFO"
-		}
-		
-		if (lvl.toLowerCase().startsWith("console")) {
-			java.lang.System.out.println(msg)
-			lvl = "INFO"
-			msg = "(CONSOLE) " + msg
-		}	
-		task.logmsg(lvl, msg)
-	}
-	
-	this.throwException = function(msg) {
-		throw new java.lang.IllegalArgumentException(msg);
-	}
-
-	// Checks the validity of the reply and sets up for Iteration
-	this.parseReply = function(replyEntry) {
-		if (replyEntry === null) { return } 
-		
-		var status = replyEntry.getString("http.responseCode");
-	
-		// Check the return status
-		if (status == "401") { // Unauthorized - time to renew the token
-			throwException("Unauthorized")
-		}
-		if (!status.startsWith("2")) {
-			throwException("Error response from ITIM. Response code: " 
-								+ status
-								+ "    Message: " + replyEntry.getString("http.responseMsg"));
-		}
-		
-		// Now parse the body
-		var body = replyEntry.getString("http.bodyAsString");
-	
-		try {
-			var reply = fromJson(body);
-		} catch (ex) {
-			throwException("Error parsing return payload from itim: " + ex.toString()
-							+ "\n*** dump of reply ***\n" 
-							+ replyEntry)
-		}
-			
-		return reply;
-	}
-	
-	// Left justified text
-	this.LJ = function(txt, len) {
-		txt = txt || "";
-		len = len || txt.length;
-		return (txt + "                                                       ").substring(0, len)
-	}
-	
-	this.httpEntry = function(entry, sent) {
-		sent = sent || false;
-		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
-	
-		for (var att in entry) {
-			var name = att.getName();
-			var val = att.getValue();
-			if (val && name.indexOf("tcp.") < 0 
-				&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
-				&& !(val instanceof Array) && !val.startsWith("[B@")) {
-				txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
-			}
-		}
-		
-		return txt
-	}
-}]]></parameter>
-        </Script>
-    <Script name="RESTCLIENT class 20250411 1529 Before fixing mock server to fit new getToken logic">
-            <ModTime>1743621173053</ModTime>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[// 20250116 1116 Created
-// 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
-// 20250121 2104 RestClientConnector form working! RESTCLIENT class doing its job both in the test AL and in the Form
-// 20250123 1819 Tightening up code
-// 20250128 2122 Fixing httpEntry() so it does not fail on argument = null
-// 20250130 1243 Making sure this class works both inside and outside a Connector
-// 20250131 1942 Made this.logmsg() write to both System.out and main.logmsg
-// 20250319 1452 Franz and I made some changes to makeRequest(), adding support for redirection
-// 20250321 2041 Still working on it
-// 20250322 1443 Working now! Added Franz's code, plus made cookie handling better
-// 20250402 1345 Added "accept" arg to makeRequest method, else default is 'application/json'
-// 20250402 1429 Added handling of Redirect for makeRequest method
-//
-// This is the class that provides methods for making HTTP requests
-//
-// NOTES:
-//			* It uses its own this.logmsg() for more control over logging
-
-function RESTCLIENT(args) {
-	this.baseUrl = (args.baseUrl || "").trim();
-	this.authUrl = args.authUrl || "";
-	this.apikey = args.apikey || "";
-	this.username = args.username || ""; 
-	this.password = args.password || "";
-	this.debug = true //args.debug || false;
-	this.cookieArrayList = new java.util.ArrayList();
-	
-	// The HTTP Client Connector to use
-	this.http = system.getConnector("ibmdi.HTTPClient");
-	
-	// Member variables
-	this.requestEntry = system.newEntry();
-	
-	this.token = null;
-	this.sessionId = null;
-	
-	// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
-	this.getToken = function() {
-		this.cookies = ""; // empty out cookies
-		this.cookieArrayList.clear();
-		
-		// First get session id
-		this.sessionId = this.makeRequest({
-				token: true, // Getting a token
-				returnValue: "cookie",
-				verb: "GET",
-				url: "/itim/restlogin/login.jsp", // @@TODO Should make this a parameter under Connections
-				where: "getToken()"
-		});
-		
-		// Now for the LTPAToken2
-		this.token = this.makeRequest({
-				token: true, // Getting a token
-				returnValue: "cookie",
-				verb: "POST",
-				url: "/itim/j_security_check", // @@TODO Should make this a parameter under Connections
-				ctype: "application/x-www-form-urlencoded",
-				where: "getToken()",
-				headers: {
-					Authorization: "Bearer " + this.apikey
-				},
-				body: "j_username=" + this.username + "&j_password=" + this.password
-		});
-		
-		// Get CSRFToken
-		var reply = this.makeRequest({
-				token: true, // Getting a token - or at least part of the process
-				returnValue: "entry",
-				verb: "GET",
-				url: "/itim/rest/systemusers/me", // @@TODO Should make this a parameter under Connections
-				ctype: "application/json",
-				where: "getToken()",
-				cookies: this.sessionId + "\n" + this.token
-		});
-		this.CSRFToken = reply.getString("http.CSRFToken")
-	}
-	
-	// Get the currently set Cookies
-	this.getCookies = function() {
-		return this.cookieArrayList.toArray().join("; ")
-	}	
-	
-	// REST Client http-call method. The first lines of code show you the parameters you can send in the 'param' JS object
-	this.makeRequest = function(params) {
-		// Get token if necessary
-		if (!this.token && !params.token) {
-			this.getToken();
-		} 
-		
-		//if (form && this.debug) this.alert("RESTCLIENT.makeRequest(" + toJson(params) + "}");
-			
-		// Here come the various local variables set from parameters passed OR default values
-		var verb = params.verb || "GET";
-		var url = params.url || this.throwException("makeRequest called with no URL");
-		var body = params.body || null;
-		var ctype = params.ctype || "application/json";
-		var where = params.where || "";
-		var headers = params.headers || {};
-		var accept = params.accept || "application/json";
-		var gettingToken = params.token || false;
-		var username = params.username || "";
-		var password = params.password || "";
-		
-		var returnValue = params.returnValue || "JS object";
-		
-		var alreadyImportedCert = false;
-		
-		if (url && !url.startsWith("/")) url = "/" + url;
-		
-		// Empty out the requestEntry before setting it up for the call
-		this.requestEntry.removeAllAttributes();
-		
-		// Prepend the host (baseURL) if not already there
-		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
-			if (this.baseUrl.endsWith("/")) {
-				this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length-1) // remove / at end of baseUrl if found
-			}	
-			url = this.baseUrl + url;
-		}
-		
-		// If a body is passed, this must be a POST (I think)
-		if (typeof body !== "undefined" && body !== null) {
-			verb = "POST";
-	
-			if (typeof body != "string") {
-				this.requestEntry["http.body"] = toJson(body);
-			} else {
-				this.requestEntry["http.body"] = body;
-			}
-		}	
-		
-		// Set up the global HTTP Connector
-		this.http.setParam("method", verb.toUpperCase());
-		this.http.setParam("url", url);
-		this.http.setParam("username", username);
-		this.http.setParam("password", password);
-	
-		// Now set up the request entry
-		this.requestEntry["http.url"] = url;
-		this.requestEntry["http.method"] = verb.toUpperCase();
-		this.requestEntry["http.Content-Type"] = ctype;
-		this.requestEntry["http.remote_user"] = username;
-		this.requestEntry["http.remote_password"] = password;
-		this.requestEntry["http.Accept"] = accept;
-		this.requestEntry["http.Connection"] = "keep-alive";
-				
-		for (var hdr in headers) {
-			this.requestEntry["http." + hdr] = headers[hdr]
-		}
-		
-		if (this.debug) {
-			this.logDetails({msg : "Request to itim", 
-						obj : this.httpEntry(this.requestEntry, true), 
-						url : url, 
-						verb : verb, 
-						ctype : ctype, 
-						where : where,
-						sent: true});
-		}
-	
-		// Reinitialize the HTTP Client connector so the updated parameters are applied
-		this.http.terminate();
-		this.http.initialize(null);
-	
-		alreadyImportedCert = false; 
-		var reply = null;
-		// Make the call
-		do {
-			var retry = false;
-			try {	
-				this.alert("\nMaking call:" + this.requestEntry + "\n");
-				
-				// Set cookies
-				this.requestEntry["http.Cookie"] = this.getCookies(); // In case these have been changed since last time
-		
-				var retEntry = this.http.queryReply(this.requestEntry);
-
-				// Grab any cookies if found
-				if (retEntry["http.Set-Cookie"]) {
-					this.cookieArrayList.add(retEntry.getString("http.Set-Cookie"));
-				}
-
-				// Grab the CSRFToken if found
-				if (retEntry.getString("http.CSRFToken")) {
-					this.CSRFToken = retEntry.getString("http.CSRFToken");
-				}	
-				
-				var retCode = retEntry.getString("http.responseCode");
-				
-				if (retCode.startsWith("3")) {
-					this.requestEntry("http.url") = retEntry.getString("http.location");
-					retry = true
-				} else
-				// Else decide what to return, based on the returnValue argument passed in and continue processing this request
-				if (returnValue == "cookie") {
-					reply = retEntry
-				} else
-				if (returnValue == "JS object") {
-					reply = this.parseReply(retEntry);
-				} else {
-					reply = retEntry
-				}	
-				
-			} catch (ex) {
-				//if (form && this.debug) this.alert("Exception: " + ex);
-				
-				// If the token has expired, get a new one
-				if (ex.toString().indexOf("Unauthorized") >= 0) {
-					this.getToken();
-					retry = true
-				} else
-				// Else if we first must import the client cert, then do so. The Server must be restarted after.
-				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
-					if ((ex.toString().indexOf("Certificate chaining error") >= 0) && alreadyImportedCert) {
-						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
-					}
-					this.getCertificate();
-					alreadyImportedCert = true;
-					retry = true;
-				} else
-				// If a redirect - follow the redirect
-				if (retEntry && retEntry.getString("http.responseCode").startsWith("3")) {
-					this.requestEntry["http.url"] = retEntry.getString("http.Location");
- 					retry = true;
-				} else {
-					throw ex;
-				}	
-			}
-		} while (retry);
-		
-		retEntry["http.url"] = "http://" + retEntry["http.host"] + retEntry["http.base"];
-		retEntry.removeAttribute("http.url");
-		retEntry.removeAttribute("http.base");
-		retEntry.removeAttribute("http.host");
-		retEntry.removeAttribute("http.method");
-		
-		if (this.debug) {
-			this.logDetails({msg : "Response from itim", 
-						obj : this.httpEntry(retEntry),
-					    entry : retEntry});
-		}
-		
-		//if (form && this.debug) this.alert("reply: " + toJson(reply));
-		
-		return reply;
-	}
-	
-	// Handle terminate to close the connector
-	this.terminate = function() {
-		this.http.terminate();
-		this.token = null;
-		this.sessionId = null
-	}
-	
-	// Handle alerting - @@ DISABLED for now
-	this.alert = function(msg) {
-		if (!this.debug) continue;
-		main.logmsg(msg);
-		java.lang.System.out.println(msg)
-	}	
-		
-	
-	// Get the client certificate from the server and import it to the TDI keystore
-	this.getCertificate = function() {
-		this.logmsg("! Getting client cert");
-		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(this.baseUrl, 443);
-		this.logmsg("! Result: " + msg)
-	}
-	
-	this.getToken_OLD = function() {
-		var reply = this.makeRequest({
-				token: true, // Getting a token
-				verb: "POST",
-				url: this.authUrl,
-				ctype: "application/json",
-				where: "getToken()",
-				headers: {
-					Authorization: "Bearer " + this.apikey
-				},
-				body: {
-					username: this.username,
-					password: this.password
-				}
-		});
-		
-		this.token = reply.csrftoken || "";
-		this.sessionId = reply.sessionId || ""
-	}
-	
-	// Log specifics arguments passed to makeRequest()
-	this.logDetails = function(params, sent) {
-		sent = sent || false;
-		var msg = params.msg;
-		var obj = params.obj; 
-		var url = params.url;
-		var verb = params.verb;
-		var ctype = params.ctype; 
-		var where = params.where;
-		
-		if (!this.debug) continue;
-		
-		if (msg == null) {
-			msg = "*unknown entry*";
-		}
-	
-		var s = new java.lang.StringBuffer();
-/*		
-		if (where != null) {
-			s.append("\n<<" + where + ">> " + msg);
-		} else {
-			s.append("\n---------> " + msg);
-		}
-*/		
 		
 		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
 		if (ctype != null) { s.append("   " + ctype); } 
