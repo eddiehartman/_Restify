@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu Apr 17 19:33:21 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sun Apr 20 16:16:28 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -2717,7 +2717,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
     
         
     <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1744908280243</ModTime>
+            <ModTime>1745142884727</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -2744,9 +2744,10 @@ SCHEMA class]]></parameter>
             </SimulationConfig>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer">
+                <ModTime>1745142884727</ModTime>
                 <Connector name="ITIMRestClientConnector_iterate">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1744806213549</ModTime>
+                    <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
+                    <ModTime>1745142884727</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -19865,7 +19866,7 @@ function SCHEMA(schema, format) {
         
         
         <Script name="RESTCLIENT class">
-            <ModTime>1744911189620</ModTime>
+            <ModTime>1745158540070</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -19883,6 +19884,7 @@ function SCHEMA(schema, format) {
 // 20250411 1626 Adding handling for contextRoot
 // 20250416 1512 Fixed broken code for retCode 302 and prevent only rootContext calls
 // 20250417 1914 makeRequest - if 404 and url endsWith("/itim") retry one more time with .../systemuser/me
+// 20250420 1543 makeRequest - if this.cookieArrayList.size() == 0 and not already getting a token, then call getToken()
 //
 // This is the class that provides methods for making HTTP requests
 //
@@ -19987,13 +19989,6 @@ function RESTCLIENT(args) {
 	
 	// REST Client http-call method. The first lines of code show you the parameters you can send in the 'param' JS object
 	this.makeRequest = function(params) {
-		// Get token if necessary
-		if (!this.csrftoken && !this.gettingToken) {
-			this.gettingToken = true;
-			this.getToken();
-			this.gettingToken = false
-		} 
-		
 		//if (form && this.debug) this.alert("RESTCLIENT.makeRequest(" + toJson(params) + "}");
 			
 		// Here come the various local variables set from parameters passed OR default values
@@ -20010,6 +20005,13 @@ function RESTCLIENT(args) {
 		var contextRoot = params.contextRoot || "";
 		
 		var returnValue = params.returnValue || "JS object";
+		
+		// Get token if necessary
+		if ((this.cookieArrayList.size() == 0) && !gettingToken) {
+			//this.gettingToken = true;
+			this.getToken();
+			this.gettingToken = false // Just making sure it stays false
+		} 
 		
 		var alreadyImportedCert = false;
 		
@@ -20079,12 +20081,13 @@ function RESTCLIENT(args) {
 		// Keep making the call until something not handled happens
 		do { // while (retry)
 			try {	
-				this.alert("\nMaking call:" + this.requestEntry + "\n");
 				retry = false;
 				
 				// Set cookies
 				this.requestEntry["http.Cookie"] = this.getCookies(); // In case these have been changed since last time
 		
+				this.alert("\nMaking request:" + this.requestEntry + "\n");
+
 				// *****************************************************************************************
 				// ****************         Make the actual request         ********************************
 				// *****************************************************************************************
@@ -20174,6 +20177,7 @@ function RESTCLIENT(args) {
 	this.alert = function(msg) {
 		if (!this.debug) continue;
 		main.logmsg(msg);
+		task.logmsg(msg);
 		java.lang.System.out.println(msg)
 	}	
 		
