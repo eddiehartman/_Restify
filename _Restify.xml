@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sun Apr 20 16:16:28 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Fri Apr 25 20:37:52 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -21,7 +21,7 @@
     
     
     <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1744908280153</ModTime>
+            <ModTime>1745603058657</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -1419,7 +1419,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
         
     
     <AssemblyLine name="_testScriptConnectorCode 20250212 1224 putEntry() working">
-            <ModTime>1744908280378</ModTime>
+            <ModTime>1745603058705</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -2717,7 +2717,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
     
         
     <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1745142884727</ModTime>
+            <ModTime>1745603087970</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -2744,14 +2744,15 @@ SCHEMA class]]></parameter>
             </SimulationConfig>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer">
-                <ModTime>1745142884727</ModTime>
+                <ModTime>1745603087970</ModTime>
                 <Connector name="ITIMRestClientConnector_iterate">
                     <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
-                    <ModTime>1745142884727</ModTime>
+                    <ModTime>1745603087970</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="searchCrit">ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw</parameter>
                     </Configuration>
                     <Parser>
                         <InheritFrom>[parent]</InheritFrom>
@@ -3262,7 +3263,7 @@ task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Scr
             </InitParams>
         </AssemblyLine>
     <AssemblyLine name="ISVG_LCR_TEST">
-            <ModTime>1744908280297</ModTime>
+            <ModTime>1745603058644</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -3283,7 +3284,7 @@ task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Scr
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
                         <parameter name="action">GET</parameter>
-                        <parameter encrypted="true" name="password">Ym5CDsKutz9hgHww0DtqBn9u0k4n0e3kNld2MRscEAuQNpFR6wZMrSseddSrHnIVdyL+rb/73osDNx52NPNyjG54Z+Z3xhhTria9QJZvts2X2115KNmL0F5QiOaCy3GKl8AFMWZRs8/ge3Sl3vVBUzkbKtGfuf2DRsPZiBl77Zc=</parameter>
+                        <parameter encrypted="true" name="password">Ej9brFmxJ7cLGdLVC3VwYx6qVKfhrbbh/XenlHxZ8ns61PAB8Le9Noz4cF0YQZdfbMuT5Wp83wkpmajZTvNL5kdoULZExUgkaHRqdHswatGApAO+4KPglLwvWjtXKpQbTIUaWgQv04By3tLO1zbjluBA6+uACKzk7qGxq4/W2ew=</parameter>
                         <parameter name="path">/lifecyclerule</parameter>
                         <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
                         <parameter name="username">itim manager</parameter>
@@ -4860,7 +4861,7 @@ function querySchema(queryMode) {
         </Connector>
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1744908280008</ModTime>
+            <ModTime>1745603058561</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
@@ -5374,7 +5375,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">sticqZRieZuIUrqS7hspE4eoQXAoAptOZ7rcmi/8TGSJaKoL3rfhwsDiFU/nicqzPrKR5JUx3qU9l8HrMOF6pPfPipLuTudYG6SsC/yn0jTt0VhScRHN5AkyuA8D73EVPfQR+A0ucW+ni32zF4OQrXpPYfu3ZpaCPypdUc6bvQk=</parameter>
+                <parameter encrypted="true" name="apikey">GQe+e8jtaODfI+ybBP31Ia/OqRMBoyH7JGR7bxAuVuXr/qZkB4/3K3B+3YLOiJ6ofciFfzbqPYz8ZTluX6mIoeNXTZnjujeYHHfEWxfI2p26mDPGywiP6fHJfEjJUjplSqpOTK4EkIv87VV+wQSqa88hhZ2vYEl/IaEhYwLXs94=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -5385,7 +5386,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">JvjGX4BHW5ZK3iVXq86y0UG2QKrQpXx9PXfjn/bggdZ6WqPL8KMjamOqqbOQmm6HQR9XHAIfWXgl8YmoLdK0FpJMjrqzDw0ty9Eucv3XZNyB26ttTjnB171MoJAazErLNUMGSr4FGV4mX8nTT9JtV3qeOy6wVhDJjhyZLCv7S1E=</parameter>
+                <parameter encrypted="true" name="password">WK8d9p/7B90JjxOlGy6L9aPfyGGhvqEdSyKwqLeNYa3g8u6/hRqvN5VB2AhUSTCvj5Z1L+7ge9o8QlCjXMMWplGoAXgBYT4BHLRv/P2Vhi1Cc6fJ6ChaUHIVcoVIn5gXhEtcpcESa3NpUn0E1l0kLrICRoDaKv2tN16zXzjgIrg=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
@@ -5415,6 +5416,7 @@ RESTCLIENT class]]></parameter>
 // 20250219 2023 All connector modes supported except modify
 // 20250402 1423 Added __contextRoot global param - @@TODO: Should be a parameter
 // 20250411 1621 Making contextRoot a parameter
+// 20250423 1428 Sending contextRoot to RestClient constructor
 //
 // --- TODO Freetext parameter where all the standard set of parameter values can be set
 //                                        
@@ -5448,7 +5450,7 @@ var __paramNames = {
 	searchCrit: true,
 	includeUIDs: true,
 	parameters: true,
-	rootContext: true
+	contextRoot: true
 }
 
 //
@@ -5536,6 +5538,7 @@ function resetConnector() {
 						username:  __parameters.username,
 						password:  __parameters.password,
 						schemaUrl: __parameters.schema,
+						contextRoot: __parameters.contextRoot,
 						debug: 	   debug() // true => debug output		
 					})
 }
@@ -5611,6 +5614,7 @@ function fetchSchema() {
 			url: __parameters.schema,
 			authUrl: __parameters.authUrl,
 			ctype: "application/json",
+			contextRoot: "",
 			where: "fetchSchema()"		
 	})
     
@@ -6341,7 +6345,7 @@ function querySchema(queryMode) {
     
     
     <Script name="SCHEMA class">
-            <ModTime>1744908279955</ModTime>
+            <ModTime>1745603058483</ModTime>
             <parameter name="enabled">true</parameter>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
@@ -6490,7 +6494,7 @@ function SCHEMA(schema, format) {
         </Script>
         
     <Script name="RESTIFY library class">
-            <ModTime>1744908279992</ModTime>
+            <ModTime>1745603058408</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20241127 2024 Created
 
@@ -6538,7 +6542,7 @@ function RESTIFY () {
         </Script>
     
         <Script name="OAuth Class">
-            <ModTime>1744908279924</ModTime>
+            <ModTime>1745603058551</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[var OAUTH = null; // Will be instantiated below
 
@@ -6701,7 +6705,7 @@ function fullStacktrace(e, delimArg) {
 }]]></parameter>
         </Script>
     <Script name="itim_swagger.json">
-            <ModTime>1744908279806</ModTime>
+            <ModTime>1745603058453</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[{
     "openapi": "3.0.3",
@@ -19693,7 +19697,7 @@ function fullStacktrace(e, delimArg) {
     
         
     <Script name="SCHEMA class 20250128 1552 replaceEmbeddedUID() working as desired">
-            <ModTime>1744908279661</ModTime>
+            <ModTime>1745603058624</ModTime>
             <parameter name="enabled">true</parameter>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
@@ -19866,7 +19870,7 @@ function SCHEMA(schema, format) {
         
         
         <Script name="RESTCLIENT class">
-            <ModTime>1745158540070</ModTime>
+            <ModTime>1745605937340</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -19882,9 +19886,9 @@ function SCHEMA(schema, format) {
 // 20250402 1429 Added handling of Redirect for makeRequest method
 // 20250411 1538 Removing this.sessionId since it is a cookie and handled elsewhere. Also renaming .token to .csrftoken
 // 20250411 1626 Adding handling for contextRoot
-// 20250416 1512 Fixed broken code for retCode 302 and prevent only rootContext calls
-// 20250417 1914 makeRequest - if 404 and url endsWith("/itim") retry one more time with .../systemuser/me
-// 20250420 1543 makeRequest - if this.cookieArrayList.size() == 0 and not already getting a token, then call getToken()
+// 20250416 1512 Fixed broken code for retCode 302 and prevent only contextRoot calls
+// 20250423 1421 Fixed rootContext to contextRoot && fixed handling rootContext in makeRequest
+// 20250425 2031 Fixed makeRequest's handling of contextRoot passed in as an argument
 //
 // This is the class that provides methods for making HTTP requests
 //
@@ -19894,7 +19898,7 @@ function SCHEMA(schema, format) {
 function RESTCLIENT(args) {
 	this.baseUrl = (args.baseUrl || "").trim();
 //	this.authUrl = args.authUrl || ""; // not used
-	this.rootContext = args.rootContext || "";
+	this.contextRoot = args.contextRoot || "";
 	this.apikey = args.apikey || "";
 	this.username = args.username || ""; 
 	this.password = args.password || "";
@@ -19989,6 +19993,13 @@ function RESTCLIENT(args) {
 	
 	// REST Client http-call method. The first lines of code show you the parameters you can send in the 'param' JS object
 	this.makeRequest = function(params) {
+		// Get token if necessary
+		if (!this.csrftoken && !this.gettingToken) {
+			this.gettingToken = true;
+			this.getToken();
+			this.gettingToken = false
+		} 
+		
 		//if (form && this.debug) this.alert("RESTCLIENT.makeRequest(" + toJson(params) + "}");
 			
 		// Here come the various local variables set from parameters passed OR default values
@@ -20002,16 +20013,11 @@ function RESTCLIENT(args) {
 		var gettingToken = params.gettingToken || false;
 		var username = params.username || "";
 		var password = params.password || "";
-		var contextRoot = params.contextRoot || "";
+//		var contextRoot = params.contextRoot || this.contextRoot;
+		var contextRoot = (typeof(params.contextRoot) == "undefined") ? this.contextRoot : params.contextRoot;
+ 
 		
 		var returnValue = params.returnValue || "JS object";
-		
-		// Get token if necessary
-		if ((this.cookieArrayList.size() == 0) && !gettingToken) {
-			//this.gettingToken = true;
-			this.getToken();
-			this.gettingToken = false // Just making sure it stays false
-		} 
 		
 		var alreadyImportedCert = false;
 		
@@ -20023,13 +20029,21 @@ function RESTCLIENT(args) {
 		if (gettingToken) {
 			url = this.assembleUrl([this.baseUrl, url]) // Skip the context root for these calls
 		} else {
-			url = this.assembleUrl([this.baseUrl, this.contextRoot, url])
+			url = this.assembleUrl([this.baseUrl, contextRoot, url])
 		}	
 
-		if (url == this.assembleUrl([this.baseUrl, this.contextRoot])){
-			url = this.assembleUrl([this.baseUrl, this.contextRoot, "me"])
+		if (url == this.assembleUrl([this.baseUrl, contextRoot])){
+			url = this.assembleUrl([this.baseUrl, contextRoot, "me"])
 		}	
-				
+		
+/* old code - can be deleted - I think		
+		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
+			if (this.baseUrl.endsWith("/")) {
+				this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length-1) // remove / at end of baseUrl if found
+			}	
+			url = this.baseUrl + url;
+		}
+*/		
 		// If a body is passed, this must be a POST (I think)
 		if (typeof body !== "undefined" && body !== null) {
 			verb = "POST";
@@ -20075,19 +20089,16 @@ function RESTCLIENT(args) {
 		this.http.initialize(null);
 	
 		alreadyImportedCert = false; 
-		var retry = false;
 		var reply = null;
-		var swappedURLalready = false;
-		// Keep making the call until something not handled happens
-		do { // while (retry)
+		// Make the call
+		do {
+			var retry = false;
 			try {	
-				retry = false;
+				this.alert("\nMaking call:" + this.requestEntry + "\n");
 				
 				// Set cookies
 				this.requestEntry["http.Cookie"] = this.getCookies(); // In case these have been changed since last time
 		
-				this.alert("\nMaking request:" + this.requestEntry + "\n");
-
 				// *****************************************************************************************
 				// ****************         Make the actual request         ********************************
 				// *****************************************************************************************
@@ -20107,14 +20118,8 @@ function RESTCLIENT(args) {
 				
 				var retCode = retEntry.getString("http.responseCode");
 				
-				if (retCode.startsWith("3")) {
-					var location = retEntry.getString("http.location");
-					this.requestEntry["http.url"] = location;
-					retry = true
-				} else
-				if (retCode.equals("404") && (this.requestEntry.getString("http.url") || "").toLowerCase().endsWith("/itim") && !swappedURLalready) {
-					this.requestEntry["http.utl"] = this.assembleUrl([this.baseUrl, this.contextRoot, "me"]); // @TODO Is this just a problem with our test server?
-					swappedURLalready = true;
+				if (retCode.startsWith("3") && false) { //@@TODO could be an ITIM thing 
+					this.requestEntry["http.url"] = retEntry.getString("http.location");
 					retry = true
 				} else
 				// Else decide what to return, based on the returnValue argument passed in and continue processing this request
@@ -20139,17 +20144,19 @@ function RESTCLIENT(args) {
 					}
 					this.getCertificate();
 					alreadyImportedCert = true;
-					retry = true
-				} 	
-				
-				// If we don't know how to handle this (i.e. retry is true) then throw the exception upwards
-				if (!retry) {
-					throw ex
+					retry = true;
+				} else
+				// If a redirect - follow the redirect
+				if (retEntry && retEntry.getString("http.responseCode").startsWith("3")) {
+					this.requestEntry["http.url"] = retEntry.getString("http.Location");
+ 					retry = true;
+				} else {
+					throw ex;
 				}	
 			}
 		} while (retry);
 		
-		retEntry["http.url"] = "http://" + retEntry["http.host"] + retEntry["http.base"]; // demotes automatically from Attributes to getString value. Very handy
+		retEntry["http.url"] = "http://" + retEntry["http.host"] + retEntry["http.base"];
 		retEntry.removeAttribute("http.url");
 		retEntry.removeAttribute("http.base");
 		retEntry.removeAttribute("http.host");
@@ -20177,7 +20184,6 @@ function RESTCLIENT(args) {
 	this.alert = function(msg) {
 		if (!this.debug) continue;
 		main.logmsg(msg);
-		task.logmsg(msg);
 		java.lang.System.out.println(msg)
 	}	
 		
@@ -20320,7 +20326,7 @@ function RESTCLIENT(args) {
         
         
         <Script name="HTTPCLIENT class 20250119 2013 renaming to RESTCLIENT">
-            <ModTime>1744908279974</ModTime>
+            <ModTime>1745603058465</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 
@@ -20591,7 +20597,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
     <Script name="RESTCLIENT class 20250411 1529 Before fixing mock server to fit new getToken logic">
-            <ModTime>1744908280042</ModTime>
+            <ModTime>1745603058630</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9

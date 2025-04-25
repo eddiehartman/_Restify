@@ -52,23 +52,23 @@ my $reduced_schema = {
     paths   => \%filtered_paths,
 };
 
-# Route for /openapi - Returns the reduced OpenAPI spec
+# Route for get /itim/rest/openapi - Returns the reduced OpenAPI spec
 get '/openapi' => sub {
     my $c = shift;
     $c->render(json => $reduced_schema);
 };
 
-# Route for /people/{personId} - Returns person details
-get '/people/:personId' => sub {
+# Route for get /people/{personId} - Returns person details
+get '/itim/rest/people/:personId' => sub {
     my $c        = shift;
     my $personId = $c->param('personId');    
 
     app->log->info("GET /people/$personId requested.");
 
-     if ($personId ne "itim manager") {
-        app->log->warn("GET request for unknown personId: $personId. Returning 404.");
-        return $c->render(status => 404, json => { error => "Person not found" });
-    }
+#     if ($personId ne "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw") {
+#        app->log->warn("GET request for unknown personId: $personId. Returning 404.");
+#        return $c->render(status => 404, json => { error => "Person not found" });
+#    }
    # Ensure CSRF token is present
     #my $csrf_token = $c->req->headers->header('CSRFToken') || '';
     #unless ($csrf_token) {
@@ -87,7 +87,7 @@ get '/people/:personId' => sub {
 };
 
 # PUT /people/{personId} - Modify a person
-post '/people/:personId' => sub {
+post '/itim/rest/people/:personId' => sub {
     my $c        = shift;
     my $personId = $c->param('personId');
 
@@ -118,7 +118,7 @@ post '/people/:personId' => sub {
 };
 
 # DELETE /people/{personId} - Delete a person
-del '/people/:personId' => sub {
+del '/itim/rest/people/:personId' => sub {
     my $c        = shift;
     my $personId = $c->param('personId');
 
@@ -191,28 +191,37 @@ post '/itim/j_security_check' => sub {
     $c->render(json => $response);
 };
 
-# Route for /v1.0/endpoint/default/token - Returns auth token
-get '/itim/rest/systemusers/me' => sub {
-    my $c = shift;
+# Route for post /people/{personId} - Returns person details
+post '/itim/rest/systemusers/me' => sub {
+    my $c        = shift;
+    my $personId = $c->param('personId');
+
+    # Extract JSON request body
+    #my $body = $c->req->json || {};
+
+    # Ensure CSRF token is present
+    #my $csrf_token = $c->req->headers->header('CSRFToken') || '';
+    #unless ($csrf_token) {
+    #    return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
+    #}
+
+    # Handle optional method override (e.g., suspend, restore)
+    #my $method_override = $c->req->headers->header('X-HTTP-Method-Override') || '';
 
     # Define token response
     my $response = {
         csrftoken => "token-xyz",
         sessionId => "session-xyz",
-        user      => {
-            id   => "12345",
-            name => "Edbird"
-        }
     };
 
-    $c->res->headers->header('CSRFToken' => 'csrf42');
+    app->log->info("post '/itim/rest/systemusers/me' requested");
 
-    # Log the request
-    app->log->info("GET /itim/rest/systemusers/me requested.");
+    $c->res->headers->header('Set-Cookie' => 'token-xyz');
+    $c->res->headers->header('Set-Cookie' => 'sessionId=sess42');
 
-    # Send response
-    $c->render(json => $response);
+    $c->render(status => 202, json => $response);
 };
+
 
 # Start the Mojolicious application
 app->start;
