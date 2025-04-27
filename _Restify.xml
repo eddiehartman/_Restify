@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Fri Apr 25 20:37:52 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Sun Apr 27 16:46:37 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -19870,7 +19870,7 @@ function SCHEMA(schema, format) {
         
         
         <Script name="RESTCLIENT class">
-            <ModTime>1745605937340</ModTime>
+            <ModTime>1745765195687</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -19889,6 +19889,7 @@ function SCHEMA(schema, format) {
 // 20250416 1512 Fixed broken code for retCode 302 and prevent only contextRoot calls
 // 20250423 1421 Fixed rootContext to contextRoot && fixed handling rootContext in makeRequest
 // 20250425 2031 Fixed makeRequest's handling of contextRoot passed in as an argument
+// 20250427 1646 Some fixes and improvements, thanks to suggestions from the TDI LabJam GPT
 //
 // This is the class that provides methods for making HTTP requests
 //
@@ -19928,7 +19929,7 @@ function RESTCLIENT(args) {
 				gettingToken: true, // Getting a token, so dont call getToken again
 				verb: "GET",
 				url: "/itim/restlogin/login.jsp", // @@TODO Should make this a parameter under Connections
-				returnValue: "entry",
+				expectedReturnType: "entry",
 				where: "getToken()"
 		});
 		
@@ -19942,18 +19943,18 @@ function RESTCLIENT(args) {
 					Authorization: "Bearer " + this.apikey
 				},
 				body: "j_username=" + this.username + "&j_password=" + this.password,
-				returnValue: "entry",
+				expectedReturnType: "entry",
 				where: "getToken()"
 		});
 		
 		// Get CSRFToken
 		retEntry = this.makeRequest({
 				gettingToken: true, // Getting a token, so dont call getToken again
-				returnValue: "entry",
+				expectedReturnType: "entry",
 				verb: "POST",
 				url: "/itim/rest/systemusers/me", // @@TODO Should make this a parameter under Connections
 				ctype: "application/json",
-				returnValue: "entry",
+				expectedReturnType: "entry",
 				where: "getToken()"
 		});
 		this.csrftoken = retEntry.getString("http.CSRFToken")
@@ -20016,8 +20017,7 @@ function RESTCLIENT(args) {
 //		var contextRoot = params.contextRoot || this.contextRoot;
 		var contextRoot = (typeof(params.contextRoot) == "undefined") ? this.contextRoot : params.contextRoot;
  
-		
-		var returnValue = params.returnValue || "JS object";
+		var returnType = params.expectedReturnType || "JS object";
 		
 		var alreadyImportedCert = false;
 		
@@ -20106,9 +20106,16 @@ function RESTCLIENT(args) {
 				var retEntry = this.http.queryReply(this.requestEntry);
 
 
-				// Grab any cookies if found
+				// Grab any cookies if found - also made more robust thanks to @@Chat
 				if (retEntry["http.Set-Cookie"]) {
-					this.cookieArrayList.add(retEntry.getString("http.Set-Cookie"));
+					var cookies = retEntry["http.Set-Cookie"].getValues();
+					if (cookies instanceof Array) {
+						for (var ndx = 0; ndx < cookies.length; ndx++) {
+							this.cookieArrayList.add(cookies[ndx])
+						}
+					} else {	
+						this.cookieArrayList.add()
+					}	
 				}
 
 				// Grab the CSRFToken if found
@@ -20122,8 +20129,8 @@ function RESTCLIENT(args) {
 					this.requestEntry["http.url"] = retEntry.getString("http.location");
 					retry = true
 				} else
-				// Else decide what to return, based on the returnValue argument passed in and continue processing this request
-				if (returnValue == "JS object") {
+				// Else decide what to return, based on the returnType argument passed in and continue processing this request
+				if (returnType == "JS object") {
 					reply = this.parseReply(retEntry);
 				} else {
 					reply = retEntry
@@ -20147,7 +20154,7 @@ function RESTCLIENT(args) {
 					retry = true;
 				} else
 				// If a redirect - follow the redirect
-				if (retEntry && retEntry.getString("http.responseCode").startsWith("3")) {
+				if (typeof retEntry != "undefined" && retEntry && retEntry.getString("http.responseCode").startsWith("3")) { // @@Chat
 					this.requestEntry["http.url"] = retEntry.getString("http.Location");
  					retry = true;
 				} else {
@@ -20156,8 +20163,7 @@ function RESTCLIENT(args) {
 			}
 		} while (retry);
 		
-		retEntry["http.url"] = "http://" + retEntry["http.host"] + retEntry["http.base"];
-		retEntry.removeAttribute("http.url");
+		retEntry["http.url"] = url; // Another fix from @@Chat
 		retEntry.removeAttribute("http.base");
 		retEntry.removeAttribute("http.host");
 		retEntry.removeAttribute("http.method");
@@ -20182,7 +20188,7 @@ function RESTCLIENT(args) {
 	
 	// Handle alerting - @@ DISABLED for now
 	this.alert = function(msg) {
-		if (!this.debug) continue;
+		if (!this.debug) return; // changed from 'continue' thanks to @@Chat
 		main.logmsg(msg);
 		java.lang.System.out.println(msg)
 	}	
@@ -20297,7 +20303,7 @@ function RESTCLIENT(args) {
 		return txt
 	}
 
-	// Own logmsg() to aid in debugging
+	// Own logmsg() to aid in debugging to output to the log and console
 	this.logmsg = function(lvl, msg) {
 		if (!lvl) { // undefined, and allows just a call to this.logmsg() to log a carriage return
 			lvl = "INFO";
