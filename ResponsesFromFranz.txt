@@ -1,0 +1,46 @@
+Request1 : {
+      "http.Content-Type": "application/x-www-form-urlencoded",
+      "http.body": "j_username=itim manager&j_password=secret",
+      "http.url": "https://192.168.2.39:30943/itim/j_security_check",
+      "http.method": "POST"
+}
+ Reply1 : {
+      "http.responseMsg": "Found",
+      "http.bodyAsString": "",
+      "http.Location": "https://192.168.2.39:30943/itim/",
+      "http.Set-Cookie": [
+            "LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly",
+            "WASReqURL=""; Expires=Thu, 01 Dec 1994 16:00:00 GMT; Path=/; HttpOnly"
+      ],
+      "http.responseCode": "302"
+}
+14:23:56,355 INFO  - Request2 : {
+      "http.Cookie": "LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly",
+      "http.url": "https://192.168.2.39:30943/itim/rest/systemusers/me",
+      "http.method": "POST"
+}
+ Reply2 : {
+      "http.bodyAsString": "com.ibm.isim.ui.HTTP_ERROR",
+      "http.CSRFToken": "8BC04350E6A9091B13FC3109B21BFAAE",
+      "http.body": "com.ibm.isim.ui.HTTP_ERROR",
+      "http.responseMsg": "Bad Request",
+      "http.responseCode": "400",
+      "http.Set-Cookie": "csrfToken=SHA-256%3AcG9iOGhoc2s3OG81%3Ab592%2BZPlL6H06yU8UzU6a6YvLQPXaFH0LYM4vIcP7F4%3D; Path=/itim; Secure; HttpOnly",
+}
+14:23:56,698 INFO  - Request3 : {
+      "http.Cookie": "[8BC04350E6A9091B13FC3109B21BFAAE, LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly]",
+      "http.url": "https://192.168.2.39:30943/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw",
+      "http.method": "GET"
+}
+ Reply3 : {
+      "http.bodyAsString": "{"_links":{"formTemplate":{"href":"/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw&filterId=formSearch"},"self":{"href":"/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw","title":"System Administrator"},"erparent":{"href":"/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc","title":"org"}},"_attributes":{"uid":"itimadmin","ercustomdisplay":"Administrator","givenname":"Administrator","name":"System Administrator","erroles":"erglobalid=00000000000000000001,ou=roles,erglobalid=00000000000000000000,ou=ivig,dc=ivig","erpersonstatus":"ACTIVE","cn":"System Administrator","sn":"Administrator","personType":"Person","uuid":"2e2bf5ce-36de-4088-a3cb-47b68f4efxyf","erparent":"erglobalid=00000000000000000000,ou=ivig,dc=ivig"}}",
+      "http.responseMsg": "OK",
+      "http.responseCode": "200",
+      "http.Set-Cookie": "com.ibm.isim.lastActivity=DCHj3ErlGLITVQYcPBAtcmZ%2Bxygm0ZCD%2BZ78fOGSyPw%3D; Path=/itim; Secure; HttpOnly",
+}
+14:23:56,726 INFO  - {
+      "http.bodyAsString": "{"_links":{"formTemplate":{"href":"/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw&filterId=formSearch"},"self":{"href":"/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw","title":"System Administrator"},"erparent":{"href":"/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc","title":"org"}},"_attributes":{"uid":"itimadmin","ercustomdisplay":"Administrator","givenname":"Administrator","name":"System Administrator","erroles":"erglobalid=00000000000000000001,ou=roles,erglobalid=00000000000000000000,ou=ivig,dc=ivig","erpersonstatus":"ACTIVE","cn":"System Administrator","sn":"Administrator","personType":"Person","uuid":"2e2bf5ce-36de-4088-a3cb-47b68f4efxyf","erparent":"erglobalid=00000000000000000000,ou=ivig,dc=ivig"}}",
+      "http.responseMsg": "OK",
+      "http.responseCode": "200",
+      "http.Set-Cookie": "com.ibm.isim.lastActivity=DCHj3ErlGLITVQYcPBAtcmZ%2Bxygm0ZCD%2BZ78fOGSyPw%3D; Path=/itim; Secure; HttpOnly",
+}

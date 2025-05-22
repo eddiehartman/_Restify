@@ -1,0 +1,28 @@
+<<<<--- Response:
+  http.bodyAsString:       {"csrftoken":"token-xyz","sessionId":"session-xyz","user":{"id":"12345","name":"Edbird"}}
+  http.responseMsg:        OK
+  http.responseCode:       200
+  http.Set-Cookie:         sessionId=sess42
+  http.url:                http://localhost:8080/itim/restlogin/login.jsp
+<<<<--- Response:
+  http.bodyAsString:       {"csrftoken":"token-xyz","sessionId":"session-xyz","user":{"id":"12345","name":"Edbird"}}
+  http.responseMsg:        OK
+  http.responseCode:       200
+  http.Set-Cookie:         LTPAToken2=tok42
+  http.url:                http://localhost:8080/itim/j_security_check
+<<<<--- Response:
+  http.bodyAsString:       {"csrftoken":"token-xyz","sessionId":"session-xyz"}
+  http.responseMsg:        Accepted
+  http.responseCode:       202
+  http.Set-Cookie:         sessionId=sess42
+  http.url:                http://localhost:8080/itim/rest/systemusers/me
+<<<<--- Response:
+  http.bodyAsString:       {"info":{"title":"Merged documentation","version":"1.0"},"openapi":"3.0.3"...}
+  http.responseMsg:        OK
+  http.responseCode:       200
+  http.url:                http://localhost:8080/openapi
+<<<<--- Response:
+  http.bodyAsString:       {"_attributes":{"cn":"Alan Smith","ercustomdisplay":"Smith","erparent":"erglobalid=00000000000000000000,ou=org,dc=com","erpersonstatus":"ACTIVE","ersupervisor":"erglobalid=328759766326767909,ou=0,ou=people,erglobalid=00000000000000000000,ou=org,dc=com","givenname":"Alan","mail":"asmith@ibm.com","manager":"erglobalid=328759766326767909,ou=0,ou=people,erglobalid=00000000000000000000,ou=org,dc=com","name":"Alan Smith","personType":"Person","sn":"Smith","uid":"asmith"},"_links":{"erparent":{"href":"\/itim\/rest\/organizationcontainers\/organizations\/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t"},"formTemplate":{"href":"\/itim\/rest\/forms?requestee=\/itim\/rest\/people\/ZXJnbG9iYWxpZD0zMjg3NTk3Njg0MDU0MDg0MTYsb3U9MCxvdT1wZW9wbGUsZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t&filterId=formSearch"},"manager":{"href":"\/itim\/rest\/people\/ZXJnbG9iYWxpZD0zMjg3NTk3NjYzMjY3Njc5MDksb3U9MCxvdT1wZW9wbGUsZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t"},"self":{"href":"\/itim\/rest\/people\/ZXJnbG9iYWxpZD0zMjg3NTk3Njg0MDU0MDg0MTYsb3U9MCxvdT1wZW9wbGUsZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t","title":"Alan Smith"}}}
+  http.responseMsg:        OK
+  http.responseCode:       200
+  http.url:                http://localhost:8080/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw
