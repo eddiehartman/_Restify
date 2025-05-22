@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Wed Apr 30 14:10:56 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu May 22 15:39:34 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -20,8 +20,837 @@
     
     
     
-    <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1745603058657</ModTime>
+    
+    
+    
+        
+        
+    
+    
+    
+    
+        
+    
+        
+    
+        
+        
+    
+        
+    
+    
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+    
+    
+    
+        
+    
+    
+        
+    
+    
+    <AssemblyLine name="_testITIMRestConnector">
+            <ModTime>1747921167153</ModTime>
+            <Settings>
+                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
+                <parameter name="automapattributes">false</parameter>
+                <parameter name="createTombstones">false</parameter>
+                <parameter name="includeGlobalPrologs">true</parameter>
+                <parameter name="includePrologs"><![CDATA[RESTCLIENT class
+SCHEMA class]]></parameter>
+                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
+            </Settings>
+            <Hooks>
+                <ModTime>1747921004140</ModTime>
+                <Hook name="prolog0">
+                    <InheritFrom>[no inheritance]</InheritFrom>
+                    <Name>prolog0</Name>
+                    <Script>searchVal = "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw"</Script>
+                    <Enabled>true</Enabled>
+                </Hook>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="ITIMRestClientConnector_add" state="Simulated"/>
+                    <Component name="ITIMRestClientConnector_delete" state="Simulated"/>
+                    <Component name="ITIMRestClientConnector_lookup" state="Enabled"/>
+                    <Component name="ITIMRestClientConnector_update_add" state="Simulated"/>
+                    <Component name="ITIMRestClientConnector_update_modify_fails_as_not_supported_yet" state="Simulated"/>
+                    <Component name="ITIMRestClientConnector_callReply" state="Enabled"/>
+                    <Component name="ITIMRestClientConnector_iterate" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1747921053620</ModTime>
+                <Connector name="ITIMRestClientConnector_iterate">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
+                    <ModTime>1747921053620</ModTime>
+                    <ConnectorMode>Iterator</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1747921053620</ModTime>
+                        <parameter name="searchCrit">@SUBSTITUTE{javascript searchVal /*defined in AL prolog*/}</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <UniqueAttribute/>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_getnext">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_getnext</Name>
+                            <Script><![CDATA[saveWork = system.newEntry();
+saveWork.merge(conn);
+
+task.logmsg("---- After GetNext: " + conn);
+
+// pass work on to add connector]]></Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1747921167153</ModTime>
+                <Connector name="ITIMRestClientConnector_add">
+                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
+                    <ModTime>1744476993899</ModTime>
+                    <ConnectorMode>AddOnly</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
+                        <parameter name="parserOption">Useless</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                        <AttributeMapItem>
+                            <Name>personId</Name>
+                            <Type>advanced</Type>
+                            <Script>"itim manager"</Script>
+                            <Simple>personId</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="addonly_ok">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>addonly_ok</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- Add Successful: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Connector name="ITIMRestClientConnector_delete">
+                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
+                    <ModTime>1747921136747</ModTime>
+                    <ConnectorMode>Delete</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
+                        <parameter name="parserOption">Useless</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1747921136747</ModTime>
+                        <AdvancedLinkMode>true</AdvancedLinkMode>
+                        <Script>searchVal /*defined in AL prolog*/</Script>
+                        <LinkCriteriaItem>
+                            <Key>1951e416282</Key>
+                            <Attribute>personId</Attribute>
+                            <Operator>equals</Operator>
+                            <Value>itim manager</Value>
+                        </LinkCriteriaItem>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_delete">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_delete</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After Delete: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Connector name="ITIMRestClientConnector_lookup">
+                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
+                    <ModTime>1747921144432</ModTime>
+                    <ConnectorMode>Lookup</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
+                        <parameter name="parserOption">Useless</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1747921144432</ModTime>
+                        <AdvancedLinkMode>true</AdvancedLinkMode>
+                        <Script>searchVal /*defined in AL prolog*/</Script>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_lookup">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_lookup</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After Lookup: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Connector name="ITIMRestClientConnector_update_add">
+                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
+                    <ModTime>1744477641443</ModTime>
+                    <ConnectorMode>Update</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
+                        <parameter name="parserOption">Useless</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                        <AttributeMapItem>
+                            <Name>personId</Name>
+                            <Type>advanced</Type>
+                            <Enabled>true</Enabled>
+                            <Add>true</Add>
+                            <Modify>true</Modify>
+                            <Script>"itim manager"</Script>
+                            <Simple>personId</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <LinkCriteriaItem>
+                            <Key>1951e434bee</Key>
+                            <Attribute>personId</Attribute>
+                            <Operator>equals</Operator>
+                            <Value>johnny nobody</Value>
+                        </LinkCriteriaItem>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_add">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_add</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add After Add: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                        <Hook name="after_lookup">
+                            <Name>after_lookup</Name>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                        <Hook name="before_add">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>before_add</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add After Lookup: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                        <Hook name="before_modify">
+                            <Name>before_modify</Name>
+                            <Enabled>false</Enabled>
+                        </Hook>
+                        <Hook name="before_update">
+                            <Name>before_update</Name>
+                            <Enabled>false</Enabled>
+                        </Hook>
+                        <Hook name="default_fail">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>default_fail</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " !!!! Error: " + error)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Connector name="ITIMRestClientConnector_update_modify_fails_as_not_supported_yet">
+                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
+                    <ModTime>1747921167153</ModTime>
+                    <ConnectorMode>Update</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
+                        <parameter name="parserOption">Useless</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>personId</Name>
+                            <Type>advanced</Type>
+                            <Script>"itim manager"</Script>
+                            <Simple>personId</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1747921167153</ModTime>
+                        <AdvancedLinkMode>true</AdvancedLinkMode>
+                        <Script>searchVal /*defined in AL prolog*/</Script>
+                        <LinkCriteriaItem>
+                            <Key>1951e850c0a</Key>
+                            <Attribute>personId</Attribute>
+                            <Operator>equals</Operator>
+                            <Value>itim manager</Value>
+                        </LinkCriteriaItem>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_modify">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_modify</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After Modify: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                        <Hook name="before_modify">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>before_modify</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_modify Before Lookup: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                        <Hook name="default_fail">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>default_fail</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add Default On Error: " + error)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Connector name="ITIMRestClientConnector_callReply">
+                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
+                    <ModTime>1744477137700</ModTime>
+                    <ConnectorMode>CallReply</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
+                        <parameter name="parserOption">Useless</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                        <AttributeMapItem>
+                            <Name>personId</Name>
+                            <Type>advanced</Type>
+                            <Script>"itim manager"</Script>
+                            <Simple>personId</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_reply">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_reply</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After CallReply: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                        <Hook name="before_call">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>before_call</Name>
+                            <Script><![CDATA[conn.merge(saveWork);
+task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+        <AssemblyLine name="HTTPServer">
+            <ModTime>1747920751409</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="DumpWorkEntry" state="Enabled"/>
+                    <Component name="HTTPServerConnector" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <Connector name="HTTPServerConnector">
+                    <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
+                    <ModTime>1746017589386</ModTime>
+                    <ConnectorMode>Server</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="tcpPort">8888</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings/>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer">
+                <Script name="DumpWorkEntry">
+                    <ModTime>1746017603308</ModTime>
+                    <parameter name="script"><![CDATA[// Dump the work entry
+task.dumpEntry(work);
+]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+        <AssemblyLine name="ISVG_LCR_TEST">
+            <ModTime>1747920751417</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="ITIMRestClientConnector" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <Connector name="ITIMRestClientConnector">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1747830231584</ModTime>
+                    <ConnectorMode>Iterator</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="action">GET</parameter>
+                        <parameter encrypted="true" name="password">lr65NQriE66TTrj2h2LmIuwtz23FD+0CPzjPvl9FDKbMFIYckqV3D/Z29zENjtA14Slhn+s7mhEPBLDpU10TkDA6nIsRERvKC1tKCUgpwQxQGa8LWXUnpmf8v03vd3biPLC5QbZ5Vu/PGejj2ihrjJs38L32BWjheHEauRi7by0=</parameter>
+                        <parameter name="path">/lifecyclerule</parameter>
+                        <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
+                        <parameter name="username">itim manager</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="before_initialize">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>before_initialize</Name>
+                            <Script><![CDATA[resthost = "https://192.168.2.39:30943";
+	
+	//Setup connector 
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+/*
+	//Prepare call to get JSESSIONID
+	myHttpConn.setParam("url",resthost + "/itim/restlogin/login.jsp");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	//Perform call
+	httpReply = myHttpConn.queryReply(null);
+	//Retrieve JSESSIONID
+	JSESSIONID = httpReply.getString("http.Set-Cookie");
+
+ * 
+ */
+	//Prepare call to get LTPAToken2
+	myHttpConn.setParam("url",resthost + "/itim/j_security_check");
+	myHttpConn.setParam("method","POST");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+	httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
+//	httpcall.setAttribute("http.Cookie",JSESSIONID);
+	//Set body to userid/password
+	httpcall.setAttribute("http.body","j_username=itim manager&j_password=secret");
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request1 : " + httpcall + "\n Reply1 : " + httpReply);
+	//Retrieve LTPAToken2
+	LTPAToken2 = httpReply.getString("http.Set-Cookie");
+	
+	//Prepare call to get CSRFToken
+	myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
+	myHttpConn.setParam("method","POST");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+//	httpcall.setAttribute("http.Cookie",[JSESSIONID,LTPAToken2]);
+	httpcall.setAttribute("http.Cookie",LTPAToken2);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request2 : " + httpcall + "\n Reply2 : " + httpReply);
+	//Retrieve CSRFToken
+	CSRFToken = httpReply.getString("http.CSRFToken");
+	
+//do a test call
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + "/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
+	task.logmsg(httpReply);
+	system.abortAssemblyLine("STOP")]]></Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer"/>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+        <AssemblyLine name="_testScriptConnectorCode">
+            <ModTime>1747920751427</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -1386,714 +2215,6 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
-    
-    
-        
-        
-    
-    
-    
-    
-        
-    
-        
-    
-        
-        
-    
-        
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-        
-        
-    
-    
-    
-        
-    <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1745603087970</ModTime>
-            <Settings>
-                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
-                <parameter name="automapattributes">false</parameter>
-                <parameter name="createTombstones">false</parameter>
-                <parameter name="includeGlobalPrologs">true</parameter>
-                <parameter name="includePrologs"><![CDATA[RESTCLIENT class
-SCHEMA class]]></parameter>
-                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
-            </Settings>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="ITIMRestClientConnector_add" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_delete" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_lookup" state="Enabled"/>
-                    <Component name="ITIMRestClientConnector_update_add" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_update_modify_fails_as_not_supported_yet" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_callReply" state="Enabled"/>
-                    <Component name="ITIMRestClientConnector_iterate" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <ModTime>1745603087970</ModTime>
-                <Connector name="ITIMRestClientConnector_iterate">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
-                    <ModTime>1745603087970</ModTime>
-                    <ConnectorMode>Iterator</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="searchCrit">ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <UniqueAttribute/>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_getnext">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_getnext</Name>
-                            <Script><![CDATA[saveWork = system.newEntry();
-saveWork.merge(conn);
-
-task.logmsg("---- After GetNext: " + conn);
-
-// pass work on to add connector]]></Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-            </ContainerEF>
-            <ContainerDF name="DataFlowContainer">
-                <Connector name="ITIMRestClientConnector_add">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744476993899</ModTime>
-                    <ConnectorMode>AddOnly</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Script>"itim manager"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="addonly_ok">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>addonly_ok</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- Add Successful: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_delete">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744477003912</ModTime>
-                    <ConnectorMode>Delete</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <LinkCriteriaItem>
-                            <Key>1951e416282</Key>
-                            <Attribute>personId</Attribute>
-                            <Operator>equals</Operator>
-                            <Value>itim manager</Value>
-                        </LinkCriteriaItem>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_delete">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_delete</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- After Delete: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_lookup">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744477009876</ModTime>
-                    <ConnectorMode>Lookup</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AdvancedLinkMode>true</AdvancedLinkMode>
-                        <Script>"itim manager"</Script>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_lookup">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_lookup</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- After Lookup: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_update_add">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744477641443</ModTime>
-                    <ConnectorMode>Update</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Enabled>true</Enabled>
-                            <Add>true</Add>
-                            <Modify>true</Modify>
-                            <Script>"itim manager"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <LinkCriteriaItem>
-                            <Key>1951e434bee</Key>
-                            <Attribute>personId</Attribute>
-                            <Operator>equals</Operator>
-                            <Value>johnny nobody</Value>
-                        </LinkCriteriaItem>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_add">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_add</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add After Add: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="after_lookup">
-                            <Name>after_lookup</Name>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_add">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_add</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add After Lookup: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_modify">
-                            <Name>before_modify</Name>
-                            <Enabled>false</Enabled>
-                        </Hook>
-                        <Hook name="before_update">
-                            <Name>before_update</Name>
-                            <Enabled>false</Enabled>
-                        </Hook>
-                        <Hook name="default_fail">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>default_fail</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " !!!! Error: " + error)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_update_modify_fails_as_not_supported_yet">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744477051116</ModTime>
-                    <ConnectorMode>Update</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Script>"itim manager"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <LinkCriteriaItem>
-                            <Key>1951e850c0a</Key>
-                            <Attribute>personId</Attribute>
-                            <Operator>equals</Operator>
-                            <Value>itim manager</Value>
-                        </LinkCriteriaItem>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_modify">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_modify</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- After Modify: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_modify">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_modify</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- update_modify Before Lookup: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="default_fail">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>default_fail</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add Default On Error: " + error)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_callReply">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744477137700</ModTime>
-                    <ConnectorMode>CallReply</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Script>"itim manager"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_reply">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_reply</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- After CallReply: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_call">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_call</Name>
-                            <Script><![CDATA[conn.merge(saveWork);
-task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
-    <AssemblyLine name="ISVG_LCR_TEST">
-            <ModTime>1745603058644</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="ITIMRestClientConnector" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <Connector name="ITIMRestClientConnector">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1744807342429</ModTime>
-                    <ConnectorMode>Iterator</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="action">GET</parameter>
-                        <parameter encrypted="true" name="password">Ej9brFmxJ7cLGdLVC3VwYx6qVKfhrbbh/XenlHxZ8ns61PAB8Le9Noz4cF0YQZdfbMuT5Wp83wkpmajZTvNL5kdoULZExUgkaHRqdHswatGApAO+4KPglLwvWjtXKpQbTIUaWgQv04By3tLO1zbjluBA6+uACKzk7qGxq4/W2ew=</parameter>
-                        <parameter name="path">/lifecyclerule</parameter>
-                        <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
-                        <parameter name="username">itim manager</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="before_initialize">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_initialize</Name>
-                            <Script><![CDATA[resthost = "https://192.168.2.39:30943";
-	
-	//Setup connector 
-	myHttpConn = system.getConnector("ibmdi.HTTPClient");
-	//Prepare call to get JSESSIONID
-	myHttpConn.setParam("url",resthost + "/itim/restlogin/login.jsp");
-	myHttpConn.setParam("method","GET");
-	myHttpConn.initialize(null);
-	//Perform call
-	httpReply = myHttpConn.queryReply(null);
-	//Retrieve JSESSIONID
-	JSESSIONID = httpReply.getString("http.Set-Cookie");
-
-	//Prepare call to get LTPAToken2
-	myHttpConn.setParam("url",resthost + "/itim/j_security_check");
-	myHttpConn.setParam("method","POST");
-	myHttpConn.initialize(null);
-	
-	//Configure the call
-	var httpcall = system.newEntry();
-	httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
-	httpcall.setAttribute("http.Cookie",JSESSIONID);
-	//Set body to userid/password
-	httpcall.setAttribute("http.body","j_username=itim manager&j_password=secret");
-	//Perform call
-	httpReply = myHttpConn.queryReply(httpcall);
-	//Retrieve LTPAToken2
-	LTPAToken2 = httpReply.getString("http.Set-Cookie");
-	
-	//Prepare call to get CSRFToken
-	myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
-	myHttpConn.setParam("method","POST");
-	myHttpConn.initialize(null);
-	
-	//Configure the call
-	var httpcall = system.newEntry();
-	httpcall.setAttribute("http.Cookie",[JSESSIONID,LTPAToken2]);
-	//Perform call
-	httpReply = myHttpConn.queryReply(httpcall);
-	//Retrieve CSRFToken
-	CSRFToken = httpReply.getString("http.CSRFToken");]]></Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-            </ContainerEF>
-            <ContainerDF name="DataFlowContainer"/>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
-        
-    
-    
     </Folder>
     <Folder name="Connectors">
         
@@ -2154,9 +2275,12 @@ task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Scr
     
     
         
-        <Connector name="ITIMRestClientConnector">
+        
+        
+        
+    <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1745603058561</ModTime>
+            <ModTime>1747920751291</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
@@ -2670,7 +2794,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">GQe+e8jtaODfI+ybBP31Ia/OqRMBoyH7JGR7bxAuVuXr/qZkB4/3K3B+3YLOiJ6ofciFfzbqPYz8ZTluX6mIoeNXTZnjujeYHHfEWxfI2p26mDPGywiP6fHJfEjJUjplSqpOTK4EkIv87VV+wQSqa88hhZ2vYEl/IaEhYwLXs94=</parameter>
+                <parameter encrypted="true" name="apikey">XPvRvUeG6Xjr3erznrNRI+0ivw13cyVnU3yHmalh/CfADlaaxcn8GEDR4s+aMlhZF1LF8CQZtefOlZCp1P/8KTj+OWJDBQ7p08f8YNc7d+7QBTIZ2ZwgU/rd+/Ddw6Lr85MlQKqJBbVoW3/TQgMjm4bNDlQnrjt984dpYT+7CE8=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -2681,7 +2805,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">WK8d9p/7B90JjxOlGy6L9aPfyGGhvqEdSyKwqLeNYa3g8u6/hRqvN5VB2AhUSTCvj5Z1L+7ge9o8QlCjXMMWplGoAXgBYT4BHLRv/P2Vhi1Cc6fJ6ChaUHIVcoVIn5gXhEtcpcESa3NpUn0E1l0kLrICRoDaKv2tN16zXzjgIrg=</parameter>
+                <parameter encrypted="true" name="password">BbI9gKuG0C8oKkJODTaJ4lKBRskXXUn1I8Z3KY1b58eaT4PDPZZUNv8sKuuak5PPO7AphqALpyoU+n7IPQivhGaYJ1noultVnt8sYUygbvUg3swAQnW79YgJuO9x+Qmd8AT6aPSccKs3wRZDS0JlpOI4QyS1G8kUVMkd8i4wAsM=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
@@ -3580,17 +3704,16 @@ function querySchema(queryMode) {
         </Connector>
         <Connector name="ITIMRestClientConnector_TEST">
             <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-            <ModTime>1744472467957</ModTime>
+            <ModTime>1747920751346</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1744472467957</ModTime>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">Dwo91UCEAY23wz0Kbr70loKlU2ufwgrypTf45adbP8glNCCoyQeD4vY2ak978lqhk4R9uFKzMZGbgLB3plshVYIj0Yr2qnlKBuZ7aCo7qi9E7ZyoLfIt03wgM1eLZWpqX7DLGav2tM4WT+UnSCZWcNOvs5O9KGfxoRZv6KdT/u0=</parameter>
+                <parameter encrypted="true" name="apikey">i1UXaSz5Mhf6o2jTsD8Ad7yBxL4Vpdh4VbQNyv5ic3pmM3LAD42d7V6E8fY7tVoL5jUvrTxASkjsG0gfK9wR6kT+PQmP4IhjvDizUxF5JFVlM+pPspJDwf3AZNI/NFIIV9fcUnVdDBYOVN+4TuMgDqBLqy7ICHddYNmD+hAikSo=</parameter>
                 <parameter name="authUrl">/v1.0/endpoint/default/token</parameter>
                 <parameter name="parameters"/>
-                <parameter encrypted="true" name="password">ly3NR6BjR2df9i/rca+BUYTJ/f8cB+V0tK2TyPYjgATRA3WrYtyDAIYszWOP/Eh7clt6+s17ag3NUyAr543leDCTtd8xE0Rj5fKsIsblDyyJ/Yrh3t9nNSnwwSpX+dFqZwDtyKwArA3dZx9SKFcw7NzT33aiwNT1eATQQ2b7H4M=</parameter>
+                <parameter encrypted="true" name="password">O3j6uhWVeOZb6a7KkY5eMFXckYPBdFD5lkNjxQ1DgedlccuV4YLeLr5zdcK/NirUTVO1QbKZZUQd2W90rz3/+U7icrrWB/xYMTv5DY4GHWia/lKv+SQybU+zBCTdV8Pj5ocoLdR1jisj32PVEh5QV00rgiyGjCyBnPhPawOcpTs=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="searchCrit">itim manager</parameter>
                 <parameter name="url">http://localhost:8080</parameter>
@@ -3630,7 +3753,6 @@ function querySchema(queryMode) {
             </PoolDefinition>
             <PoolInstance/>
         </Connector>
-        
     </Folder>
     <Folder name="Parsers"/>
     <Folder name="Scripts">
@@ -3639,205 +3761,56 @@ function querySchema(queryMode) {
     
     
     
-    <Script name="SCHEMA class">
-            <ModTime>1745603058483</ModTime>
-            <parameter name="enabled">true</parameter>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
-// 20250128 1552 Updated replaceEmbeddedUID() to accept either an Entry or a string value as the criteria argument
-// 20250129 1645 Fixing getChildren so it works (again) - stumbled on "parameters"
-
-function SCHEMA(schema, format) {
-	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
-	this.name = "SCHEMA";
-	this.schemaObj = {};
-	
-	/* Main init logic after method definitions
-
-       The name says it all. Returns a JS Obj */
-       
-    this.parseOpenAPIschema = function(openApiSchema) {
-    	if (typeof(openApiSchema) != "string") return openApiSchema;
-    	
-        openApiSchema = openApiSchema.trim();
-        var jsonString = "";
-
-        /* Load Jackson libraries */
-        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
-        var objectMapper = new ObjectMapper();
-
-		if (openApiSchema.startsWith("{") && openApiSchema.endsWith("}")) {
-			// overriding above arguments - for now
-			this.format = "JSON"
-		} else {
-			this.format = "YAML"
-		}
-
-        /* Check if YAML and if so, convert to Json */
-        if ("YAML".equalsIgnoreCase(this.format)) {
-            /* Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read */
-            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
-            /* Create instances of Yaml and ObjectMapper */
-            var yaml = new Yaml();
-            /* Parse YAML into a Java Map */
-            var map = yaml.load(openApiSchema);
-
-            /* Convert Java Map to JSON string */
-            jsonString = objectMapper.writeValueAsString(map)
-        } else {
-            jsonString = openApiSchema;
-        }
-
-        this.schemaObj = fromJson(jsonString);
-        return this.schemaObj
-    }
-
-	/*
-		Parses the path and returns the name of the embedded UID attribute in the URL
-	*/
-	this.getEmbeddedUID = function(path) {
-		var parts = system.splitString(path, "/");
-		
-		for (var i = 0; i < parts.length; i++) {
-			var part = parts[i].trim();
-			if (part.startsWith("{") && part.endsWith("}")) {
-				// Found an embedded uid
-				return part.substring(1, part.length-1)
-			}
-		}
-		return null
-	}
-
-	/*
-		Replaces the uid placeholder in the URL path with the uid value passed
- 		The criteria argument is either an Entry or a string value
-	*/
-	this.replaceEmbeddedUID = function(path, criteria) {
-		var parts = system.splitString(path, "/");
-		var newPath = [parts[0]];
-		
-		for (var i = 1; i < parts.length; i++) {
-			var part = parts[i].trim();
-			if (part.startsWith("{") && part.endsWith("}")) {
-				// Found an embedded uid
-				var embeddedUID = part.substring(1, part.length-1);
-				
-				// If criteria is an Entry then grab the attribute value, else use the parameter value itself
-				var uidValue = (criteria instanceof com.ibm.di.entry.Entry) ? entry[embeddedUID] : criteria;
-				
-				if (!uidValue) {
-					throw new java.lang.Exception("UID attribute not mapped out or is null: " + embeddedUID)
-				}	
-				newPath.push(uidValue)
-			} else {
-				newPath.push(part)
-			}
-		}
-		return newPath.join("/")
-	}
-	
-	/*
-		Uses .getChildren() to return the parameters array for the chosen path and action.
-	*/
-	this.getParameters = function(path, action) {
-		var params = this.getChildren(["paths", path, action, "parameters"])
-		return params
-	}
-	
-    /* Returns the child elements (JS Obj) of the specified path
-       Root level if no argument or blank text passed. Always return a JS object
-    */
-    this.getChildren = function(path) { 
-        //var children = {};
-        var subtree;
-        
-        if (!path) {
-        	path = []
-        }
-        else 
-        if (!(path instanceof Array)) {
-        	path = [path]	
-        }
-        
-        subtree = this.schemaObj[path[0]];
-        for (var i = 1; i < path.length && subtree; i++) {
-        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
-        		if (subtree instanceof Array) {
-	        		for (var j = 0; j < subtree.length; j++) {
-	        			if (subtree[j][path[i]]) {
-	        				subtree = subtree[j][path[i]];
-	        				break
-	        			}
-	        		}
-        		}
-        		
-        		// subtree does not exist
-        		subtree = {}; // return empty
-        	} else {
-        		subtree = subtree[path[i]]
-        	}
-        }
-
-        return subtree;
-    }
     
-    /* Main init logic */
-    this.schemaArg = schema;
-    this.format = format || "YAML";
-    this.schemaObj = this.parseOpenAPIschema(schema)
-}]]></parameter>
-        </Script>
         
-    <Script name="RESTIFY library class">
-            <ModTime>1745603058408</ModTime>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[// 20241127 2024 Created
-
-// Restify script library class
-
-function RESTIFY () {
-	this.loadFileToByteArray = function(filepath) {
-		var file = new java.io.File(filepath);
-		var fis = new java.io.FileInputStream(file);
-		var bytes = java.util.Arrays.copyOf("".getBytes(), file.length());
-		fis.read(bytes); //read file into bytes[]
-		fis.close();
-		return bytes;
-	}
-	
-	this.loadFileToString = function(filepath) {
-		var sb = new java.lang.StringBuilder();
-		var file = system.openFileForInput(filepath);
-		var line;
-		while ((line = file.readLine()) != null) {
-			sb.append(line + "\n");
-		}
-		return sb.toString();
-	}
-	
-	this.loadFileToArray = function(filepath, delimiter) {
-		delimiter = delimiter || "\n";
-		
-		var sb = new java.lang.StringBuilder();
-		var file = system.openFileForInput(filepath);
-		var line;
-		while ((line = file.readLine()) != null) {
-			sb.append(line + "\n");
-		}
-		var str = sb.toString();
-		return system.splitString(str, delimiter)
-	}
-	
-	this.getCertificate = function(url) {
-		try {
-			var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(url, 443);
-		} finally {}
-	}
-}]]></parameter>
-        </Script>
     
-        <Script name="OAuth Class">
-            <ModTime>1745603058551</ModTime>
+    
+        
+    
+    
+    
+        
+    
+    
+    
+    
+    
+    
+        
+    
+        
+    
+    
+    
+    
+    
+    
+        
+    
+    
+        
+        
+        
+        
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    <Script name="OAuth Class">
+            <ModTime>1747920751336</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[var OAUTH = null; // Will be instantiated below
 
@@ -3999,8 +3972,55 @@ function fullStacktrace(e, delimArg) {
 	return starry.join(delim)
 }]]></parameter>
         </Script>
-    <Script name="itim_swagger.json">
-            <ModTime>1745603058453</ModTime>
+        <Script name="RESTIFY library class">
+            <ModTime>1747920751342</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20241127 2024 Created
+
+// Restify script library class
+
+function RESTIFY () {
+	this.loadFileToByteArray = function(filepath) {
+		var file = new java.io.File(filepath);
+		var fis = new java.io.FileInputStream(file);
+		var bytes = java.util.Arrays.copyOf("".getBytes(), file.length());
+		fis.read(bytes); //read file into bytes[]
+		fis.close();
+		return bytes;
+	}
+	
+	this.loadFileToString = function(filepath) {
+		var sb = new java.lang.StringBuilder();
+		var file = system.openFileForInput(filepath);
+		var line;
+		while ((line = file.readLine()) != null) {
+			sb.append(line + "\n");
+		}
+		return sb.toString();
+	}
+	
+	this.loadFileToArray = function(filepath, delimiter) {
+		delimiter = delimiter || "\n";
+		
+		var sb = new java.lang.StringBuilder();
+		var file = system.openFileForInput(filepath);
+		var line;
+		while ((line = file.readLine()) != null) {
+			sb.append(line + "\n");
+		}
+		var str = sb.toString();
+		return system.splitString(str, delimiter)
+	}
+	
+	this.getCertificate = function(url) {
+		try {
+			var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(url, 443);
+		} finally {}
+	}
+}]]></parameter>
+        </Script>
+        <Script name="itim_swagger.json">
+            <ModTime>1747920751346</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[{
     "openapi": "3.0.3",
@@ -16972,44 +16992,8 @@ function fullStacktrace(e, delimArg) {
     }
 }]]></parameter>
         </Script>
-    
-    
-        
-    
-    
-    
-    
-    
-    
-        
-    
-        
-    
-    
-    
-    
-    
-    
-        
-    
-    
-        
-        
-        
-        
-    
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
         <Script name="RESTCLIENT class">
-            <ModTime>1746015048287</ModTime>
+            <ModTime>1747920751361</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -17046,6 +17030,7 @@ function RESTCLIENT(args) {
 	this.cookieArrayList = new java.util.ArrayList();
 	
 	this.gettingToken = false;
+	this.gotToken = false;
 	
 	// The HTTP Client Connector to use
 	this.http = system.getConnector("ibmdi.HTTPClient");
@@ -17134,10 +17119,11 @@ function RESTCLIENT(args) {
 	// REST Client http-call method. The first lines of code show you the parameters you can send in the 'param' JS object
 	this.makeRequest = function(params) {
 		// Get token if necessary
-		if (!this.csrftoken && !this.gettingToken) {
+		if (!this.gotToken && !this.gettingToken) {
 			this.gettingToken = true;
 			this.getToken();
-			this.gettingToken = false
+			this.gettingToken = false;
+			this.gotToken = true;
 		} 
 		
 		//if (form && this.debug) this.alert("RESTCLIENT.makeRequest(" + toJson(params) + "}");
@@ -17213,16 +17199,6 @@ function RESTCLIENT(args) {
 			this.requestEntry["http." + hdr] = headers[hdr]
 		}
 		
-		if (this.debug) {
-			this.logDetails({msg : "Request to itim", 
-						obj : this.httpEntry(this.requestEntry, true), 
-						url : url, 
-						verb : verb, 
-						ctype : ctype, 
-						where : where,
-						sent: true});
-		}
-	
 		// Reinitialize the HTTP Client connector so the updated parameters are applied
 		this.http.terminate();
 		this.http.initialize(null);
@@ -17237,6 +17213,23 @@ function RESTCLIENT(args) {
 				
 				// Set cookies
 				this.requestEntry["http.Cookie"] = this.getCookies(); // In case these have been changed since last time
+				if (this.csrfToken) {
+					this.requestEntry["http.csrfToken"] = this.csrfToken
+				}
+				if (this.ltpaToken2) {
+					this.requestEntry["http.ltpaToken2"] = this.ltpaToken2
+				}
+					
+				if (this.debug) {
+					this.logDetails({msg : "Request to itim", 
+								obj : this.httpEntry(this.requestEntry, true), 
+								url : url, 
+								verb : verb, 
+								ctype : ctype, 
+								where : where,
+								sent: true});
+				}
+	
 		
 				// *****************************************************************************************
 				// ****************         Make the actual request         ********************************
@@ -17248,9 +17241,12 @@ function RESTCLIENT(args) {
 				// Grab any cookies if found - also made more robust thanks to @@Chat
 				if (retEntry["http.Set-Cookie"]) {
 					var cookies = retEntry["http.Set-Cookie"].getValues();
-					if ((typeof(cookies) == "object") && cookies.length) { // Then it's a Java array
+					if ((typeof(cookies) != "string") && cookies.length) { // Then it's a Java array
 						for (var ndx = 0; ndx < cookies.length; ndx++) {
-							this.cookieArrayList.add(cookies[ndx])
+							this.cookieArrayList.add(cookies[ndx]);
+							if (cookies[ndx].trim().toLowerCase().startsWith("ltpatoken2")){
+								this.ltpaToken2 = cookies[ndx].substring(11);
+							}	 
 						}
 					} else {	
 						this.cookieArrayList.add(cookies)
@@ -17464,11 +17460,271 @@ function RESTCLIENT(args) {
 	}	
 }]]></parameter>
         </Script>
+        <Script name="SCHEMA class">
+            <ModTime>1747920751377</ModTime>
+            <parameter name="enabled">true</parameter>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
+// 20250128 1552 Updated replaceEmbeddedUID() to accept either an Entry or a string value as the criteria argument
+// 20250129 1645 Fixing getChildren so it works (again) - stumbled on "parameters"
+
+function SCHEMA(schema, format) {
+	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
+	this.name = "SCHEMA";
+	this.schemaObj = {};
+	
+	/* Main init logic after method definitions
+
+       The name says it all. Returns a JS Obj */
+       
+    this.parseOpenAPIschema = function(openApiSchema) {
+    	if (typeof(openApiSchema) != "string") return openApiSchema;
+    	
+        openApiSchema = openApiSchema.trim();
+        var jsonString = "";
+
+        /* Load Jackson libraries */
+        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
+        var objectMapper = new ObjectMapper();
+
+		if (openApiSchema.startsWith("{") && openApiSchema.endsWith("}")) {
+			// overriding above arguments - for now
+			this.format = "JSON"
+		} else {
+			this.format = "YAML"
+		}
+
+        /* Check if YAML and if so, convert to Json */
+        if ("YAML".equalsIgnoreCase(this.format)) {
+            /* Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read */
+            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
+            /* Create instances of Yaml and ObjectMapper */
+            var yaml = new Yaml();
+            /* Parse YAML into a Java Map */
+            var map = yaml.load(openApiSchema);
+
+            /* Convert Java Map to JSON string */
+            jsonString = objectMapper.writeValueAsString(map)
+        } else {
+            jsonString = openApiSchema;
+        }
+
+        this.schemaObj = fromJson(jsonString);
+        return this.schemaObj
+    }
+
+	/*
+		Parses the path and returns the name of the embedded UID attribute in the URL
+	*/
+	this.getEmbeddedUID = function(path) {
+		var parts = system.splitString(path, "/");
+		
+		for (var i = 0; i < parts.length; i++) {
+			var part = parts[i].trim();
+			if (part.startsWith("{") && part.endsWith("}")) {
+				// Found an embedded uid
+				return part.substring(1, part.length-1)
+			}
+		}
+		return null
+	}
+
+	/*
+		Replaces the uid placeholder in the URL path with the uid value passed
+ 		The criteria argument is either an Entry or a string value
+	*/
+	this.replaceEmbeddedUID = function(path, criteria) {
+		var parts = system.splitString(path, "/");
+		var newPath = [parts[0]];
+		
+		for (var i = 1; i < parts.length; i++) {
+			var part = parts[i].trim();
+			if (part.startsWith("{") && part.endsWith("}")) {
+				// Found an embedded uid
+				var embeddedUID = part.substring(1, part.length-1);
+				
+				// If criteria is an Entry then grab the attribute value, else use the parameter value itself
+				var uidValue = (criteria instanceof com.ibm.di.entry.Entry) ? entry[embeddedUID] : criteria;
+				
+				if (!uidValue) {
+					throw new java.lang.Exception("UID attribute not mapped out or is null: " + embeddedUID)
+				}	
+				newPath.push(uidValue)
+			} else {
+				newPath.push(part)
+			}
+		}
+		return newPath.join("/")
+	}
+	
+	/*
+		Uses .getChildren() to return the parameters array for the chosen path and action.
+	*/
+	this.getParameters = function(path, action) {
+		var params = this.getChildren(["paths", path, action, "parameters"])
+		return params
+	}
+	
+    /* Returns the child elements (JS Obj) of the specified path
+       Root level if no argument or blank text passed. Always return a JS object
+    */
+    this.getChildren = function(path) { 
+        //var children = {};
+        var subtree;
         
+        if (!path) {
+        	path = []
+        }
+        else 
+        if (!(path instanceof Array)) {
+        	path = [path]	
+        }
         
-        
+        subtree = this.schemaObj[path[0]];
+        for (var i = 1; i < path.length && subtree; i++) {
+        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
+        		if (subtree instanceof Array) {
+	        		for (var j = 0; j < subtree.length; j++) {
+	        			if (subtree[j][path[i]]) {
+	        				subtree = subtree[j][path[i]];
+	        				break
+	        			}
+	        		}
+        		}
+        		
+        		// subtree does not exist
+        		subtree = {}; // return empty
+        	} else {
+        		subtree = subtree[path[i]]
+        	}
+        }
+
+        return subtree;
+    }
     
-    
+    /* Main init logic */
+    this.schemaArg = schema;
+    this.format = format || "YAML";
+    this.schemaObj = this.parseOpenAPIschema(schema)
+}]]></parameter>
+        </Script>
+        <Script name="_Franz output">
+            <ModTime>1747920830208</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[14:23:56,322 INFO  - Request1 : {
+      "http.Content-Type": "application/x-www-form-urlencoded",
+      "http.body": "j_username=itim manager&j_password=secret",
+      "http.url": "https://192.168.2.39:30943/itim/j_security_check",
+      "http.method": "POST"
+}
+ Reply1 : {
+      "http.body": "",
+      "http.Cache-Control": "no-cache="set-cookie, set-cookie2"",
+      "http.Date": "Wed, 21 May 2025 12:23:56 GMT",
+      "http.Content-Language": "en-US",
+      "http.X-Powered-By": "Servlet/4.0",
+      "http.Expires": "Thu, 01 Dec 1994 16:00:00 GMT",
+      "http.Vary": "Accept-Encoding",
+      "http.bodyAsBytes":],
+      "http.body.response": "",
+      "http.Transfer-Encoding": "chunked",
+      "http.Strict-Transport-Security": [
+            "max-age=31536000; includeSubdomains",
+            "max-age=31536000; includeSubdomains"
+      ],
+      "http.responseMsg": "Found",
+      "http.X-FRAME-OPTIONS": "SAMEORIGIN",
+      "http.bodyAsString": "",
+      "http.Location": "https://192.168.2.39:30943/itim/",
+      "http.Set-Cookie": [
+            "LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly",
+            "WASReqURL=""; Expires=Thu, 01 Dec 1994 16:00:00 GMT; Path=/; HttpOnly"
+      ],
+      "http.responseCode": "302"
+}
+14:23:56,355 INFO  - Request2 : {
+      "http.Cookie": "LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly",
+      "http.url": "https://192.168.2.39:30943/itim/rest/systemusers/me",
+      "http.method": "POST"
+}
+ Reply2 : {
+      "http.bodyAsString": "com.ibm.isim.ui.HTTP_ERROR",
+      "http.body.response": "com.ibm.isim.ui.HTTP_ERROR",
+      "http.Transfer-Encoding": "chunked",
+      "http.Date": "Wed, 21 May 2025 12:23:56 GMT",
+      "http.Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+      "http.CSRFToken": "8BC04350E6A9091B13FC3109B21BFAAE",
+      "http.Cache-Control": "no-cache="set-cookie, set-cookie2"",
+      "http.body": "com.ibm.isim.ui.HTTP_ERROR",
+      "http.X-FRAME-OPTIONS": "SAMEORIGIN",
+      "http.responseMsg": "Bad Request",
+      "http.X-Powered-By": "Servlet/4.0",
+      "http.responseCode": "400",
+      "http.Vary": "Accept-Encoding",
+      "http.Set-Cookie": "csrfToken=SHA-256%3AcG9iOGhoc2s3OG81%3Ab592%2BZPlL6H06yU8UzU6a6YvLQPXaFH0LYM4vIcP7F4%3D; Path=/itim; Secure; HttpOnly",
+      "http.Connection": "Close",
+      "http.Expires": "Thu, 01 Dec 1994 16:00:00 GMT",
+      "http.bodyAsBytes": [0x63, 0x6f, 0x6d, 0x2e, 0x69, 0x62, 0x6d, 0x2e, 0x69, 0x73, 0x69, 0x6d, 0x2e, 0x75, 0x69, 0x2e, 0x48, 0x54, 0x54, 0x50, 0x5f, 0x45, 0x52, 0x52, 0x4f, 0x52],
+      "http.Content-Language": "en-US"
+}
+14:23:56,698 INFO  - Request3 : {
+      "http.Cookie": "[8BC04350E6A9091B13FC3109B21BFAAE, LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly]",
+      "http.url": "https://192.168.2.39:30943/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw",
+      "http.method": "GET"
+}
+ Reply3 : {
+      "http.bodyAsString": "{"_links":{"formTemplate":{"href":"/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw&filterId=formSearch"},"self":{"href":"/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw","title":"System Administrator"},"erparent":{"href":"/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc","title":"org"}},"_attributes":{"uid":"itimadmin","ercustomdisplay":"Administrator","givenname":"Administrator","name":"System Administrator","erroles":"erglobalid=00000000000000000001,ou=roles,erglobalid=00000000000000000000,ou=ivig,dc=ivig","erpersonstatus":"ACTIVE","cn":"System Administrator","sn":"Administrator","personType":"Person","uuid":"2e2bf5ce-36de-4088-a3cb-47b68f4efxyf","erparent":"erglobalid=00000000000000000000,ou=ivig,dc=ivig"}}",
+      "http.body.response": [0x7b, 0x22, 0x5f, 0x6c, 0x69, 0x6e, 0x6b, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x66, 0x6f, 0x72, 0x6d, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x66, 0x6f, 0x72, 0x6d, 0x73, 0x3f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x65, 0x65, 0x3d, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x26, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x49, 0x64, 0x3d, 0x66, 0x6f, 0x72, 0x6d, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x22, 0x7d, 0x2c, 0x22, 0x73, 0x65, 0x6c, 0x66, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x7d, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x43, 0x78, 0x76, 0x64, 0x54, 0x31, 0x70, 0x64, 0x6d, 0x6c, 0x6e, 0x4c, 0x47, 0x52, 0x6a, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x6f, 0x72, 0x67, 0x22, 0x7d, 0x7d, 0x2c, 0x22, 0x5f, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x69, 0x74, 0x69, 0x6d, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x67, 0x69, 0x76, 0x65, 0x6e, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2c, 0x6f, 0x75, 0x3d, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x2c, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x3a, 0x22, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x22, 0x2c, 0x22, 0x63, 0x6e, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x73, 0x6e, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x22, 0x3a, 0x22, 0x50, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x22, 0x2c, 0x22, 0x75, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x32, 0x65, 0x32, 0x62, 0x66, 0x35, 0x63, 0x65, 0x2d, 0x33, 0x36, 0x64, 0x65, 0x2d, 0x34, 0x30, 0x38, 0x38, 0x2d, 0x61, 0x33, 0x63, 0x62, 0x2d, 0x34, 0x37, 0x62, 0x36, 0x38, 0x66, 0x34, 0x65, 0x66, 0x78, 0x79, 0x66, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x7d, 0x7d],
+      "http.Date": "Wed, 21 May 2025 12:23:56 GMT",
+      "http.Strict-Transport-Security": [
+            "max-age=31536000; includeSubdomains",
+            "max-age=31536000; includeSubdomains"
+      ],
+      "http.Content-Type": "application/vnd.ibm.isim-v1+json",
+      "http.Cache-Control": "no-cache,no-store,max-age=0",
+      "http.Content-Length": "1003",
+      "http.body": [0x7b, 0x22, 0x5f, 0x6c, 0x69, 0x6e, 0x6b, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x66, 0x6f, 0x72, 0x6d, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x66, 0x6f, 0x72, 0x6d, 0x73, 0x3f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x65, 0x65, 0x3d, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x26, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x49, 0x64, 0x3d, 0x66, 0x6f, 0x72, 0x6d, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x22, 0x7d, 0x2c, 0x22, 0x73, 0x65, 0x6c, 0x66, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x7d, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x43, 0x78, 0x76, 0x64, 0x54, 0x31, 0x70, 0x64, 0x6d, 0x6c, 0x6e, 0x4c, 0x47, 0x52, 0x6a, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x6f, 0x72, 0x67, 0x22, 0x7d, 0x7d, 0x2c, 0x22, 0x5f, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x69, 0x74, 0x69, 0x6d, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x67, 0x69, 0x76, 0x65, 0x6e, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2c, 0x6f, 0x75, 0x3d, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x2c, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x3a, 0x22, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x22, 0x2c, 0x22, 0x63, 0x6e, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x73, 0x6e, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x22, 0x3a, 0x22, 0x50, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x22, 0x2c, 0x22, 0x75, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x32, 0x65, 0x32, 0x62, 0x66, 0x35, 0x63, 0x65, 0x2d, 0x33, 0x36, 0x64, 0x65, 0x2d, 0x34, 0x30, 0x38, 0x38, 0x2d, 0x61, 0x33, 0x63, 0x62, 0x2d, 0x34, 0x37, 0x62, 0x36, 0x38, 0x66, 0x34, 0x65, 0x66, 0x78, 0x79, 0x66, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x7d, 0x7d],
+      "http.X-FRAME-OPTIONS": "SAMEORIGIN",
+      "http.responseMsg": "OK",
+      "http.Pragma": "No-cache",
+      "http.X-Powered-By": "Servlet/4.0",
+      "http.responseCode": "200",
+      "http.Vary": "Accept-Encoding",
+      "http.Set-Cookie": "com.ibm.isim.lastActivity=DCHj3ErlGLITVQYcPBAtcmZ%2Bxygm0ZCD%2BZ78fOGSyPw%3D; Path=/itim; Secure; HttpOnly",
+      "http.Expires": "Thu, 01 Jan 1970 00:00:00 GMT",
+      "http.bodyAsBytes": [0x7b, 0x22, 0x5f, 0x6c, 0x69, 0x6e, 0x6b, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x66, 0x6f, 0x72, 0x6d, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x66, 0x6f, 0x72, 0x6d, 0x73, 0x3f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x65, 0x65, 0x3d, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x26, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x49, 0x64, 0x3d, 0x66, 0x6f, 0x72, 0x6d, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x22, 0x7d, 0x2c, 0x22, 0x73, 0x65, 0x6c, 0x66, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x7d, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x43, 0x78, 0x76, 0x64, 0x54, 0x31, 0x70, 0x64, 0x6d, 0x6c, 0x6e, 0x4c, 0x47, 0x52, 0x6a, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x6f, 0x72, 0x67, 0x22, 0x7d, 0x7d, 0x2c, 0x22, 0x5f, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x69, 0x74, 0x69, 0x6d, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x67, 0x69, 0x76, 0x65, 0x6e, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2c, 0x6f, 0x75, 0x3d, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x2c, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x3a, 0x22, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x22, 0x2c, 0x22, 0x63, 0x6e, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x73, 0x6e, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x22, 0x3a, 0x22, 0x50, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x22, 0x2c, 0x22, 0x75, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x32, 0x65, 0x32, 0x62, 0x66, 0x35, 0x63, 0x65, 0x2d, 0x33, 0x36, 0x64, 0x65, 0x2d, 0x34, 0x30, 0x38, 0x38, 0x2d, 0x61, 0x33, 0x63, 0x62, 0x2d, 0x34, 0x37, 0x62, 0x36, 0x38, 0x66, 0x34, 0x65, 0x66, 0x78, 0x79, 0x66, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x7d, 0x7d],
+      "http.Content-Language": "en-US"
+}
+14:23:56,726 INFO  - {
+      "http.bodyAsString": "{"_links":{"formTemplate":{"href":"/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw&filterId=formSearch"},"self":{"href":"/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw","title":"System Administrator"},"erparent":{"href":"/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc","title":"org"}},"_attributes":{"uid":"itimadmin","ercustomdisplay":"Administrator","givenname":"Administrator","name":"System Administrator","erroles":"erglobalid=00000000000000000001,ou=roles,erglobalid=00000000000000000000,ou=ivig,dc=ivig","erpersonstatus":"ACTIVE","cn":"System Administrator","sn":"Administrator","personType":"Person","uuid":"2e2bf5ce-36de-4088-a3cb-47b68f4efxyf","erparent":"erglobalid=00000000000000000000,ou=ivig,dc=ivig"}}",
+      "http.body.response": [0x7b, 0x22, 0x5f, 0x6c, 0x69, 0x6e, 0x6b, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x66, 0x6f, 0x72, 0x6d, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x66, 0x6f, 0x72, 0x6d, 0x73, 0x3f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x65, 0x65, 0x3d, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x26, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x49, 0x64, 0x3d, 0x66, 0x6f, 0x72, 0x6d, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x22, 0x7d, 0x2c, 0x22, 0x73, 0x65, 0x6c, 0x66, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x7d, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x43, 0x78, 0x76, 0x64, 0x54, 0x31, 0x70, 0x64, 0x6d, 0x6c, 0x6e, 0x4c, 0x47, 0x52, 0x6a, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x6f, 0x72, 0x67, 0x22, 0x7d, 0x7d, 0x2c, 0x22, 0x5f, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x69, 0x74, 0x69, 0x6d, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x67, 0x69, 0x76, 0x65, 0x6e, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2c, 0x6f, 0x75, 0x3d, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x2c, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x3a, 0x22, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x22, 0x2c, 0x22, 0x63, 0x6e, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x73, 0x6e, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x22, 0x3a, 0x22, 0x50, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x22, 0x2c, 0x22, 0x75, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x32, 0x65, 0x32, 0x62, 0x66, 0x35, 0x63, 0x65, 0x2d, 0x33, 0x36, 0x64, 0x65, 0x2d, 0x34, 0x30, 0x38, 0x38, 0x2d, 0x61, 0x33, 0x63, 0x62, 0x2d, 0x34, 0x37, 0x62, 0x36, 0x38, 0x66, 0x34, 0x65, 0x66, 0x78, 0x79, 0x66, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x7d, 0x7d],
+      "http.Date": "Wed, 21 May 2025 12:23:56 GMT",
+      "http.Strict-Transport-Security": [
+            "max-age=31536000; includeSubdomains",
+            "max-age=31536000; includeSubdomains"
+      ],
+      "http.Content-Type": "application/vnd.ibm.isim-v1+json",
+      "http.Cache-Control": "no-cache,no-store,max-age=0",
+      "http.Content-Length": "1003",
+      "http.body": [0x7b, 0x22, 0x5f, 0x6c, 0x69, 0x6e, 0x6b, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x66, 0x6f, 0x72, 0x6d, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x66, 0x6f, 0x72, 0x6d, 0x73, 0x3f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x65, 0x65, 0x3d, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x26, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x49, 0x64, 0x3d, 0x66, 0x6f, 0x72, 0x6d, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x22, 0x7d, 0x2c, 0x22, 0x73, 0x65, 0x6c, 0x66, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x7d, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x43, 0x78, 0x76, 0x64, 0x54, 0x31, 0x70, 0x64, 0x6d, 0x6c, 0x6e, 0x4c, 0x47, 0x52, 0x6a, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x6f, 0x72, 0x67, 0x22, 0x7d, 0x7d, 0x2c, 0x22, 0x5f, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x69, 0x74, 0x69, 0x6d, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x67, 0x69, 0x76, 0x65, 0x6e, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2c, 0x6f, 0x75, 0x3d, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x2c, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x3a, 0x22, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x22, 0x2c, 0x22, 0x63, 0x6e, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x73, 0x6e, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x22, 0x3a, 0x22, 0x50, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x22, 0x2c, 0x22, 0x75, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x32, 0x65, 0x32, 0x62, 0x66, 0x35, 0x63, 0x65, 0x2d, 0x33, 0x36, 0x64, 0x65, 0x2d, 0x34, 0x30, 0x38, 0x38, 0x2d, 0x61, 0x33, 0x63, 0x62, 0x2d, 0x34, 0x37, 0x62, 0x36, 0x38, 0x66, 0x34, 0x65, 0x66, 0x78, 0x79, 0x66, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x7d, 0x7d],
+      "http.X-FRAME-OPTIONS": "SAMEORIGIN",
+      "http.responseMsg": "OK",
+      "http.Pragma": "No-cache",
+      "http.X-Powered-By": "Servlet/4.0",
+      "http.responseCode": "200",
+      "http.Vary": "Accept-Encoding",
+      "http.Set-Cookie": "com.ibm.isim.lastActivity=DCHj3ErlGLITVQYcPBAtcmZ%2Bxygm0ZCD%2BZ78fOGSyPw%3D; Path=/itim; Secure; HttpOnly",
+      "http.Expires": "Thu, 01 Jan 1970 00:00:00 GMT",
+      "http.bodyAsBytes": [0x7b, 0x22, 0x5f, 0x6c, 0x69, 0x6e, 0x6b, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x66, 0x6f, 0x72, 0x6d, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x66, 0x6f, 0x72, 0x6d, 0x73, 0x3f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x65, 0x65, 0x3d, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x26, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x49, 0x64, 0x3d, 0x66, 0x6f, 0x72, 0x6d, 0x53, 0x65, 0x61, 0x72, 0x63, 0x68, 0x22, 0x7d, 0x2c, 0x22, 0x73, 0x65, 0x6c, 0x66, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x70, 0x65, 0x6f, 0x70, 0x6c, 0x65, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4e, 0x79, 0x78, 0x76, 0x64, 0x54, 0x30, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x58, 0x42, 0x6c, 0x62, 0x33, 0x42, 0x73, 0x5a, 0x53, 0x78, 0x6c, 0x63, 0x6d, 0x64, 0x73, 0x62, 0x32, 0x4a, 0x68, 0x62, 0x47, 0x6c, 0x6b, 0x50, 0x54, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4c, 0x47, 0x39, 0x31, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x73, 0x5a, 0x47, 0x4d, 0x39, 0x61, 0x58, 0x5a, 0x70, 0x5a, 0x77, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x7d, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x7b, 0x22, 0x68, 0x72, 0x65, 0x66, 0x22, 0x3a, 0x22, 0x2f, 0x69, 0x74, 0x69, 0x6d, 0x2f, 0x72, 0x65, 0x73, 0x74, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x73, 0x2f, 0x6f, 0x72, 0x67, 0x61, 0x6e, 0x69, 0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x5a, 0x58, 0x4a, 0x6e, 0x62, 0x47, 0x39, 0x69, 0x59, 0x57, 0x78, 0x70, 0x5a, 0x44, 0x30, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x44, 0x41, 0x77, 0x4d, 0x43, 0x78, 0x76, 0x64, 0x54, 0x31, 0x70, 0x64, 0x6d, 0x6c, 0x6e, 0x4c, 0x47, 0x52, 0x6a, 0x50, 0x57, 0x6c, 0x32, 0x61, 0x57, 0x63, 0x22, 0x2c, 0x22, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x22, 0x3a, 0x22, 0x6f, 0x72, 0x67, 0x22, 0x7d, 0x7d, 0x2c, 0x22, 0x5f, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73, 0x22, 0x3a, 0x7b, 0x22, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x69, 0x74, 0x69, 0x6d, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x67, 0x69, 0x76, 0x65, 0x6e, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x31, 0x2c, 0x6f, 0x75, 0x3d, 0x72, 0x6f, 0x6c, 0x65, 0x73, 0x2c, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x3a, 0x22, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x22, 0x2c, 0x22, 0x63, 0x6e, 0x22, 0x3a, 0x22, 0x53, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x20, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x73, 0x6e, 0x22, 0x3a, 0x22, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2c, 0x22, 0x70, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x22, 0x3a, 0x22, 0x50, 0x65, 0x72, 0x73, 0x6f, 0x6e, 0x22, 0x2c, 0x22, 0x75, 0x75, 0x69, 0x64, 0x22, 0x3a, 0x22, 0x32, 0x65, 0x32, 0x62, 0x66, 0x35, 0x63, 0x65, 0x2d, 0x33, 0x36, 0x64, 0x65, 0x2d, 0x34, 0x30, 0x38, 0x38, 0x2d, 0x61, 0x33, 0x63, 0x62, 0x2d, 0x34, 0x37, 0x62, 0x36, 0x38, 0x66, 0x34, 0x65, 0x66, 0x78, 0x79, 0x66, 0x22, 0x2c, 0x22, 0x65, 0x72, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x22, 0x65, 0x72, 0x67, 0x6c, 0x6f, 0x62, 0x61, 0x6c, 0x69, 0x64, 0x3d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2c, 0x6f, 0x75, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x2c, 0x64, 0x63, 0x3d, 0x69, 0x76, 0x69, 0x67, 0x22, 0x7d, 0x7d],
+      "http.Content-Language": "en-US"
+}
+14:23:56,745 ERROR - CTGDIS266E Error in InitConnectors. Exception occurred: com.ibm.di.exceptions.AbortALException: STOP 
+14:23:56,749 INFO  - CTGDIS100I Printing the Connector statistics.
+14:23:56,751 INFO  -  [ITIMRestClientConnector] Not used
+14:23:56,752 INFO  - CTGDIS104I Total: Errors:1.
+14:23:56,754 INFO  - CTGDIS101I Finished printing the Connector statistics.
+14:23:56,755 ERROR - CTGDIS077I Failed with error: STOP.]]></parameter>
+        </Script>
     </Folder>
     <JavaLibraries/>
     <JavaProperties/>
@@ -17526,12 +17782,12 @@ function RESTCLIENT(args) {
                 <InitialLoad>true</InitialLoad>
                 <CacheTimeout>0</CacheTimeout>
             </PropertyStore>
-            <PropertyStore name="Java-Properties">
+            <PropertyStore name="_Restify">
                 <Parser/>
                 <RawConnector>
                     <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
                     <parameter name="collection">@SUBSTITUTE{config.$directory}/_Restify.properties</parameter>
-                    <parameter name="collectionType">Java-Properties</parameter>
+                    <parameter name="collectionType">_Restify</parameter>
                 </RawConnector>
                 <Key>key</Key>
                 <Value>value</Value>
@@ -17539,12 +17795,12 @@ function RESTCLIENT(args) {
                 <InitialLoad>true</InitialLoad>
                 <CacheTimeout>0</CacheTimeout>
             </PropertyStore>
-            <PropertyStore name="_Restify">
+            <PropertyStore name="Java-Properties">
                 <Parser/>
                 <RawConnector>
                     <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
                     <parameter name="collection">@SUBSTITUTE{config.$directory}/_Restify.properties</parameter>
-                    <parameter name="collectionType">_Restify</parameter>
+                    <parameter name="collectionType">Java-Properties</parameter>
                 </RawConnector>
                 <Key>key</Key>
                 <Value>value</Value>
