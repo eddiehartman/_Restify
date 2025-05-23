@@ -65,16 +65,6 @@ get '/itim/rest/people/:personId' => sub {
 
     app->log->info("GET /people/$personId requested.");
 
-#     if ($personId ne "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw") {
-#        app->log->warn("GET request for unknown personId: $personId. Returning 404.");
-#        return $c->render(status => 404, json => { error => "Person not found" });
-#    }
-   # Ensure CSRF token is present
-    #my $csrf_token = $c->req->headers->header('CSRFToken') || '';
-    #unless ($csrf_token) {
-    #    return $c->render(status => 400, json => { error => "Missing CSRFToken header" });
-    #}
-
     # Fetch response from OpenAPI schema safely
     my $response = $schema_data->{paths}{"/people/{personId}"}{get}{responses}{200}{content}{"application/vnd.ibm.isim-v1+json"}{example} 
         || { error => "Mock response not found in OpenAPI schema" };

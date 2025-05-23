@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Thu May 22 22:44:56 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Fri May 23 11:35:06 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -16993,7 +16993,7 @@ function RESTIFY () {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1747946570247</ModTime>
+            <ModTime>1747992842896</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -17033,6 +17033,7 @@ function RESTCLIENT(args) {
 	
 	this.gettingToken = false;
 	this.gotToken = false;
+	this.CSRFToken = null;
 	
 	// The HTTP Client Connector to use
 	this.http = system.getConnector("ibmdi.HTTPClient");
@@ -17088,7 +17089,9 @@ function RESTCLIENT(args) {
 	
 	// Get the currently set Cookies
 	this.getCookies = function() {
-		return this.cookieArrayList.toArray().join("; ")
+		var cookieList = this.cookieArrayList.toArray().join("; ");
+		if (this.CSRFToken >= null) cookieList += "; " + this.CSRFToken;
+		return cookieList
 	}
 	
 	// Put together a URL from an array of parts
@@ -17254,6 +17257,10 @@ function RESTCLIENT(args) {
 					var cookies = retEntry.getString("http.Set-Cookie");
 					this.cookieArrayList.add(cookies)
 				}
+				
+				if (retEntry["http.CSRFToken"]) {
+					this.CSRFToken = retEntry.getString("http.CSRFToken")
+				}	
 
 				// Grab the CSRFToken if found
 				if (retEntry.getString("http.CSRFToken")) {
