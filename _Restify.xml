@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Fri May 23 11:35:06 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Tue May 27 09:13:13 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         
     
@@ -16993,7 +16993,7 @@ function RESTIFY () {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1747992842896</ModTime>
+            <ModTime>1748329941839</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -17007,7 +17007,7 @@ function RESTIFY () {
 // 20250322 1443 Working now! Added Franz's code, plus made cookie handling better
 // 20250402 1345 Added "accept" arg to makeRequest method, else default is 'application/json'
 // 20250402 1429 Added handling of Redirect for makeRequest method
-// 20250411 1538 Removing this.sessionId since it is a cookie and handled elsewhere. Also renaming .token to .csrftoken
+// 20250411 1538 Removing this.sessionId since it is a cookie and handled elsewhere. Also renaming .token to .CSRFToken
 // 20250411 1626 Adding handling for contextRoot
 // 20250416 1512 Fixed broken code for retCode 302 and prevent only contextRoot calls
 // 20250423 1421 Fixed rootContext to contextRoot && fixed handling rootContext in makeRequest
@@ -17015,6 +17015,7 @@ function RESTIFY () {
 // 20250427 1646 Some fixes and improvements, thanks to suggestions from the TDI LabJam GPT
 // 20250520 1530 A number of changes together with Franz. Trying to figure out how my calls differ from Franz' TDI test AL script
 // 20250522 2241 Simplified cookie setting to just use .getString() - i.e. only first value
+// 20250523 1159 Changed the handling of the CSRFToken read as "http.CSRFToken"
 //
 // This is the class that provides methods for making HTTP requests
 //
@@ -17033,15 +17034,17 @@ function RESTCLIENT(args) {
 	
 	this.gettingToken = false;
 	this.gotToken = false;
+
 	this.CSRFToken = null;
-	
+	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
+		
 	// The HTTP Client Connector to use
 	this.http = system.getConnector("ibmdi.HTTPClient");
 	
 	// Member variables
 	this.requestEntry = system.newEntry();
 	
-	this.csrftoken = null;
+	this.CSRFToken = null;
 	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
 	
 	// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
@@ -17084,16 +17087,43 @@ function RESTCLIENT(args) {
 				expectedReturnType: "entry",
 				where: "getToken()"
 		});
-		this.csrftoken = retEntry.getString("http.CSRFToken")
+		this.CSRFToken = retEntry.getString("http.CSRFToken")
 	}
 	
 	// Get the currently set Cookies
 	this.getCookies = function() {
-		var cookieList = this.cookieArrayList.toArray().join("; ");
-		if (this.CSRFToken >= null) cookieList += "; " + this.CSRFToken;
-		return cookieList
+		var cookiesAtt = system.newAttribute("http.Cookie");
+		// Add CSRFToken if set
+		if (this.CSRFToken != null) {
+			cookiesAtt.addValue(this.CSRFToken)
+		}
+
+		// Add remaining cookies picked up
+		var cookieArray = this.cookieArrayList.toArray();
+		for (var cookie in cookieArray) {
+			cookiesAtt.addValue(cookie)
+		}	
+			
+		// Return it
+		return cookiesAtt
 	}
 	
+/* OLD	
+	// Get the currently set Cookies
+	this.getCookies = function() {
+		var cookieList = this.cookieArrayList.toArray().join("; ");
+		// Add CSRFToken if set
+		if (this.CSRFToken != null) {
+			if (cookieList != "") {
+				cookieList = this.CSRFToken + "; " + cookieList
+			} else {
+				cookieList = this.CSRFToken
+			}
+		}
+		// Return it
+		return cookieList
+	}
+*/	
 	// Put together a URL from an array of parts
 	this.assembleUrl = function(partsArray) {
 		if (!(partsArray instanceof Array)) partsArray = [partsArray]; // Note - instanceof works only for identifying JS arrays
@@ -17218,8 +17248,8 @@ function RESTCLIENT(args) {
 				
 				// Set cookies
 				this.requestEntry["http.Cookie"] = this.getCookies(); // In case these have been changed since last time
-				if (this.csrfToken) {
-					this.requestEntry["http.csrfToken"] = this.csrfToken
+				if (this.CSRFToken) {
+					this.requestEntry["http.CSRFToken"] = this.CSRFToken
 				}
 				if (this.ltpaToken2) {
 					this.requestEntry["http.ltpaToken2"] = this.ltpaToken2
@@ -17264,7 +17294,7 @@ function RESTCLIENT(args) {
 
 				// Grab the CSRFToken if found
 				if (retEntry.getString("http.CSRFToken")) {
-					this.csrftoken = retEntry.getString("http.CSRFToken");
+					this.CSRFToken = retEntry.getString("http.CSRFToken");
 				}	
 				
 				var retCode = retEntry.getString("http.responseCode");
@@ -17326,7 +17356,7 @@ function RESTCLIENT(args) {
 	// Handle terminate to close the connector
 	this.terminate = function() {
 		this.http.terminate();
-		this.csrftoken = null
+		this.CSRFToken = null
 	}
 	
 	// Handle alerting - @@ DISABLED for now
@@ -17440,16 +17470,8 @@ function RESTCLIENT(args) {
 	
 		for (var att in entry) {
 			var name = att.getName();
-
-			var val = att.getValue(0);
-
-			//if (typeof(val) == "string") val = val.substring(0,1000); //@@TODO Remove after it works
-			
-			if (val && name.indexOf("tcp.") < 0 
-				&& typeof val != "object" && typeof val !=  "com.ibm.di.entry.Attribute" 
-				&& !(val instanceof Array) && !String(val).startsWith("[B@")) {
-				txt += "  " + this.LJ(name + ": ", 25) + val + "\n"
-			}
+			var val = att.toString();
+			txt += "  " + val + "\n"
 		}
 		
 		return txt
