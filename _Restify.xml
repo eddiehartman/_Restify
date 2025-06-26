@@ -1,68 +1,213 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Sun Nov 17 15:16:51 CET 2024" createdBy="eddiehartman" modified="Tue May 27 09:13:13 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Thu Jun 26 20:58:58 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
-        
-    
-        
-    
-    
-    
-    
-        
-        
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-        
-    
-    
-    
-    
-        
-    
-        
-    
-        
-        
-    
-        
-    
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-        
-        
-    
-    
-    
-        
-    
-    
-        
-    
-    
-    <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1747921793522</ModTime>
+        <AssemblyLine name="startAL">
+            <ModTime>1748688055504</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="AssemblyLineFunctionComponent" state="Simulated"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1748688055504</ModTime>
+                <Function name="AssemblyLineFunctionComponent">
+                    <InheritFrom>system:/Functions/ibmdi.AssemblyLineFC</InheritFrom>
+                    <ModTime>1748688055504</ModTime>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1748688038903</ModTime>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1748688055504</ModTime>
+                        <SchemaItem>
+                            <Name>CSRFToken</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>_links_erparent</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>_links_formTemplate</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>_links_manager</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>_links_self</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>attributes</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>cn</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>counter</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>embedded</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>ercustomdisplay</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>erparent</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>erpersonstatus</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>ersupervisor</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>forms</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>givenname</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>mail</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>manager</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>name</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>personId</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>personType</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>self</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>sn</Name>
+                        </SchemaItem>
+                        <SchemaItem>
+                            <Name>uid</Name>
+                        </SchemaItem>
+                    </Schema>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1748688038903</ModTime>
+                    </Hooks>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1748688055504</ModTime>
+                        <parameter name="assemblyLine">_testITIMRestConnector</parameter>
+                    </Configuration>
+                    <SandboxConfig/>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1748688038903</ModTime>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1748688038903</ModTime>
+                    </AttributeMap>
+                </Function>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    <AssemblyLine name="HTTPServer">
+            <ModTime>1749648470025</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="DumpWorkEntry" state="Enabled"/>
+                    <Component name="HTTPServerConnector" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <Connector name="HTTPServerConnector">
+                    <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
+                    <ModTime>1746017589386</ModTime>
+                    <ConnectorMode>Server</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="tcpPort">8888</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings/>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer">
+                <Script name="DumpWorkEntry">
+                    <ModTime>1746017603308</ModTime>
+                    <parameter name="script"><![CDATA[// Dump the work entry
+task.dumpEntry(work);
+]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+        <AssemblyLine name="_testITIMRestConnector">
+            <ModTime>1750926771132</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -73,7 +218,6 @@ SCHEMA class]]></parameter>
                 <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
             </Settings>
             <Hooks>
-                <ModTime>1747921004140</ModTime>
                 <Hook name="prolog0">
                     <InheritFrom>[no inheritance]</InheritFrom>
                     <Name>prolog0</Name>
@@ -97,16 +241,14 @@ SCHEMA class]]></parameter>
             </SimulationConfig>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer">
-                <ModTime>1747921793522</ModTime>
                 <Connector name="ITIMRestClientConnector_iterate">
                     <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
-                    <ModTime>1747921793522</ModTime>
+                    <ModTime>1750926771132</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1747921793522</ModTime>
-                        <parameter name="searchCrit">@SUBSTITUTE{javascript return searchVal}</parameter>
+                        <parameter name="searchCrit">ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw</parameter>
                     </Configuration>
                     <Parser>
                         <InheritFrom>[parent]</InheritFrom>
@@ -165,7 +307,6 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1747921167153</ModTime>
                 <Connector name="ITIMRestClientConnector_add">
                     <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
                     <ModTime>1744476993899</ModTime>
@@ -268,7 +409,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1747921136747</ModTime>
                         <AdvancedLinkMode>true</AdvancedLinkMode>
                         <Script>searchVal /*defined in AL prolog*/</Script>
                         <LinkCriteriaItem>
@@ -336,7 +476,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1747921144432</ModTime>
                         <AdvancedLinkMode>true</AdvancedLinkMode>
                         <Script>searchVal /*defined in AL prolog*/</Script>
                     </LinkCriteria>
@@ -502,7 +641,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1747921167153</ModTime>
                         <AdvancedLinkMode>true</AdvancedLinkMode>
                         <Script>searchVal /*defined in AL prolog*/</Script>
                         <LinkCriteriaItem>
@@ -624,233 +762,8 @@ task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Scr
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
-        <AssemblyLine name="HTTPServer">
-            <ModTime>1747920751409</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="DumpWorkEntry" state="Enabled"/>
-                    <Component name="HTTPServerConnector" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <Connector name="HTTPServerConnector">
-                    <InheritFrom>system:/Connectors/ibmdi.HTTPServer</InheritFrom>
-                    <ModTime>1746017589386</ModTime>
-                    <ConnectorMode>Server</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="tcpPort">8888</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings/>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-            </ContainerEF>
-            <ContainerDF name="DataFlowContainer">
-                <Script name="DumpWorkEntry">
-                    <ModTime>1746017603308</ModTime>
-                    <parameter name="script"><![CDATA[// Dump the work entry
-task.dumpEntry(work);
-]]></parameter>
-                </Script>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
-        <AssemblyLine name="ISVG_LCR_TEST">
-            <ModTime>1747920751417</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="ITIMRestClientConnector" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <Connector name="ITIMRestClientConnector">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1747830231584</ModTime>
-                    <ConnectorMode>Iterator</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="action">GET</parameter>
-                        <parameter encrypted="true" name="password">lr65NQriE66TTrj2h2LmIuwtz23FD+0CPzjPvl9FDKbMFIYckqV3D/Z29zENjtA14Slhn+s7mhEPBLDpU10TkDA6nIsRERvKC1tKCUgpwQxQGa8LWXUnpmf8v03vd3biPLC5QbZ5Vu/PGejj2ihrjJs38L32BWjheHEauRi7by0=</parameter>
-                        <parameter name="path">/lifecyclerule</parameter>
-                        <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
-                        <parameter name="username">itim manager</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="before_initialize">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_initialize</Name>
-                            <Script><![CDATA[resthost = "https://192.168.2.39:30943";
-	
-	//Setup connector 
-	myHttpConn = system.getConnector("ibmdi.HTTPClient");
-/*
-	//Prepare call to get JSESSIONID
-	myHttpConn.setParam("url",resthost + "/itim/restlogin/login.jsp");
-	myHttpConn.setParam("method","GET");
-	myHttpConn.initialize(null);
-	//Perform call
-	httpReply = myHttpConn.queryReply(null);
-	//Retrieve JSESSIONID
-	JSESSIONID = httpReply.getString("http.Set-Cookie");
-
- * 
- */
-	//Prepare call to get LTPAToken2
-	myHttpConn.setParam("url",resthost + "/itim/j_security_check");
-	myHttpConn.setParam("method","POST");
-	myHttpConn.initialize(null);
-	
-	//Configure the call
-	var httpcall = system.newEntry();
-	httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
-//	httpcall.setAttribute("http.Cookie",JSESSIONID);
-	//Set body to userid/password
-	httpcall.setAttribute("http.body","j_username=itim manager&j_password=secret");
-	//Perform call
-	httpReply = myHttpConn.queryReply(httpcall);
-	task.logmsg("Request1 : " + httpcall + "\n Reply1 : " + httpReply);
-	//Retrieve LTPAToken2
-	LTPAToken2 = httpReply.getString("http.Set-Cookie");
-	
-	//Prepare call to get CSRFToken
-	myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
-	myHttpConn.setParam("method","POST");
-	myHttpConn.initialize(null);
-	
-	//Configure the call
-	var httpcall = system.newEntry();
-//	httpcall.setAttribute("http.Cookie",[JSESSIONID,LTPAToken2]);
-	httpcall.setAttribute("http.Cookie",LTPAToken2);
-	//Perform call
-	httpReply = myHttpConn.queryReply(httpcall);
-	task.logmsg("Request2 : " + httpcall + "\n Reply2 : " + httpReply);
-	//Retrieve CSRFToken
-	CSRFToken = httpReply.getString("http.CSRFToken");
-	
-//do a test call
-	var httpcall = system.newEntry();
-	myHttpConn.setParam("url",resthost + "/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw");
-	myHttpConn.setParam("method","GET");
-	myHttpConn.initialize(null);
-	httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
-	//Perform call
-	httpReply = myHttpConn.queryReply(httpcall);
-	task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
-	task.logmsg(httpReply);
-	system.abortAssemblyLine("STOP")]]></Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-            </ContainerEF>
-            <ContainerDF name="DataFlowContainer"/>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
         <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1747920751427</ModTime>
+            <ModTime>1749648470099</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -2215,72 +2128,168 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
+        <AssemblyLine name="ISVG_LCR_TEST">
+            <ModTime>1750930826379</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="ITIMRestClientConnector" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1750930826379</ModTime>
+                <Connector name="ITIMRestClientConnector">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
+                    <ModTime>1750930826379</ModTime>
+                    <ConnectorMode>Iterator</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="action">GET</parameter>
+                        <parameter encrypted="true" name="password">IlqDsVbykQrV1FGAaXEL++hRjESgeGmi9WfsHjhKGb4DAPolYZB0PjUgwu+BhYHScfohWUHMJAZWDA2/PgrCCcqYJ+aZ3bkCFn/uX1mgtq9LOJypd5XnSfhb/pEgHcv6ZMFKEwZ8kvFU/FwS99muIRawsGKuXJaQvjUTm3f59U0=</parameter>
+                        <parameter name="path">/lifecyclerule</parameter>
+                        <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
+                        <parameter name="username">itim manager</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <ModTime>1750927151273</ModTime>
+                        <UniqueAttribute/>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1750930826379</ModTime>
+                        <Hook name="before_initialize">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>before_initialize</Name>
+                            <Script><![CDATA[resthost = "https://192.168.252.3:30943";
+	
+	//Setup connector 
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+/*
+	//Prepare call to get JSESSIONID
+	myHttpConn.setParam("url",resthost + "/itim/restlogin/login.jsp");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	//Perform call
+	httpReply = myHttpConn.queryReply(null);
+	//Retrieve JSESSIONID
+	JSESSIONID = httpReply.getString("http.Set-Cookie");
+
+ * 
+ */
+	//Prepare call to get LTPAToken2
+	myHttpConn.setParam("url",resthost + "/itim/j_security_check");
+	myHttpConn.setParam("method","POST");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+	httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
+//	httpcall.setAttribute("http.Cookie",JSESSIONID);
+	//Set body to userid/password
+	httpcall.setAttribute("http.body","j_username=itim manager&j_password=Passw0rd");
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request1 : " + httpcall + "\n Reply1 : " + httpReply);
+
+
+
+
+	//Retrieve LTPAToken2
+	LTPAToken2 = httpReply.getString("http.Set-Cookie");
+	
+	//Prepare call to get CSRFToken
+	myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
+	myHttpConn.setParam("method","POST");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+//	httpcall.setAttribute("http.Cookie",[JSESSIONID,LTPAToken2]);
+	httpcall.setAttribute("http.Cookie",LTPAToken2);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request2 : " + httpcall + "\n Reply2 : " + httpReply);
+
+
+
+
+
+
+	//Retrieve CSRFToken
+	CSRFToken = httpReply.getString("http.CSRFToken");
+	
+//do a test call
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + "/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
+	task.logmsg(httpReply);
+	system.exitFlow();
+	system.abortAssemblyLine("STOP")]]></Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer"/>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
     </Folder>
     <Folder name="Connectors">
-        
-        
-    
-        
-    
-    
-    
-    
-        
-        
-    
-    
-    
-        
-    
-    
-        
-        
-    
-    
-        
-    
-    
-        
-    
-        
-    
-    
-        
-    
-    
-        
-    
-    
-    
-    
-        
-        
-        
-    
-        
-        
-    
-    
-    
-        
-    
-        
-    
-    
-        
-        
-        
-    
-    
-    
-    
-        
-        
-        
-        
-    <Connector name="ITIMRestClientConnector">
+        <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1747920751291</ModTime>
+            <ModTime>1749647749905</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
@@ -2794,7 +2803,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">XPvRvUeG6Xjr3erznrNRI+0ivw13cyVnU3yHmalh/CfADlaaxcn8GEDR4s+aMlhZF1LF8CQZtefOlZCp1P/8KTj+OWJDBQ7p08f8YNc7d+7QBTIZ2ZwgU/rd+/Ddw6Lr85MlQKqJBbVoW3/TQgMjm4bNDlQnrjt984dpYT+7CE8=</parameter>
+                <parameter encrypted="true" name="apikey">Nk/H3xad1bz5O0y/IgX49r7SYK0883LY9gDQ/rxDioHpNtOLGmgyxEJNBcYLe1WmlfDhriClHlyuUA9FA9aEIeiVRRlN3Vg/n5H+0QZM8PTtNYZM/Vw9CfUjO6baZWu0gH/raRbiUm4gftzdkmjc9PrieNGR6cPpIhpKWlDqB5k=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -2805,7 +2814,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">BbI9gKuG0C8oKkJODTaJ4lKBRskXXUn1I8Z3KY1b58eaT4PDPZZUNv8sKuuak5PPO7AphqALpyoU+n7IPQivhGaYJ1noultVnt8sYUygbvUg3swAQnW79YgJuO9x+Qmd8AT6aPSccKs3wRZDS0JlpOI4QyS1G8kUVMkd8i4wAsM=</parameter>
+                <parameter encrypted="true" name="password">WnenIcaJRYT/f+mMaHxvFvlBXpyuQX3HCKowSQHNr+ARWR8aSfBpBeYkeWkReIzjYkiuo8TxOQ7zGdm/RlVk/lvThfulJuWikk0UmMLaPVQT73vYuIB/V07hbz1G3mnJWpcUIsMtcpDv649BqFLwsXQhJUP3DrnOh/ZygX1Udh0=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
@@ -3704,20 +3713,21 @@ function querySchema(queryMode) {
         </Connector>
         <Connector name="ITIMRestClientConnector_TEST">
             <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-            <ModTime>1747920751346</ModTime>
+            <ModTime>1750927377013</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927377013</ModTime>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">i1UXaSz5Mhf6o2jTsD8Ad7yBxL4Vpdh4VbQNyv5ic3pmM3LAD42d7V6E8fY7tVoL5jUvrTxASkjsG0gfK9wR6kT+PQmP4IhjvDizUxF5JFVlM+pPspJDwf3AZNI/NFIIV9fcUnVdDBYOVN+4TuMgDqBLqy7ICHddYNmD+hAikSo=</parameter>
+                <parameter encrypted="true" name="apikey">fVv03Zlyg7aq0HjL+cLZHQDdJIpxvnaORT22ipHCj5ylVvSOuqtnPeovVp1hakJv/lPZS4MvlsELoGXkkQJQUYOuohBycL439zcxKhdtbeq4bj9fVw7CBijf2x62BkaRfWIQb17VqOH5TBdF4lynD/p1mUsive8UVFyrQ46yN6E=</parameter>
                 <parameter name="authUrl">/v1.0/endpoint/default/token</parameter>
                 <parameter name="parameters"/>
-                <parameter encrypted="true" name="password">O3j6uhWVeOZb6a7KkY5eMFXckYPBdFD5lkNjxQ1DgedlccuV4YLeLr5zdcK/NirUTVO1QbKZZUQd2W90rz3/+U7icrrWB/xYMTv5DY4GHWia/lKv+SQybU+zBCTdV8Pj5ocoLdR1jisj32PVEh5QV00rgiyGjCyBnPhPawOcpTs=</parameter>
+                <parameter encrypted="true" name="password">XxRPi9L7hNJCuS6LWGXczEVlVwP3D0xpTB3MKShB7ODtgZiZzIVagMh4efKomu4pu3i20HIsu+0QI+stmUUrFfiJ9YH77+AIEiRIOHaUDGU4e2krLQwTsRpPWHu5FTssf0Xpj/UcDjlwsrEhexjZaYHSlW68LFI0rglM4QVQbig=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="searchCrit">itim manager</parameter>
-                <parameter name="url">http://localhost:8080</parameter>
-                <parameter name="username">edbird</parameter>
+                <parameter name="url">https://192.168.252.3:30943</parameter>
+                <parameter name="username">itim manager</parameter>
             </Configuration>
             <Parser>
                 <InheritFrom>[parent]</InheritFrom>
@@ -3753,227 +3763,624 @@ function querySchema(queryMode) {
             </PoolDefinition>
             <PoolInstance/>
         </Connector>
+    <Connector name="Grab cert">
+            <InheritFrom>system:/Connectors/ibmdi.HTTPClient</InheritFrom>
+            <ModTime>1750927216038</ModTime>
+            <ConnectorMode>AddOnly</ConnectorMode>
+            <ConnectorState>Enabled</ConnectorState>
+            <Configuration>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927216038</ModTime>
+                <parameter name="url">http://192.168.252.3:30943</parameter>
+            </Configuration>
+            <Parser>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927192373</ModTime>
+            </Parser>
+            <AttributeMap name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927192373</ModTime>
+            </AttributeMap>
+            <AttributeMap name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927192373</ModTime>
+            </AttributeMap>
+            <DeltaSettings/>
+            <Schema name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927192373</ModTime>
+            </Schema>
+            <Schema name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927192373</ModTime>
+            </Schema>
+            <LinkCriteria>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927192373</ModTime>
+            </LinkCriteria>
+            <Hooks>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927192373</ModTime>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <Reconnect>
+                <InheritFrom>[parent]</InheritFrom>
+                <ReconnectRules/>
+            </Reconnect>
+            <Operations/>
+            <PoolDefinition>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1750927198808</ModTime>
+                <Enabled>false</Enabled>
+                <MinPoolSize>0</MinPoolSize>
+                <MaxPoolSize>0</MaxPoolSize>
+                <PurgeInterval>0</PurgeInterval>
+                <InitializeAttempts>1</InitializeAttempts>
+                <InitializeSleepInterval>0</InitializeSleepInterval>
+            </PoolDefinition>
+            <PoolInstance/>
+        </Connector>
     </Folder>
     <Folder name="Parsers"/>
     <Folder name="Scripts">
-        
-        
-    
-    
-    
-    
-        
-    
-    
-        
-    
-    
-    
-        
-    
-    
-    
-    
-    
-    
-        
-    
-        
-    
-    
-    
-    
-    
-    
-        
-    
-    
-        
-        
-        
-        
-    
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-    
-    <Script name="OAuth Class">
-            <ModTime>1747920751336</ModTime>
+        <Script name="RESTCLIENT class">
+            <ModTime>1750928657135</ModTime>
             <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[var OAUTH = null; // Will be instantiated below
+            <parameter name="script"><![CDATA[// 20250116 1116 Created
+// 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
+// 20250121 2104 RestClientConnector form working! RESTCLIENT class doing its job both in the test AL and in the Form
+// 20250123 1819 Tightening up code
+// 20250128 2122 Fixing httpEntry() so it does not fail on argument = null
+// 20250130 1243 Making sure this class works both inside and outside a Connector
+// 20250131 1942 Made this.logmsg() write to both System.out and main.logmsg
+// 20250319 1452 Franz and I made some changes to makeRequest(), adding support for redirection
+// 20250321 2041 Still working on it
+// 20250322 1443 Working now! Added Franz's code, plus made cookie handling better
+// 20250402 1345 Added "accept" arg to makeRequest method, else default is 'application/json'
+// 20250402 1429 Added handling of Redirect for makeRequest method
+// 20250411 1538 Removing this.sessionId since it is a cookie and handled elsewhere. Also renaming .token to .CSRFToken
+// 20250411 1626 Adding handling for contextRoot
+// 20250416 1512 Fixed broken code for retCode 302 and prevent only contextRoot calls
+// 20250423 1421 Fixed rootContext to contextRoot && fixed handling rootContext in makeRequest
+// 20250425 2031 Fixed makeRequest's handling of contextRoot passed in as an argument
+// 20250427 1646 Some fixes and improvements, thanks to suggestions from the TDI LabJam GPT
+// 20250520 1530 A number of changes together with Franz. Trying to figure out how my calls differ from Franz' TDI test AL script
+// 20250522 2241 Simplified cookie setting to just use .getString() - i.e. only first value
+// 20250523 1159 Changed the handling of the CSRFToken read as "http.CSRFToken"
+//
+// This is the class that provides methods for making HTTP requests
+//
+// NOTES:
+//			* It uses its own this.logmsg() for more control over logging
 
-// OAUTH is an object (as all js functions are) and is instantiated using this function (another object).
-function OAuth2(params) {
-	//
-	// -- Token this.request parameters
-	//
-	this.params = params;
-	this.debug = params.debug || false;
-	this.url = params.url || "* url not specified *";
+function RESTCLIENT(args) {
+	this.baseUrl = (args.baseUrl || "").trim();
+//	this.authUrl = args.authUrl || ""; // not used
+	this.contextRoot = args.contextRoot || "";
+	this.apikey = args.apikey || "";
+	this.username = args.username || ""; 
+	this.password = args.password || "";
+	this.debug = false //args.debug || false;
+	this.cookieArrayList = new java.util.ArrayList();
+	
+	this.gettingToken = false;
+	this.gotToken = false;
 
-	//
-	// -- Returns form-urlencoded string of an object
-	//
-	this.urlEncode = function(obj) {
-		var arr = [];
-		for (var f in obj) {
-			arr.push(f + "=" + obj[f]);
-		}
-		return arr.join("&");
-	}
-
-	// 
-	// -- Returns an initialized HTTP Client Connector
-	//
-	this.setupHTTPClient = function(params) {
-		if (!this.httpClient) {
-			this.httpClient = system.loadConnector("ibmdi.HTTPClient");
-			for (var paramName in params) {
-				this.httpClient.setParam(paramName, params[paramName])
-			}
-			this.httpClient.initialize(null);
-		}
-		return this.httpClient
-	}
-
-	//
-	// -- Returns the access token if we have an access token that hasn't expired
-	//
+	this.CSRFToken = null;
+	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
+		
+	// The HTTP Client Connector to use
+	this.http = system.getConnector("ibmdi.HTTPClient");
+	
+	// Member variables
+	this.requestEntry = system.newEntry();
+	
+	this.CSRFToken = null;
+	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
+	
+	// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
 	this.getToken = function() {
-		return this.response ? this.response.access_token : null;
+		//Prepare call to get LTPAToken2
+		var myHttpConn = this.http;
+		myHttpConn.setParam("url",this.baseUrl + "/itim/j_security_check");
+		myHttpConn.setParam("method","POST");
+		myHttpConn.initialize(null);
+		
+		//Configure the call
+		var httpcall = this.requestEntry;
+		httpcall.removeAllAttributes();
+		
+		httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
+		//Set body to userid/password
+		httpcall.setAttribute("http.body","j_username=" + this.username + "&j_password=" + this.password);
+		//Perform call
+		httpReply = myHttpConn.queryReply(httpcall);
+		task.logmsg("\n\n--------------\nRequest1 : " + httpcall + "\n Reply1 : " + httpReply);
+		//Retrieve LTPAToken2
+		LTPAToken2 = httpReply.getString("http.Set-Cookie");
+		this.cookieArrayList.add(LTPAToken2);
+		
+		//Prepare call to get CSRFToken
+		myHttpConn.setParam("url",this.baseUrl + "/itim/rest/systemusers/me");
+		myHttpConn.setParam("method","POST");
+		myHttpConn.initialize(null);
+		
+		//Configure the call
+	//	var httpcall = system.newEntry();
+	//	httpcall.setAttribute("http.Cookie",[JSESSIONID,LTPAToken2]);
+		httpcall.removeAllAttributes();
+		httpcall.setAttribute("http.Cookie",LTPAToken2);
+		//Perform call
+		httpReply = myHttpConn.queryReply(httpcall);
+		task.logmsg("\n---------------\nRequest2 : " + httpcall + "\n Reply2 : " + httpReply);
+		//Retrieve CSRFToken
+		CSRFToken = httpReply.getString("http.CSRFToken");
+/*		
+	//do a test call
+	//	var httpcall = system.newEntry();
+		myHttpConn.setParam("url",resthost + "/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw");
+		myHttpConn.setParam("method","GET");
+		myHttpConn.initialize(null);
+		httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
+		//Perform call
+		httpReply = myHttpConn.queryReply(httpcall);
+		task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
+		task.logmsg(httpReply);
+		system.abortAssemblyLine("STOP")
+*/
 	}
 
-	//
-	// -- Sends a this.request to get a new access token
-	// -- @return String Access token
-	// -- @throws Exception
-	//
-	this.requestToken = function() {
-
-		// -- If we already have a valid token return that
-		if (this.getToken() != null) {
-			if (this.debug) {
-				task.logmsg("OAuth: returning current token");
+	// Get the currently set Cookies
+	this.getCookies = function() {
+		var cookiesAtt = system.newAttribute("http.Cookie");
+		// Add CSRFToken if set
+		if (this.CSRFToken != null) {
+			cookiesAtt.addValue(this.CSRFToken)
+		}
+ 
+		// Add remaining cookies picked up
+		var cookieArray = this.cookieArrayList.toArray();
+		for (var cookie in cookieArray) {
+			cookiesAtt.addValue(cookie)
+		}	
+			
+		// Return it
+		if (cookiesAtt.size() > 1){
+			var cookies = cookiesAtt.getValues().toString();
+			return "[" + cookies + "]"; 			
+		} else {
+			return cookiesAtt.getValue(0);
+		}		
+	}
+ 
+	this.getToken_old = function() {
+		var retEntry;
+		
+		// Get rid of cookies
+		this.cookieArrayList.clear();
+		
+		// First get session id
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				verb: "GET",
+				url: "/itim/restlogin/login.jsp", // @@TODO Should make this a parameter under Connections
+				expectedReturnType: "entry",
+				where: "getToken()"
+		});
+		
+		// Now for the LTPAToken2
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				verb: "POST",
+				url: "/itim/j_security_check", // @@TODO Should make this a parameter under Connections
+				ctype: "application/x-www-form-urlencoded",
+				headers: {
+					Authorization: "Bearer " + this.apikey
+				},
+				body: "j_username=" + this.username + "&j_password=" + this.password,
+				expectedReturnType: "entry",
+				where: "getToken()"
+		});
+		
+		// Get CSRFToken
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				expectedReturnType: "entry",
+				verb: "POST",
+				url: "/itim/rest/systemusers/me", // @@TODO Should make this a parameter under Connections
+				ctype: "application/json",
+				expectedReturnType: "entry",
+				where: "getToken()"
+		});
+		this.CSRFToken = retEntry.getString("http.CSRFToken")
+	}
+ 
+ 	// Put together a URL from an array of parts
+	this.assembleUrl = function(partsArray) {
+		if (!(partsArray instanceof Array)) partsArray = [partsArray]; // Note - instanceof works only for identifying JS arrays
+		var url = "";
+		
+		for (var i = 0; i < partsArray.length; i++) {
+			var part = (partsArray[i] || "").trim();
+			if (!part) continue; // skip empty string
+			
+			// Remove starting and/or ending slashes
+			if (part.startsWith("/")) 
+			{
+				part = part.substring(1)
+			}	
+			else
+			if (part.endsWith("/"))
+			{
+				part = part.substring(0, part.length-1)
 			}
-			return this.getToken();
+			
+			// Assemble the url
+			url += ((i > 0) ? "/" : "") + part	
 		}
+		
+		return url
+	}	
+	
+	// REST Client http-call method. The first lines of code show you the parameters you can send in the 'param' JS object
+	this.makeRequest = function(params) {
+		// Get token if necessary
+		if (!this.gotToken && !this.gettingToken) {
+			this.gettingToken = true;
+			this.getToken();
+			this.gettingToken = false;
+			this.gotToken = true;
+		} 
+		
+		//if (form && this.debug) this.alert("RESTCLIENT.makeRequest(" + toJson(params) + "}");
+			
+		// Here come the various local variables set from parameters passed OR default values
+		var verb = params.verb || "GET";
+		var url = params.url || this.throwException("makeRequest called with no URL");
+		var body = params.body || null;
+		var ctype = params.ctype || "application/json";
+		var where = params.where || "";
+		var headers = params.headers || {};
+		var accept = params.accept || "application/json";
+		var gettingToken = params.gettingToken || false;
+		var username = params.username || "";
+		var password = params.password || "";
+//		var contextRoot = params.contextRoot || this.contextRoot;
+		var contextRoot = (typeof(params.contextRoot) == "undefined") ? this.contextRoot : params.contextRoot;
+ 
+		var returnType = params.expectedReturnType || "JS object";
+		
+		var alreadyImportedCert = false;
+		
+		// Empty out the requestEntry before setting it up for the call
+		this.requestEntry.removeAllAttributes();
+		
+		// Prepare the url
+		var origUrl = url;
+		if (gettingToken) {
+			url = this.assembleUrl([this.baseUrl, url]) // Skip the context root for these calls
+		} else {
+			url = this.assembleUrl([this.baseUrl, contextRoot, url])
+		}	
 
-		//
-		// -- Create this.request entry object
-		//
-		this.request = system.newEntry();
-		this.request["url"] = this.url;
-		this.request["http.body"] = this.urlEncode(this.params);
-		this.request["http.method"] = "POST";
-		this.request["http.content-type"] = "application/x-www-form-urlencoded";
-		this.request["grant_type"] = this.params["grant_type"];
-		//		this.request["grant_type"] = "client_credentials";
-		this.request["scope"] = this.params["scope"];
-		//		this.request["scope"] = "gmail.readonly";
-		this.request["redirect_uri"] = this.params["redirect_uri"] | "url:itef:wg:oauth:2.0:oob";
-		this.request["client_id"] = this.params["client_id"];
-		this.request["client_secret"] = this.params["client_secret"];
-
-		if (this.debug) {
-			task.logmsg("Requesting AccessToken: url=" + this.url);
-			task.logmsg(this.request.toJSON());
+		if (url == this.assembleUrl([this.baseUrl, contextRoot])){
+			url = this.assembleUrl([this.baseUrl, contextRoot, "me"])
+		}	
+		
+/* old code - can be deleted - I think		
+		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
+			if (this.baseUrl.endsWith("/")) {
+				this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length-1) // remove / at end of baseUrl if found
+			}	
+			url = this.baseUrl + url;
 		}
+*/		
+		// If a body is passed, this must be a POST (I think)
+		if (typeof body !== "undefined" && body !== null) {
+			verb = "POST";
+	
+			if (typeof body != "string") {
+				this.requestEntry["http.body"] = toJson(body);
+			} else {
+				this.requestEntry["http.body"] = body;
+			}
+		}	
+		
+		// Set up the global HTTP Connector
+		this.http.setParam("method", verb.toUpperCase());
+		this.http.setParam("url", url);
+		this.http.setParam("username", username);
+		this.http.setParam("password", password);
+	
+		// Now set up the request entry
+		this.requestEntry["http.url"] = url;
+		this.requestEntry["http.method"] = verb.toUpperCase();
+		this.requestEntry["http.Content-Type"] = ctype;
+//		this.requestEntry["http.Accept"] = accept;
+//		this.requestEntry["http.Connection"] = "keep-alive";
 
+		// if credentials set then send them
+		if (username != ""){
+			this.requestEntry["http.remote_user"] = username;
+			this.requestEntry["http.remote_password"] = password;
+		}		
+		 				
+		for (var hdr in headers) {
+			this.requestEntry["http." + hdr] = headers[hdr]
+		}
+		
+		// Reinitialize the HTTP Client connector so the updated parameters are applied
+		this.http.terminate();
+		this.http.initialize(null);
+	
+		alreadyImportedCert = false; 
+		var reply = null;
+		// Make the call
 		do {
-			//
-			// -- Send token this.request
-			//
-			this.setupHTTPClient(this.params);
-			var response = this.httpClient.queryReply(this.request);
-			var httpCode = response.getString("http.responseCode");
-
-			// Log and check response for errors
-			if (this.debug) {
-				task.logmsg("this.request Access Token Response");
-				task.logmsg("" + this.response);
-			}
-			if (response && response["http.bodyAsString"] != null) {
-				var json = response["http.bodyAsString"].getValue();
-
-				// Try to parse it
-				try {
-					this.response = fromJson(json);
-	 				// See if it's an error
-					if (this.response.error) {
-						var err = "Error: " + this.response.error + ": " + this.response.error_description;
-						this.response = null;
-						throw err;
-					}					
-				} catch (parsingException) {
-					// I guess it's not JSON
-					this.response = {error: "Return is NOT JSON!"}
+			var retry = false;
+			try {	
+				//this.alert("\nMaking call:" + this.reduceEntry(this.requestEntry) + "\n");
+				
+				// Set cookies
+				var cookies = this.getCookies();
+				if (cookies && cookies.length > 0) {
+					this.requestEntry.setAttribute("http.Cookie",this.getCookies()); // In case these have been changed since last time
+				}	
+				if (this.CSRFToken) {
+					this.requestEntry["http.CSRFToken"] = this.CSRFToken
 				}
+//				if (this.ltpaToken2) {
+//					this.requestEntry["http.ltpaToken2"] = this.ltpaToken2
+//				}
+					
+				if (this.debug) {
+					this.logDetails({msg : "Request to itim", 
+								obj : this.httpEntry(this.requestEntry, true), 
+								url : url, 
+								verb : verb, 
+								ctype : ctype, 
+								where : where,
+								sent: true});
+				}
+	
+		
+				// *****************************************************************************************
+				// ****************         Make the actual request         ********************************
+				// *****************************************************************************************
+
+				var retEntry = this.http.queryReply(this.requestEntry);
+
+				retEntry["http.url"] = url; // Another fix from @@Chat
+				
+				if (this.debug) {
+					this.logDetails({msg : "Response from itim", 
+								obj : this.httpEntry(retEntry),
+								where: where,
+								sent: false,
+							    entry : retEntry});
+				}
+
+				// Grab any cookies if found - also made more robust thanks to @@Chat
+				if (retEntry["http.Set-Cookie"]) {
+					var cookies = retEntry.getString("http.Set-Cookie");
+					this.cookieArrayList.add(cookies)
+				}
+				
+				if (retEntry["http.CSRFToken"]) {
+					this.CSRFToken = retEntry.getString("http.CSRFToken")
+				}	
+
+				// Grab the CSRFToken if found
+				if (retEntry.getString("http.CSRFToken")) {
+					this.CSRFToken = retEntry.getString("http.CSRFToken");
+				}	
+				
+				var retCode = retEntry.getString("http.responseCode");
+				
+				if (retCode.startsWith("3") && false) { //@@TODO could be an ITIM thing 
+					this.requestEntry["http.url"] = retEntry.getString("http.location");
+					retry = true
+				} else
+				// Else decide what to return, based on the returnType argument passed in and continue processing this request
+				if (returnType == "JS object") {
+					reply = this.parseReply(retEntry);
+				} else {
+					reply = retEntry
+				}	
+				
+			} catch (ex) {
+				//if (form && this.debug) this.alert("Exception: " + ex);
+				
+				// If the token has expired, get a new one
+				if (ex.toString().indexOf("Unauthorized") >= 0) {
+					this.getToken();
+					retry = true
+				} else
+				// Else if we first must import the client cert, then do so. The Server must be restarted after.
+				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+					if ((ex.toString().indexOf("Certificate chaining error") >= 0) && alreadyImportedCert) {
+						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+					}
+					this.getCertificate();
+					alreadyImportedCert = true;
+					retry = true;
+				} else
+				// If a redirect - follow the redirect
+				if (typeof retEntry != "undefined" && retEntry && retEntry.getString("http.responseCode").startsWith("3")) { // @@Chat
+					this.requestEntry["http.url"] = retEntry.getString("http.Location");
+ 					retry = true;
+				} else {
+					throw ex;
+				}	
 			}
-
-			// Check for redirect
-			if (httpCode == 302) {
-				var location = response.getString("http.Location");
-				task.logmsg("Redirecting to: " + location);
-				this.httpClient.setParam("url", location);
-				this.httpClient.terminate();
-				this.httpClient.initialize(null);
+		} while (retry);
+				
+		//if (form && this.debug) this.alert("reply: " + toJson(reply));
+		
+		return reply;
+	}
+	
+	// Remove some attributes from an Entry
+	this.reduceEntry = function(entryArg) {
+		var entry = system.newEntry();
+		entry = entryArg.clone();
+		entry.removeAttribute("http.base");
+		entry.removeAttribute("http.body.response");
+		entry.removeAttribute("http.ipaddress");
+		entry.removeAttribute("http.bodyAsBytes");
+		return entry
+	}	
+	
+	// Handle terminate to close the connector
+	this.terminate = function() {
+		this.http.terminate();
+		this.CSRFToken = null
+	}
+	
+	// Handle alerting - @@ DISABLED for now
+	this.alert = function(msg) {
+		if (!this.debug) return; // changed from 'continue' thanks to @@Chat
+		task.logmsg(msg);
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}	
+		
+	
+	// Get the client certificate from the server and import it to the TDI keystore
+	this.getCertificate = function() {
+		this.logmsg("! Getting client cert");
+		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(this.baseUrl, 443);
+		this.logmsg("! Result: " + msg)
+	}
+	
+	// Log specifics arguments passed to makeRequest()
+	this.logDetails = function(params, sent) {
+		sent = sent || false;
+		var msg = params.msg;
+		var obj = params.obj; 
+		var url = params.url;
+		var verb = params.verb;
+		var ctype = params.ctype; 
+		var where = params.where;
+		
+		//if (!this.debug) continue;
+		if (url && url.endsWith("openapi") > 0) continue;
+		
+		if (msg == null) {
+			msg = "*unknown entry*";
+		}
+	
+		var s = new java.lang.StringBuffer();
+		
+		if (where != null) {
+			s.append("\n<<" + where + ">> " + msg);
+		} else {
+			s.append("\n---------> " + msg);
+		}
+		
+		
+		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+		if (ctype != null) { s.append("   " + ctype); } 
+		if (url != null) { s.append("   " + url); } 
+		s.append("\n");
+	
+		if (obj != null) {
+			if (obj instanceof com.ibm.di.entry.Entry) {	
+				s.append(this.httpEntry(obj, sent))	
+			} else {
+				s.append(obj.toString());
 			}
-		} while (httpCode == 302 && location.toLowerCase().indexOf("error") < 0)
-
-		// Return the token	
-		return this.getToken();
-
-	};
-}
-
-// Return the OAUTH object itself
-function getOAUTH() {
-	return OAUTH
-}
-
-// Returns the OAuth access token
-function getOAuthAccessToken(args) {
-	// If this is the first time called, set up the OAuth2 object
-	if (OAUTH == null) {
-		type = args["grant_type"];
-		if (type != "password") {
-			args.grant_type = "client_credentials";
-		}
-		if (args.debug) {
-			task.logmsg("Create OAuth2 this.request");
-			task.logmsg(work.fromJSON(toJson(args)));
-		}
-		OAUTH = new OAuth2(args);
+		}	
+	
+		this.logmsg(s.toString());
 	}
-	return OAUTH.requestToken();
-}
 
-// Returns a delimited string with the full stacktrace for the passed Exception e
-function fullStacktrace(e, delimArg) {
-	var delim = delimArg || "\n";
-	var starry = [];
-	// Log the full stack trace
-	var stackTrace = e.getStackTrace(); // Get the stack trace as an array
-	for (var i = 0; i < stackTrace.length; i++) {
-		starry.push(stackTrace[i].toString())
+	this.throwException = function(msg) {
+		throw new java.lang.Exception(msg);
 	}
-	return starry.join(delim)
+
+	// Checks the validity of the reply and sets up for Iteration
+	this.parseReply = function(replyEntry) {
+		if (replyEntry === null) { return } 
+		
+		var status = replyEntry.getString("http.responseCode");
+	
+		// Check the return status
+		if (status == "401") { // Unauthorized - time to renew the token
+			this.throwException("Unauthorized")
+		}
+		if (!status.startsWith("2")) {
+			this.throwException("Error response from ITIM. Response code: " 
+								+ status
+								+ "    Message: " + replyEntry.getString("http.responseMsg"));
+		}
+		
+		// Now parse the body
+		var body = replyEntry.getString("http.bodyAsString");
+	
+		try {
+			var reply = fromJson(body);
+		} catch (ex) {
+			this.throwException("Error parsing return payload from itim: " + ex.toString()
+							+ "\n*** dump of reply ***\n" 
+							+ replyEntry)
+		}
+			
+		return reply;
+	}
+	
+	// Left justified text
+	this.LJ = function(txt, len) {
+		txt = txt || "";
+		len = len || txt.length;
+		return (txt + "                                                       ").substring(0, len)
+	}
+	
+	// Returns a string with legible listing of important attributes and their values
+	this.httpEntry = function(entry, sent) {
+		if (!entry) return "";
+		
+		var entry = this.reduceEntry(entry);
+		
+		if (typeof(sent) == "undefined") sent = false;
+		
+		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
+	
+		for (var att in entry) {
+			var name = att.getName();
+			var val = att.toString();
+			txt += "  " + val + "\n"
+		}
+		
+		return txt
+	}
+
+	// Own logmsg() to aid in debugging to output to the log and console
+	this.logmsg = function(lvl, msg) {
+		if (!lvl) { // undefined, and allows just a call to this.logmsg() to log a carriage return
+			lvl = "INFO";
+			msg = ""
+		} else
+		if (!msg) {
+			msg = lvl;
+			lvl = "INFO"
+		}
+		
+		if ("DEBUG".equalsIgnoreCase(lvl)) {
+			// Write to console out also
+			java.lang.System.out.println("|" + this.LJ(lvl,5) + "| " + msg);
+		}
+		
+		// This to allow it to be used by Connector Form Event script
+		task.logmsg(lvl, msg);
+		main.logmsg(lvl, msg);
+		java.lang.System.out.println(((lvl == "INFO") ? "" : lvl) + msg)
+	}	
 }]]></parameter>
         </Script>
-        <Script name="RESTIFY library class">
-            <ModTime>1747920751342</ModTime>
+    <Script name="RESTIFY library class">
+            <ModTime>1749648469953</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20241127 2024 Created
 
@@ -4019,8 +4426,104 @@ function RESTIFY () {
 	}
 }]]></parameter>
         </Script>
+        <Script name="temp">
+            <ModTime>1749648470025</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
+	this.getToken = function() {
+		//Prepare call to get LTPAToken2
+		var myHttpConn = this.http;
+		myHttpConn.setParam("url",resthost + "/itim/j_security_check");
+		myHttpConn.setParam("method","POST");
+		myHttpConn.initialize(null);
+		
+		//Configure the call
+		var httpcall = this.requestEntry;
+		
+		httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
+		//Set body to userid/password
+		httpcall.setAttribute("http.body","j_username=" + this.username + "&j_password=" + this.password);
+		//Perform call
+		httpReply = myHttpConn.queryReply(httpcall);
+		task.logmsg("\n\n--------------\nRequest1 : " + httpcall + "\n Reply1 : " + httpReply);
+		//Retrieve LTPAToken2
+		LTPAToken2 = httpReply.getString("http.Set-Cookie");
+		this.cookieArrayList.add(LTPAToken2);
+		
+		//Prepare call to get CSRFToken
+		myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
+		myHttpConn.setParam("method","POST");
+		myHttpConn.initialize(null);
+		
+		//Configure the call
+	//	var httpcall = system.newEntry();
+	//	httpcall.setAttribute("http.Cookie",[JSESSIONID,LTPAToken2]);
+		httpcall.setAttribute("http.Cookie",LTPAToken2);
+		//Perform call
+		httpReply = myHttpConn.queryReply(httpcall);
+		task.logmsg("\n---------------\nRequest2 : " + httpcall + "\n Reply2 : " + httpReply);
+		//Retrieve CSRFToken
+		CSRFToken = httpReply.getString("http.CSRFToken");
+/*		
+	//do a test call
+	//	var httpcall = system.newEntry();
+		myHttpConn.setParam("url",resthost + "/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw");
+		myHttpConn.setParam("method","GET");
+		myHttpConn.initialize(null);
+		httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
+		//Perform call
+		httpReply = myHttpConn.queryReply(httpcall);
+		task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
+		task.logmsg(httpReply);
+		system.abortAssemblyLine("STOP")
+*/
+	}
+ 
+ 
+	this.getToken_old = function() {
+		var retEntry;
+		
+		// Get rid of cookies
+		this.cookieArrayList.clear();
+		
+		// First get session id
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				verb: "GET",
+				url: "/itim/restlogin/login.jsp", // @@TODO Should make this a parameter under Connections
+				expectedReturnType: "entry",
+				where: "getToken()"
+		});
+		
+		// Now for the LTPAToken2
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				verb: "POST",
+				url: "/itim/j_security_check", // @@TODO Should make this a parameter under Connections
+				ctype: "application/x-www-form-urlencoded",
+				headers: {
+					Authorization: "Bearer " + this.apikey
+				},
+				body: "j_username=" + this.username + "&j_password=" + this.password,
+				expectedReturnType: "entry",
+				where: "getToken()"
+		});
+		
+		// Get CSRFToken
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				expectedReturnType: "entry",
+				verb: "POST",
+				url: "/itim/rest/systemusers/me", // @@TODO Should make this a parameter under Connections
+				ctype: "application/json",
+				expectedReturnType: "entry",
+				where: "getToken()"
+		});
+		this.CSRFToken = retEntry.getString("http.CSRFToken")
+	}]]></parameter>
+        </Script>
         <Script name="itim_swagger.json">
-            <ModTime>1747920751346</ModTime>
+            <ModTime>1749648470012</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[{
     "openapi": "3.0.3",
@@ -16992,8 +17495,369 @@ function RESTIFY () {
     }
 }]]></parameter>
         </Script>
-        <Script name="RESTCLIENT class">
-            <ModTime>1748329941839</ModTime>
+        <Script name="_Franz output">
+            <ModTime>1749648469969</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[Request1 : {
+      "http.Content-Type": "application/x-www-form-urlencoded",
+      "http.body": "j_username=itim manager&j_password=secret",
+      "http.url": "https://192.168.2.39:30943/itim/j_security_check",
+      "http.method": "POST"
+}
+ Reply1 : {
+      "http.responseMsg": "Found",
+      "http.bodyAsString": "",
+      "http.Location": "https://192.168.2.39:30943/itim/",
+      "http.Set-Cookie": [
+            "LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly",
+            "WASReqURL=""; Expires=Thu, 01 Dec 1994 16:00:00 GMT; Path=/; HttpOnly"
+      ],
+      "http.responseCode": "302"
+}
+14:23:56,355 INFO  - Request2 : {
+      "http.Cookie": "LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly",
+      "http.url": "https://192.168.2.39:30943/itim/rest/systemusers/me",
+      "http.method": "POST"
+}
+ Reply2 : {
+      "http.bodyAsString": "com.ibm.isim.ui.HTTP_ERROR",
+      "http.CSRFToken": "8BC04350E6A9091B13FC3109B21BFAAE",
+      "http.body": "com.ibm.isim.ui.HTTP_ERROR",
+      "http.responseMsg": "Bad Request",
+      "http.responseCode": "400",
+      "http.Set-Cookie": "csrfToken=SHA-256%3AcG9iOGhoc2s3OG81%3Ab592%2BZPlL6H06yU8UzU6a6YvLQPXaFH0LYM4vIcP7F4%3D; Path=/itim; Secure; HttpOnly",
+}
+14:23:56,698 INFO  - Request3 : {
+      "http.Cookie": "[8BC04350E6A9091B13FC3109B21BFAAE, LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly]",
+      "http.url": "https://192.168.2.39:30943/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw",
+      "http.method": "GET"
+}
+ Reply3 : {
+      "http.bodyAsString": "{"_links":{"formTemplate":{"href":"/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw&filterId=formSearch"},"self":{"href":"/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw","title":"System Administrator"},"erparent":{"href":"/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc","title":"org"}},"_attributes":{"uid":"itimadmin","ercustomdisplay":"Administrator","givenname":"Administrator","name":"System Administrator","erroles":"erglobalid=00000000000000000001,ou=roles,erglobalid=00000000000000000000,ou=ivig,dc=ivig","erpersonstatus":"ACTIVE","cn":"System Administrator","sn":"Administrator","personType":"Person","uuid":"2e2bf5ce-36de-4088-a3cb-47b68f4efxyf","erparent":"erglobalid=00000000000000000000,ou=ivig,dc=ivig"}}",
+      "http.responseMsg": "OK",
+      "http.responseCode": "200",
+      "http.Set-Cookie": "com.ibm.isim.lastActivity=DCHj3ErlGLITVQYcPBAtcmZ%2Bxygm0ZCD%2BZ78fOGSyPw%3D; Path=/itim; Secure; HttpOnly",
+}
+14:23:56,726 INFO  - {
+      "http.bodyAsString": "{"_links":{"formTemplate":{"href":"/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw&filterId=formSearch"},"self":{"href":"/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw","title":"System Administrator"},"erparent":{"href":"/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc","title":"org"}},"_attributes":{"uid":"itimadmin","ercustomdisplay":"Administrator","givenname":"Administrator","name":"System Administrator","erroles":"erglobalid=00000000000000000001,ou=roles,erglobalid=00000000000000000000,ou=ivig,dc=ivig","erpersonstatus":"ACTIVE","cn":"System Administrator","sn":"Administrator","personType":"Person","uuid":"2e2bf5ce-36de-4088-a3cb-47b68f4efxyf","erparent":"erglobalid=00000000000000000000,ou=ivig,dc=ivig"}}",
+      "http.responseMsg": "OK",
+      "http.responseCode": "200",
+      "http.Set-Cookie": "com.ibm.isim.lastActivity=DCHj3ErlGLITVQYcPBAtcmZ%2Bxygm0ZCD%2BZ78fOGSyPw%3D; Path=/itim; Secure; HttpOnly",
+}]]></parameter>
+        </Script>
+        <Script name="OAuth Class">
+            <ModTime>1749648470066</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[var OAUTH = null; // Will be instantiated below
+
+// OAUTH is an object (as all js functions are) and is instantiated using this function (another object).
+function OAuth2(params) {
+	//
+	// -- Token this.request parameters
+	//
+	this.params = params;
+	this.debug = params.debug || false;
+	this.url = params.url || "* url not specified *";
+
+	//
+	// -- Returns form-urlencoded string of an object
+	//
+	this.urlEncode = function(obj) {
+		var arr = [];
+		for (var f in obj) {
+			arr.push(f + "=" + obj[f]);
+		}
+		return arr.join("&");
+	}
+
+	// 
+	// -- Returns an initialized HTTP Client Connector
+	//
+	this.setupHTTPClient = function(params) {
+		if (!this.httpClient) {
+			this.httpClient = system.loadConnector("ibmdi.HTTPClient");
+			for (var paramName in params) {
+				this.httpClient.setParam(paramName, params[paramName])
+			}
+			this.httpClient.initialize(null);
+		}
+		return this.httpClient
+	}
+
+	//
+	// -- Returns the access token if we have an access token that hasn't expired
+	//
+	this.getToken = function() {
+		return this.response ? this.response.access_token : null;
+	}
+
+	//
+	// -- Sends a this.request to get a new access token
+	// -- @return String Access token
+	// -- @throws Exception
+	//
+	this.requestToken = function() {
+
+		// -- If we already have a valid token return that
+		if (this.getToken() != null) {
+			if (this.debug) {
+				task.logmsg("OAuth: returning current token");
+			}
+			return this.getToken();
+		}
+
+		//
+		// -- Create this.request entry object
+		//
+		this.request = system.newEntry();
+		this.request["url"] = this.url;
+		this.request["http.body"] = this.urlEncode(this.params);
+		this.request["http.method"] = "POST";
+		this.request["http.content-type"] = "application/x-www-form-urlencoded";
+		this.request["grant_type"] = this.params["grant_type"];
+		//		this.request["grant_type"] = "client_credentials";
+		this.request["scope"] = this.params["scope"];
+		//		this.request["scope"] = "gmail.readonly";
+		this.request["redirect_uri"] = this.params["redirect_uri"] | "url:itef:wg:oauth:2.0:oob";
+		this.request["client_id"] = this.params["client_id"];
+		this.request["client_secret"] = this.params["client_secret"];
+
+		if (this.debug) {
+			task.logmsg("Requesting AccessToken: url=" + this.url);
+			task.logmsg(this.request.toJSON());
+		}
+
+		do {
+			//
+			// -- Send token this.request
+			//
+			this.setupHTTPClient(this.params);
+			var response = this.httpClient.queryReply(this.request);
+			var httpCode = response.getString("http.responseCode");
+
+			// Log and check response for errors
+			if (this.debug) {
+				task.logmsg("this.request Access Token Response");
+				task.logmsg("" + this.response);
+			}
+			if (response && response["http.bodyAsString"] != null) {
+				var json = response["http.bodyAsString"].getValue();
+
+				// Try to parse it
+				try {
+					this.response = fromJson(json);
+	 				// See if it's an error
+					if (this.response.error) {
+						var err = "Error: " + this.response.error + ": " + this.response.error_description;
+						this.response = null;
+						throw err;
+					}					
+				} catch (parsingException) {
+					// I guess it's not JSON
+					this.response = {error: "Return is NOT JSON!"}
+				}
+			}
+
+			// Check for redirect
+			if (httpCode == 302) {
+				var location = response.getString("http.Location");
+				task.logmsg("Redirecting to: " + location);
+				this.httpClient.setParam("url", location);
+				this.httpClient.terminate();
+				this.httpClient.initialize(null);
+			}
+		} while (httpCode == 302 && location.toLowerCase().indexOf("error") < 0)
+
+		// Return the token	
+		return this.getToken();
+
+	};
+}
+
+// Return the OAUTH object itself
+function getOAUTH() {
+	return OAUTH
+}
+
+// Returns the OAuth access token
+function getOAuthAccessToken(args) {
+	// If this is the first time called, set up the OAuth2 object
+	if (OAUTH == null) {
+		type = args["grant_type"];
+		if (type != "password") {
+			args.grant_type = "client_credentials";
+		}
+		if (args.debug) {
+			task.logmsg("Create OAuth2 this.request");
+			task.logmsg(work.fromJSON(toJson(args)));
+		}
+		OAUTH = new OAuth2(args);
+	}
+	return OAUTH.requestToken();
+}
+
+// Returns a delimited string with the full stacktrace for the passed Exception e
+function fullStacktrace(e, delimArg) {
+	var delim = delimArg || "\n";
+	var starry = [];
+	// Log the full stack trace
+	var stackTrace = e.getStackTrace(); // Get the stack trace as an array
+	for (var i = 0; i < stackTrace.length; i++) {
+		starry.push(stackTrace[i].toString())
+	}
+	return starry.join(delim)
+}]]></parameter>
+        </Script>
+        <Script name="SCHEMA class">
+            <ModTime>1749648469973</ModTime>
+            <parameter name="enabled">true</parameter>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
+// 20250128 1552 Updated replaceEmbeddedUID() to accept either an Entry or a string value as the criteria argument
+// 20250129 1645 Fixing getChildren so it works (again) - stumbled on "parameters"
+
+function SCHEMA(schema, format) {
+	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
+	this.name = "SCHEMA";
+	this.schemaObj = {};
+	
+	/* Main init logic after method definitions
+
+       The name says it all. Returns a JS Obj */
+       
+    this.parseOpenAPIschema = function(openApiSchema) {
+    	if (typeof(openApiSchema) != "string") return openApiSchema;
+    	
+        openApiSchema = openApiSchema.trim();
+        var jsonString = "";
+
+        /* Load Jackson libraries */
+        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
+        var objectMapper = new ObjectMapper();
+
+		if (openApiSchema.startsWith("{") && openApiSchema.endsWith("}")) {
+			// overriding above arguments - for now
+			this.format = "JSON"
+		} else {
+			this.format = "YAML"
+		}
+
+        /* Check if YAML and if so, convert to Json */
+        if ("YAML".equalsIgnoreCase(this.format)) {
+            /* Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read */
+            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
+            /* Create instances of Yaml and ObjectMapper */
+            var yaml = new Yaml();
+            /* Parse YAML into a Java Map */
+            var map = yaml.load(openApiSchema);
+
+            /* Convert Java Map to JSON string */
+            jsonString = objectMapper.writeValueAsString(map)
+        } else {
+            jsonString = openApiSchema;
+        }
+
+        this.schemaObj = fromJson(jsonString);
+        return this.schemaObj
+    }
+
+	/*
+		Parses the path and returns the name of the embedded UID attribute in the URL
+	*/
+	this.getEmbeddedUID = function(path) {
+		var parts = system.splitString(path, "/");
+		
+		for (var i = 0; i < parts.length; i++) {
+			var part = parts[i].trim();
+			if (part.startsWith("{") && part.endsWith("}")) {
+				// Found an embedded uid
+				return part.substring(1, part.length-1)
+			}
+		}
+		return null
+	}
+
+	/*
+		Replaces the uid placeholder in the URL path with the uid value passed
+ 		The criteria argument is either an Entry or a string value
+	*/
+	this.replaceEmbeddedUID = function(path, criteria) {
+		var parts = system.splitString(path, "/");
+		var newPath = [parts[0]];
+		
+		for (var i = 1; i < parts.length; i++) {
+			var part = parts[i].trim();
+			if (part.startsWith("{") && part.endsWith("}")) {
+				// Found an embedded uid
+				var embeddedUID = part.substring(1, part.length-1);
+				
+				// If criteria is an Entry then grab the attribute value, else use the parameter value itself
+				var uidValue = (criteria instanceof com.ibm.di.entry.Entry) ? entry[embeddedUID] : criteria;
+				
+				if (!uidValue) {
+					throw new java.lang.Exception("UID attribute not mapped out or is null: " + embeddedUID)
+				}	
+				newPath.push(uidValue)
+			} else {
+				newPath.push(part)
+			}
+		}
+		return newPath.join("/")
+	}
+	
+	/*
+		Uses .getChildren() to return the parameters array for the chosen path and action.
+	*/
+	this.getParameters = function(path, action) {
+		var params = this.getChildren(["paths", path, action, "parameters"])
+		return params
+	}
+	
+    /* Returns the child elements (JS Obj) of the specified path
+       Root level if no argument or blank text passed. Always return a JS object
+    */
+    this.getChildren = function(path) { 
+        //var children = {};
+        var subtree;
+        
+        if (!path) {
+        	path = []
+        }
+        else 
+        if (!(path instanceof Array)) {
+        	path = [path]	
+        }
+        
+        subtree = this.schemaObj[path[0]];
+        for (var i = 1; i < path.length && subtree; i++) {
+        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
+        		if (subtree instanceof Array) {
+	        		for (var j = 0; j < subtree.length; j++) {
+	        			if (subtree[j][path[i]]) {
+	        				subtree = subtree[j][path[i]];
+	        				break
+	        			}
+	        		}
+        		}
+        		
+        		// subtree does not exist
+        		subtree = {}; // return empty
+        	} else {
+        		subtree = subtree[path[i]]
+        	}
+        }
+
+        return subtree;
+    }
+    
+    /* Main init logic */
+    this.schemaArg = schema;
+    this.format = format || "YAML";
+    this.schemaObj = this.parseOpenAPIschema(schema)
+}]]></parameter>
+        </Script>
+        <Script name="RESTCLIENT class_backup">
+            <ModTime>1749648470066</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -17054,30 +17918,19 @@ function RESTCLIENT(args) {
 		// Get rid of cookies
 		this.cookieArrayList.clear();
 		
-		// First get session id
-		retEntry = this.makeRequest({
-				gettingToken: true, // Getting a token, so dont call getToken again
-				verb: "GET",
-				url: "/itim/restlogin/login.jsp", // @@TODO Should make this a parameter under Connections
-				expectedReturnType: "entry",
-				where: "getToken()"
-		});
-		
-		// Now for the LTPAToken2
 		retEntry = this.makeRequest({
 				gettingToken: true, // Getting a token, so dont call getToken again
 				verb: "POST",
 				url: "/itim/j_security_check", // @@TODO Should make this a parameter under Connections
 				ctype: "application/x-www-form-urlencoded",
-				headers: {
-					Authorization: "Bearer " + this.apikey
-				},
+//				headers: {
+//					Authorization: "Bearer " + this.apikey
+//				},
 				body: "j_username=" + this.username + "&j_password=" + this.password,
 				expectedReturnType: "entry",
-				where: "getToken()"
+				where: "getToken(j_security_check)"
 		});
-		
-		// Get CSRFToken
+
 		retEntry = this.makeRequest({
 				gettingToken: true, // Getting a token, so dont call getToken again
 				expectedReturnType: "entry",
@@ -17085,9 +17938,19 @@ function RESTCLIENT(args) {
 				url: "/itim/rest/systemusers/me", // @@TODO Should make this a parameter under Connections
 				ctype: "application/json",
 				expectedReturnType: "entry",
-				where: "getToken()"
+				where: "getToken(me)"
 		});
-		this.CSRFToken = retEntry.getString("http.CSRFToken")
+/*
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				verb: "GET",
+				url: "/itim/restlogin/login.jsp", // @@TODO Should make this a parameter under Connections
+				expectedReturnType: "entry",
+				ctype: "application/x-www-form-urlencoded",
+				where: "getToken(login.jsp)"
+		});
+ * 
+ */
 	}
 	
 	// Get the currently set Cookies
@@ -17097,7 +17960,7 @@ function RESTCLIENT(args) {
 		if (this.CSRFToken != null) {
 			cookiesAtt.addValue(this.CSRFToken)
 		}
-
+ 
 		// Add remaining cookies picked up
 		var cookieArray = this.cookieArrayList.toArray();
 		for (var cookie in cookieArray) {
@@ -17105,7 +17968,34 @@ function RESTCLIENT(args) {
 		}	
 			
 		// Return it
-		return cookiesAtt
+		if (cookiesAtt.size() > 1){
+			var cookies = cookiesAtt.getValues().toString();
+			return "[" + cookies + "]"; 			
+		} else {
+			return cookiesAtt.getValue(0);
+		}		
+	}
+
+
+	// Get the currently set Cookies TBD TBD
+ 	this.getCookiesOLD = function() {
+		var cookiesAtt = system.newAttribute("http.Cookie");
+		// Add CSRFToken if set
+		if (this.CSRFToken != null) {
+			cookiesAtt.addValue(this.CSRFToken)
+		}
+
+		// Add remaining cookies picked up
+		
+		var cookies = "[" + this.cookieArrayList.toArray().toString() + "]";
+		var cookiesJavaArray = this.cookieArrayList.toArray();
+		var cookiesJSArray = [];
+		for (var value in cookiesJavaArray){
+			cookiesJSArray[cookiesJSArray.length] = value;
+		}	
+
+		// Return it
+		return cookiesJSArray;
 	}
 	
 /* OLD	
@@ -17225,11 +18115,15 @@ function RESTCLIENT(args) {
 		this.requestEntry["http.url"] = url;
 		this.requestEntry["http.method"] = verb.toUpperCase();
 		this.requestEntry["http.Content-Type"] = ctype;
-		this.requestEntry["http.remote_user"] = username;
-		this.requestEntry["http.remote_password"] = password;
-		this.requestEntry["http.Accept"] = accept;
-		this.requestEntry["http.Connection"] = "keep-alive";
-				
+//		this.requestEntry["http.Accept"] = accept;
+//		this.requestEntry["http.Connection"] = "keep-alive";
+
+		// if credentials set then send them
+		if (username != ""){
+			this.requestEntry["http.remote_user"] = username;
+			this.requestEntry["http.remote_password"] = password;
+		}		
+		 				
 		for (var hdr in headers) {
 			this.requestEntry["http." + hdr] = headers[hdr]
 		}
@@ -17247,13 +18141,16 @@ function RESTCLIENT(args) {
 				//this.alert("\nMaking call:" + this.reduceEntry(this.requestEntry) + "\n");
 				
 				// Set cookies
-				this.requestEntry["http.Cookie"] = this.getCookies(); // In case these have been changed since last time
+				var cookies = this.getCookies();
+				if (cookies && cookies.length > 0) {
+					this.requestEntry.setAttribute("http.Cookie",this.getCookies()); // In case these have been changed since last time
+				}	
 				if (this.CSRFToken) {
 					this.requestEntry["http.CSRFToken"] = this.CSRFToken
 				}
-				if (this.ltpaToken2) {
-					this.requestEntry["http.ltpaToken2"] = this.ltpaToken2
-				}
+//				if (this.ltpaToken2) {
+//					this.requestEntry["http.ltpaToken2"] = this.ltpaToken2
+//				}
 					
 				if (this.debug) {
 					this.logDetails({msg : "Request to itim", 
@@ -17498,204 +18395,6 @@ function RESTCLIENT(args) {
 		main.logmsg(lvl, msg);
 		java.lang.System.out.println(((lvl == "INFO") ? "" : lvl) + msg)
 	}	
-}]]></parameter>
-        </Script>
-        <Script name="SCHEMA class">
-            <ModTime>1747920751377</ModTime>
-            <parameter name="enabled">true</parameter>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
-// 20250128 1552 Updated replaceEmbeddedUID() to accept either an Entry or a string value as the criteria argument
-// 20250129 1645 Fixing getChildren so it works (again) - stumbled on "parameters"
-
-function SCHEMA(schema, format) {
-	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
-	this.name = "SCHEMA";
-	this.schemaObj = {};
-	
-	/* Main init logic after method definitions
-
-       The name says it all. Returns a JS Obj */
-       
-    this.parseOpenAPIschema = function(openApiSchema) {
-    	if (typeof(openApiSchema) != "string") return openApiSchema;
-    	
-        openApiSchema = openApiSchema.trim();
-        var jsonString = "";
-
-        /* Load Jackson libraries */
-        var ObjectMapper = com.fasterxml.jackson.databind.ObjectMapper;
-        var objectMapper = new ObjectMapper();
-
-		if (openApiSchema.startsWith("{") && openApiSchema.endsWith("}")) {
-			// overriding above arguments - for now
-			this.format = "JSON"
-		} else {
-			this.format = "YAML"
-		}
-
-        /* Check if YAML and if so, convert to Json */
-        if ("YAML".equalsIgnoreCase(this.format)) {
-            /* Use SnakeYAML to convert the YAML to a map that the ObjectMapper can read */
-            var Yaml = Packages.org.yaml.snakeyaml.Yaml;
-            /* Create instances of Yaml and ObjectMapper */
-            var yaml = new Yaml();
-            /* Parse YAML into a Java Map */
-            var map = yaml.load(openApiSchema);
-
-            /* Convert Java Map to JSON string */
-            jsonString = objectMapper.writeValueAsString(map)
-        } else {
-            jsonString = openApiSchema;
-        }
-
-        this.schemaObj = fromJson(jsonString);
-        return this.schemaObj
-    }
-
-	/*
-		Parses the path and returns the name of the embedded UID attribute in the URL
-	*/
-	this.getEmbeddedUID = function(path) {
-		var parts = system.splitString(path, "/");
-		
-		for (var i = 0; i < parts.length; i++) {
-			var part = parts[i].trim();
-			if (part.startsWith("{") && part.endsWith("}")) {
-				// Found an embedded uid
-				return part.substring(1, part.length-1)
-			}
-		}
-		return null
-	}
-
-	/*
-		Replaces the uid placeholder in the URL path with the uid value passed
- 		The criteria argument is either an Entry or a string value
-	*/
-	this.replaceEmbeddedUID = function(path, criteria) {
-		var parts = system.splitString(path, "/");
-		var newPath = [parts[0]];
-		
-		for (var i = 1; i < parts.length; i++) {
-			var part = parts[i].trim();
-			if (part.startsWith("{") && part.endsWith("}")) {
-				// Found an embedded uid
-				var embeddedUID = part.substring(1, part.length-1);
-				
-				// If criteria is an Entry then grab the attribute value, else use the parameter value itself
-				var uidValue = (criteria instanceof com.ibm.di.entry.Entry) ? entry[embeddedUID] : criteria;
-				
-				if (!uidValue) {
-					throw new java.lang.Exception("UID attribute not mapped out or is null: " + embeddedUID)
-				}	
-				newPath.push(uidValue)
-			} else {
-				newPath.push(part)
-			}
-		}
-		return newPath.join("/")
-	}
-	
-	/*
-		Uses .getChildren() to return the parameters array for the chosen path and action.
-	*/
-	this.getParameters = function(path, action) {
-		var params = this.getChildren(["paths", path, action, "parameters"])
-		return params
-	}
-	
-    /* Returns the child elements (JS Obj) of the specified path
-       Root level if no argument or blank text passed. Always return a JS object
-    */
-    this.getChildren = function(path) { 
-        //var children = {};
-        var subtree;
-        
-        if (!path) {
-        	path = []
-        }
-        else 
-        if (!(path instanceof Array)) {
-        	path = [path]	
-        }
-        
-        subtree = this.schemaObj[path[0]];
-        for (var i = 1; i < path.length && subtree; i++) {
-        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
-        		if (subtree instanceof Array) {
-	        		for (var j = 0; j < subtree.length; j++) {
-	        			if (subtree[j][path[i]]) {
-	        				subtree = subtree[j][path[i]];
-	        				break
-	        			}
-	        		}
-        		}
-        		
-        		// subtree does not exist
-        		subtree = {}; // return empty
-        	} else {
-        		subtree = subtree[path[i]]
-        	}
-        }
-
-        return subtree;
-    }
-    
-    /* Main init logic */
-    this.schemaArg = schema;
-    this.format = format || "YAML";
-    this.schemaObj = this.parseOpenAPIschema(schema)
-}]]></parameter>
-        </Script>
-        <Script name="_Franz output">
-            <ModTime>1747925172824</ModTime>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[Request1 : {
-      "http.Content-Type": "application/x-www-form-urlencoded",
-      "http.body": "j_username=itim manager&j_password=secret",
-      "http.url": "https://192.168.2.39:30943/itim/j_security_check",
-      "http.method": "POST"
-}
- Reply1 : {
-      "http.responseMsg": "Found",
-      "http.bodyAsString": "",
-      "http.Location": "https://192.168.2.39:30943/itim/",
-      "http.Set-Cookie": [
-            "LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly",
-            "WASReqURL=""; Expires=Thu, 01 Dec 1994 16:00:00 GMT; Path=/; HttpOnly"
-      ],
-      "http.responseCode": "302"
-}
-14:23:56,355 INFO  - Request2 : {
-      "http.Cookie": "LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly",
-      "http.url": "https://192.168.2.39:30943/itim/rest/systemusers/me",
-      "http.method": "POST"
-}
- Reply2 : {
-      "http.bodyAsString": "com.ibm.isim.ui.HTTP_ERROR",
-      "http.CSRFToken": "8BC04350E6A9091B13FC3109B21BFAAE",
-      "http.body": "com.ibm.isim.ui.HTTP_ERROR",
-      "http.responseMsg": "Bad Request",
-      "http.responseCode": "400",
-      "http.Set-Cookie": "csrfToken=SHA-256%3AcG9iOGhoc2s3OG81%3Ab592%2BZPlL6H06yU8UzU6a6YvLQPXaFH0LYM4vIcP7F4%3D; Path=/itim; Secure; HttpOnly",
-}
-14:23:56,698 INFO  - Request3 : {
-      "http.Cookie": "[8BC04350E6A9091B13FC3109B21BFAAE, LtpaToken2=lJrB61au6nV3KKUr5Swfd1DKBYCPlaPnlQjVMeoLSNG7v1SLJhM8KPiuVscndKKdOvleVR84J5pQxWwHqbWGyO5QHHwJpOPmeKBV5mGs2+rk5tcmxDj6BKPf1p7qA1KFjBH2hxOoqIbweVICBZNp0Pp267cyTpWIpC4Vb3769eZYC00wjiEFNBCgPLzPDlR5r4jszGqPDYWqpODg4UVXkg5or5Fvrli/yDfv4NRV0zPnUWP5Oh2R0YPAUrx6k3vIsJqMROhU1MpSRqLZWVQpqb22v2S/+x/qLwaE4aM7l0FvVwU9euoimaJMF62rWqe1oJxXdGH3CURURXJA59Dzxg==; Path=/; HttpOnly]",
-      "http.url": "https://192.168.2.39:30943/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw",
-      "http.method": "GET"
-}
- Reply3 : {
-      "http.bodyAsString": "{"_links":{"formTemplate":{"href":"/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw&filterId=formSearch"},"self":{"href":"/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw","title":"System Administrator"},"erparent":{"href":"/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc","title":"org"}},"_attributes":{"uid":"itimadmin","ercustomdisplay":"Administrator","givenname":"Administrator","name":"System Administrator","erroles":"erglobalid=00000000000000000001,ou=roles,erglobalid=00000000000000000000,ou=ivig,dc=ivig","erpersonstatus":"ACTIVE","cn":"System Administrator","sn":"Administrator","personType":"Person","uuid":"2e2bf5ce-36de-4088-a3cb-47b68f4efxyf","erparent":"erglobalid=00000000000000000000,ou=ivig,dc=ivig"}}",
-      "http.responseMsg": "OK",
-      "http.responseCode": "200",
-      "http.Set-Cookie": "com.ibm.isim.lastActivity=DCHj3ErlGLITVQYcPBAtcmZ%2Bxygm0ZCD%2BZ78fOGSyPw%3D; Path=/itim; Secure; HttpOnly",
-}
-14:23:56,726 INFO  - {
-      "http.bodyAsString": "{"_links":{"formTemplate":{"href":"/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw&filterId=formSearch"},"self":{"href":"/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw","title":"System Administrator"},"erparent":{"href":"/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc","title":"org"}},"_attributes":{"uid":"itimadmin","ercustomdisplay":"Administrator","givenname":"Administrator","name":"System Administrator","erroles":"erglobalid=00000000000000000001,ou=roles,erglobalid=00000000000000000000,ou=ivig,dc=ivig","erpersonstatus":"ACTIVE","cn":"System Administrator","sn":"Administrator","personType":"Person","uuid":"2e2bf5ce-36de-4088-a3cb-47b68f4efxyf","erparent":"erglobalid=00000000000000000000,ou=ivig,dc=ivig"}}",
-      "http.responseMsg": "OK",
-      "http.responseCode": "200",
-      "http.Set-Cookie": "com.ibm.isim.lastActivity=DCHj3ErlGLITVQYcPBAtcmZ%2Bxygm0ZCD%2BZ78fOGSyPw%3D; Path=/itim; Secure; HttpOnly",
 }]]></parameter>
         </Script>
     </Folder>
