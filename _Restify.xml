@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Thu Jun 26 20:58:58 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Sun Jun 29 20:19:13 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
             <ModTime>1748688055504</ModTime>
@@ -2142,7 +2142,6 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
             </SimulationConfig>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer">
-                <ModTime>1750930826379</ModTime>
                 <Connector name="ITIMRestClientConnector">
                     <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
                     <ModTime>1750930826379</ModTime>
@@ -2151,7 +2150,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
                         <parameter name="action">GET</parameter>
-                        <parameter encrypted="true" name="password">IlqDsVbykQrV1FGAaXEL++hRjESgeGmi9WfsHjhKGb4DAPolYZB0PjUgwu+BhYHScfohWUHMJAZWDA2/PgrCCcqYJ+aZ3bkCFn/uX1mgtq9LOJypd5XnSfhb/pEgHcv6ZMFKEwZ8kvFU/FwS99muIRawsGKuXJaQvjUTm3f59U0=</parameter>
+                        <parameter encrypted="true" name="password">raYNYaEbkVGQVNbJQf6k176LAwITuW8biuPKqBjusDiqs0MmDE9YvX6mTCjTS0/PvLokFuUjr3+oFjfDMCFrutfXAEmJn1m1GIIwBTNQJa3CvSz1m2BIiHVyZgfLUTd3QKuNkbkC1kNnN56mgql8xGhkDzwf7ZF2zxdsK72VVDE=</parameter>
                         <parameter name="path">/lifecyclerule</parameter>
                         <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
                         <parameter name="username">itim manager</parameter>
@@ -2171,7 +2170,6 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
                         <InheritFrom>[parent]</InheritFrom>
                     </AttributeMap>
                     <DeltaSettings>
-                        <ModTime>1750927151273</ModTime>
                         <UniqueAttribute/>
                         <WhenToCommit>After every database operation</WhenToCommit>
                         <RowLocking>SERIALIZABLE</RowLocking>
@@ -2188,7 +2186,6 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
                     </LinkCriteria>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1750930826379</ModTime>
                         <Hook name="before_initialize">
                             <InheritFrom>[no inheritance]</InheritFrom>
                             <Name>before_initialize</Name>
@@ -2279,6 +2276,50 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer"/>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    <AssemblyLine name="_chunked">
+            <ModTime>1751140621551</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="Test" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1751140621551</ModTime>
+                <Script name="Test">
+                    <ModTime>1751140621551</ModTime>
+                    <parameter name="script"><![CDATA[http = system.getConnector("ibmdi.HTTPClient");
+
+reqE = system.newEntry();
+
+reqE["http.content-type"] = "application/json";
+reqE["http.url"] = "https://192.168.252.3:30943/openapi";
+http.setParam("url", "https://192.168.252.3:30943/openapi");
+
+http.initialize(null);
+
+retE = http.queryReply(reqE);
+
+task.logmsg(retE);
+
+
+
+
+i = 42]]></parameter>
+                </Script>
+            </ContainerDF>
             <ThreadOptions/>
             <Operations/>
             <InitParams>
@@ -3825,7 +3866,7 @@ function querySchema(queryMode) {
     <Folder name="Parsers"/>
     <Folder name="Scripts">
         <Script name="RESTCLIENT class">
-            <ModTime>1750928657135</ModTime>
+            <ModTime>1751217464224</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -3848,6 +3889,7 @@ function querySchema(queryMode) {
 // 20250520 1530 A number of changes together with Franz. Trying to figure out how my calls differ from Franz' TDI test AL script
 // 20250522 2241 Simplified cookie setting to just use .getString() - i.e. only first value
 // 20250523 1159 Changed the handling of the CSRFToken read as "http.CSRFToken"
+// 20250629 2222 Added garbage collection and chunk handling, both in makeRequest()
 //
 // This is the class that provides methods for making HTTP requests
 //
@@ -4048,10 +4090,15 @@ function RESTCLIENT(args) {
 		var password = params.password || "";
 //		var contextRoot = params.contextRoot || this.contextRoot;
 		var contextRoot = (typeof(params.contextRoot) == "undefined") ? this.contextRoot : params.contextRoot;
+		
+		var chunks = new java.lang.StringBuilder(); // For chunk encoded replies
  
 		var returnType = params.expectedReturnType || "JS object";
 		
 		var alreadyImportedCert = false;
+		
+		// A little garbage collection. Why not? :)
+		java.lang.Runtime.getRuntime().gc();
 		
 		// Empty out the requestEntry before setting it up for the call
 		this.requestEntry.removeAllAttributes();
@@ -4178,15 +4225,53 @@ function RESTCLIENT(args) {
 				
 				var retCode = retEntry.getString("http.responseCode");
 				
+				// If transfer encoding is chunked, then we have to continue reading until we get a 0-length reply signaling the end
+				if (retCode == "200" && retEntry["http.Transfer-Encoding"].getValue() == "chunked") {
+					var chunking = false;
+					var encodedData = "";
+					var cnt = 0;
+					
+					// Loop while getting chunks
+					do {
+						// Let's start with a little garbage collection because this will use memory
+						java.lang.Runtime.getRuntime().gc();
+		
+						chunking = false;
+						encodedData = retEntry.getString("http.bodyAsString");
+						
+						// Check the return code as well inside this loop
+						retCode = retEntry.getString("http.responseCode");
+						
+						if (retCode == "200" && encodedData != null) {
+							chunking = true;
+							chunks.append("\r\n" + encodedData);
+							
+							task.logmsg(">>>" + ("chunk #") + (++cnt) + " | Length of chunks so far: " + chunks.length() + "   Free mem: " + java.lang.Runtime.getRuntime().freeMemory());
+							
+							// Get next chunk
+							retEntry = this.http.getNextEntry();
+						}
+					} while (chunking);
+					
+					returnType == "chunks"
+				} else
+				// Are we getting redirected?
 				if (retCode.startsWith("3") && false) { //@@TODO could be an ITIM thing 
 					this.requestEntry["http.url"] = retEntry.getString("http.location");
 					retry = true
-				} else
-				// Else decide what to return, based on the returnType argument passed in and continue processing this request
-				if (returnType == "JS object") {
-					reply = this.parseReply(retEntry);
-				} else {
-					reply = retEntry
+				}
+				
+				// If not retrying then figure out what to return
+				if (!retry) {
+					// Decide what to return, based on the returnType argument passed in and continue processing this request
+					if (returnType == "chunks") {
+						reply = chunks.toString()
+					} else	
+					if (returnType == "JS object") {
+						reply = this.parseReply(retEntry);
+					} else {
+						reply = retEntry
+					}
 				}	
 				
 			} catch (ex) {
@@ -18442,6 +18527,18 @@ function RESTCLIENT(args) {
                 <InitialLoad>true</InitialLoad>
                 <CacheTimeout>0</CacheTimeout>
             </PropertyStore>
+            <PropertyStore name="Java-Properties">
+                <Parser/>
+                <RawConnector>
+                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
+                    <parameter name="collectionType">Java-Properties</parameter>
+                </RawConnector>
+                <Key>key</Key>
+                <Value>value</Value>
+                <ReadOnly>false</ReadOnly>
+                <InitialLoad>true</InitialLoad>
+                <CacheTimeout>0</CacheTimeout>
+            </PropertyStore>
             <PropertyStore name="System-Properties">
                 <Parser/>
                 <RawConnector>
@@ -18460,19 +18557,6 @@ function RESTCLIENT(args) {
                     <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
                     <parameter name="collection">@SUBSTITUTE{config.$directory}/_Restify.properties</parameter>
                     <parameter name="collectionType">_Restify</parameter>
-                </RawConnector>
-                <Key>key</Key>
-                <Value>value</Value>
-                <ReadOnly>false</ReadOnly>
-                <InitialLoad>true</InitialLoad>
-                <CacheTimeout>0</CacheTimeout>
-            </PropertyStore>
-            <PropertyStore name="Java-Properties">
-                <Parser/>
-                <RawConnector>
-                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
-                    <parameter name="collection">@SUBSTITUTE{config.$directory}/_Restify.properties</parameter>
-                    <parameter name="collectionType">Java-Properties</parameter>
                 </RawConnector>
                 <Key>key</Key>
                 <Value>value</Value>
