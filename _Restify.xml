@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Sun Jun 29 20:19:13 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Mon Jun 30 18:48:50 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
             <ModTime>1748688055504</ModTime>
@@ -3866,7 +3866,7 @@ function querySchema(queryMode) {
     <Folder name="Parsers"/>
     <Folder name="Scripts">
         <Script name="RESTCLIENT class">
-            <ModTime>1751217464224</ModTime>
+            <ModTime>1751301800786</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -3895,6 +3895,8 @@ function querySchema(queryMode) {
 //
 // NOTES:
 //			* It uses its own this.logmsg() for more control over logging
+
+// Some fixer code in case this is being called from the 
 
 function RESTCLIENT(args) {
 	this.baseUrl = (args.baseUrl || "").trim();
@@ -4234,7 +4236,7 @@ function RESTCLIENT(args) {
 					// Loop while getting chunks
 					do {
 						// Let's start with a little garbage collection because this will use memory
-						java.lang.Runtime.getRuntime().gc();
+						//java.lang.Runtime.getRuntime().gc();
 		
 						chunking = false;
 						encodedData = retEntry.getString("http.bodyAsString");
@@ -4246,14 +4248,18 @@ function RESTCLIENT(args) {
 							chunking = true;
 							chunks.append("\r\n" + encodedData);
 							
-							task.logmsg(">>>" + ("chunk #") + (++cnt) + " | Length of chunks so far: " + chunks.length() + "   Free mem: " + java.lang.Runtime.getRuntime().freeMemory());
+							task.logmsg(">>>" + ("chunk #") + (++cnt) 
+										+ " | Length: " + encodedData.length 
+										+ " | Length of chunks so far: " + chunks.length() 
+										+ " | Free mem: " + java.lang.Runtime.getRuntime().freeMemory()
+										+ " | snippet:" + encodedData.substring(256,286));
 							
 							// Get next chunk
 							retEntry = this.http.getNextEntry();
 						}
-					} while (chunking);
+					} while (chunking && cnt < 3);
 					
-					returnType == "chunks"
+					returnType = "chunks"
 				} else
 				// Are we getting redirected?
 				if (retCode.startsWith("3") && false) { //@@TODO could be an ITIM thing 
