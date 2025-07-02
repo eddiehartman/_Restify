@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Mon Jun 30 18:48:50 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Wed Jul 02 16:23:24 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
-            <ModTime>1748688055504</ModTime>
+            <ModTime>1751459018091</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -15,18 +15,15 @@
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1748688055504</ModTime>
                 <Function name="AssemblyLineFunctionComponent">
                     <InheritFrom>system:/Functions/ibmdi.AssemblyLineFC</InheritFrom>
                     <ModTime>1748688055504</ModTime>
                     <ConnectorState>Enabled</ConnectorState>
                     <Schema name="Input">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1748688038903</ModTime>
                     </Schema>
                     <Schema name="Output">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1748688055504</ModTime>
                         <SchemaItem>
                             <Name>CSRFToken</Name>
                         </SchemaItem>
@@ -99,21 +96,17 @@
                     </Schema>
                     <Hooks>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1748688038903</ModTime>
                     </Hooks>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1748688055504</ModTime>
                         <parameter name="assemblyLine">_testITIMRestConnector</parameter>
                     </Configuration>
                     <SandboxConfig/>
                     <AttributeMap name="Input">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1748688038903</ModTime>
                     </AttributeMap>
                     <AttributeMap name="Output">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1748688038903</ModTime>
                     </AttributeMap>
                 </Function>
             </ContainerDF>
@@ -124,7 +117,7 @@
             </InitParams>
         </AssemblyLine>
     <AssemblyLine name="HTTPServer">
-            <ModTime>1749648470025</ModTime>
+            <ModTime>1751459019065</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -207,7 +200,7 @@ task.dumpEntry(work);
             </InitParams>
         </AssemblyLine>
         <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1750926771132</ModTime>
+            <ModTime>1751459019221</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -243,12 +236,12 @@ SCHEMA class]]></parameter>
             <ContainerEF name="EntryFeedContainer">
                 <Connector name="ITIMRestClientConnector_iterate">
                     <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
-                    <ModTime>1750926771132</ModTime>
+                    <ModTime>1751457625163</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="searchCrit">ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw</parameter>
+                        <parameter name="searchCrit">ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWRlbW8sZGM9aXZpZw</parameter>
                     </Configuration>
                     <Parser>
                         <InheritFrom>[parent]</InheritFrom>
@@ -763,7 +756,7 @@ task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Scr
             </InitParams>
         </AssemblyLine>
         <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1749648470099</ModTime>
+            <ModTime>1751459019187</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -2129,7 +2122,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
             </InitParams>
         </AssemblyLine>
         <AssemblyLine name="ISVG_LCR_TEST">
-            <ModTime>1750930826379</ModTime>
+            <ModTime>1751459019108</ModTime>
             <Settings/>
             <Hooks/>
             <CheckpointConfig/>
@@ -2144,13 +2137,13 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
             <ContainerEF name="EntryFeedContainer">
                 <Connector name="ITIMRestClientConnector">
                     <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
-                    <ModTime>1750930826379</ModTime>
+                    <ModTime>1751453361691</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
                         <parameter name="action">GET</parameter>
-                        <parameter encrypted="true" name="password">raYNYaEbkVGQVNbJQf6k176LAwITuW8biuPKqBjusDiqs0MmDE9YvX6mTCjTS0/PvLokFuUjr3+oFjfDMCFrutfXAEmJn1m1GIIwBTNQJa3CvSz1m2BIiHVyZgfLUTd3QKuNkbkC1kNnN56mgql8xGhkDzwf7ZF2zxdsK72VVDE=</parameter>
+                        <parameter encrypted="true" name="password">Uu7cdgqRS11/uI9IrN1j4SLQ9HuXCbgiXL+/c/7ARsvx6Cb6z6+zSTlz5AwV3gGn1lWU7qclWwZZhLZhpS48UGbZJVRJ4OPqlHp9Swz6n+EMyXHavyupbVT8WnvCkW4PVC4HRj97AMDjywlO9QuP6FpA+y7OP8aI5L/YiVtpmwo=</parameter>
                         <parameter name="path">/lifecyclerule</parameter>
                         <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
                         <parameter name="username">itim manager</parameter>
@@ -2228,7 +2221,8 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
 	
 	//Prepare call to get CSRFToken
 	myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
-	myHttpConn.setParam("method","POST");
+//	myHttpConn.setParam("method","POST");
+	myHttpConn.setParam("method","GET");
 	myHttpConn.initialize(null);
 	
 	//Configure the call
@@ -2249,7 +2243,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
 	
 //do a test call
 	var httpcall = system.newEntry();
-	myHttpConn.setParam("url",resthost + "/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw");
+	myHttpConn.setParam("url",resthost + "/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWRlbW8sZGM9aXZpZw");
 	myHttpConn.setParam("method","GET");
 	myHttpConn.initialize(null);
 	httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
@@ -2257,8 +2251,19 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
 	httpReply = myHttpConn.queryReply(httpcall);
 	task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
 	task.logmsg(httpReply);
+
 	system.exitFlow();
-	system.abortAssemblyLine("STOP")]]></Script>
+	system.abortAssemblyLine("STOP")
+//get the schema
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + "/openapi");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request4 : " + httpcall + "\n Reply4 : " + httpReply);
+	task.logmsg(httpReply);]]></Script>
                             <Enabled>true</Enabled>
                         </Hook>
                     </Hooks>
@@ -2282,59 +2287,17 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
-    <AssemblyLine name="_chunked">
-            <ModTime>1751140621551</ModTime>
-            <Settings/>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="Test" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer"/>
-            <ContainerDF name="DataFlowContainer">
-                <ModTime>1751140621551</ModTime>
-                <Script name="Test">
-                    <ModTime>1751140621551</ModTime>
-                    <parameter name="script"><![CDATA[http = system.getConnector("ibmdi.HTTPClient");
-
-reqE = system.newEntry();
-
-reqE["http.content-type"] = "application/json";
-reqE["http.url"] = "https://192.168.252.3:30943/openapi";
-http.setParam("url", "https://192.168.252.3:30943/openapi");
-
-http.initialize(null);
-
-retE = http.queryReply(reqE);
-
-task.logmsg(retE);
-
-
-
-
-i = 42]]></parameter>
-                </Script>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
+    
     </Folder>
     <Folder name="Connectors">
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1749647749905</ModTime>
+            <ModTime>1751466177060</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1751466177060</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="816" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Apr 11 16:29:01 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1744381739943</ModTime>
@@ -2844,7 +2807,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">Nk/H3xad1bz5O0y/IgX49r7SYK0883LY9gDQ/rxDioHpNtOLGmgyxEJNBcYLe1WmlfDhriClHlyuUA9FA9aEIeiVRRlN3Vg/n5H+0QZM8PTtNYZM/Vw9CfUjO6baZWu0gH/raRbiUm4gftzdkmjc9PrieNGR6cPpIhpKWlDqB5k=</parameter>
+                <parameter encrypted="true" name="apikey">nd4uyAOFeUcEXgvwLU6ra/8otMFZZEmP3TuaR1OcWMAKrwJ31eI9boJXifBj8tbD5QOwu5WiPqrqMsXh/212nl0QSfftw7J8DqQgOTX4MfVkMP+/a6Mi29wYsjfgK5cgEcQZ2Z+aUFoU9ACX11irvuaMJLBAQq2D1hHjw0fm0p0=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -2855,7 +2818,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">WnenIcaJRYT/f+mMaHxvFvlBXpyuQX3HCKowSQHNr+ARWR8aSfBpBeYkeWkReIzjYkiuo8TxOQ7zGdm/RlVk/lvThfulJuWikk0UmMLaPVQT73vYuIB/V07hbz1G3mnJWpcUIsMtcpDv649BqFLwsXQhJUP3DrnOh/ZygX1Udh0=</parameter>
+                <parameter encrypted="true" name="password">c2FJxGF/SwO3ZGybKrSefGqeRBezIUQOvRi6GYLR6l1ajWI5urL8CNmj8wXgvvphn7AEc2l3dbamZYPddN8RDpjr/pf0pwRt6YoRgNzP/HaB/4lEBkrI+CfYqz3QoLCD1Kk6xMP4NFxeA5O2GXJBaoxbVYb69JyzOyoNNze8oow=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
@@ -3155,8 +3118,8 @@ function beautifyValue(val) {
 // Figure out which endpoint param is for the base path and grab the value from the entry
 // If the entry passed is null, then don't go looking for the Attribute
 function extractUID(entry, epParams, connParams) {
-	var uid = null;
-	var uidAttName = null;
+	var uid = "";
+	var uidAttName = "Unspecified";
 
 	for (var i in epParams) {
 		var param = epParams[i];
@@ -3250,7 +3213,7 @@ function queryReply() {
 		return entry
 	} catch (ex) {
 		task.logmsg("ERROR", ex);
-		return null
+		throw ex
 	}	
 }
 
@@ -3326,7 +3289,8 @@ function selectEntries(queryMode) {
 			resultEntry.merge(entry);
 			__resultSet.add(resultEntry)
 		} catch (ex) {
-			task.logmsg("ERROR", ex)
+			task.logmsg("ERROR", ex);
+			throw ex
 		}	
 	}
 	return __resultSet	
@@ -3358,35 +3322,13 @@ function putEntry(entryArg) {
 	var connParams = refreshParameters();
 	// Get the parameters for this path + actoin
 	var epParams = getParameters(connParams.path, connParams.action);
-	
-	// Now for queryParameters
-	var queryString = craftQueryString({
-		connParams: connParams,
-		path: usePath,
-		epParams: epParams,
-		action: connParams.action,
-		entry: entry
-	});
-	
-	// Check parameters for the one in the path(base) - the UID
-	var uidObj = extractUID(entry, epParams, connParams);
-	
-	var entryUID = uidObj.value;
-	var entryUIDattName = uidObj.name;
-	
-	// If there is a queryString, prepend it with ?
-	queryString = queryString ? "?" + queryString : "";
-	
-	// Get the path and replace id's as required
-	var usePath = replaceEmbeddedUID(connParams.path, entryUID);
-
-	//main.logmsg("putEntry - making call");
-
+		
 	try {	
 		// Make the REST call 
 		var reply = __http.makeRequest({
 				verb: "POST",
-				url: usePath + queryString,
+				url: connParams.path,
+				returnType: "entry",
 				ctype: "application/json",
 				where: "putEntry()",
 				body: entry.toJSON()
@@ -3400,7 +3342,7 @@ function putEntry(entryArg) {
 		return entry
 	} catch (ex) {
 		task.logmsg("ERROR", ex);
-		return null
+		throw ex
 	}	
 }
 
@@ -3451,7 +3393,7 @@ function deleteEntry(entryArg) {
 		return entry
 	} catch (ex) {
 		task.logmsg("ERROR", ex);
-		return null
+		throw ex
 	}	
 }
 
@@ -3487,7 +3429,7 @@ function findEntry(searchCriteria) {
 
 		// Set up the criteria
 		crit = {
-			name: critName,
+			name: critName || "Unspecified",
 			match: critMatch,
 			value: critValue
 		}
@@ -3542,7 +3484,7 @@ function findEntry(searchCriteria) {
 	} catch (ex) {
 		task.logmsg("ERROR", ex);
 		result.setStatus(0);
-		return null
+		throw ex
 	}	
 }
 
@@ -3866,7 +3808,7 @@ function querySchema(queryMode) {
     <Folder name="Parsers"/>
     <Folder name="Scripts">
         <Script name="RESTCLIENT class">
-            <ModTime>1751301800786</ModTime>
+            <ModTime>1751465316402</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -3890,13 +3832,12 @@ function querySchema(queryMode) {
 // 20250522 2241 Simplified cookie setting to just use .getString() - i.e. only first value
 // 20250523 1159 Changed the handling of the CSRFToken read as "http.CSRFToken"
 // 20250629 2222 Added garbage collection and chunk handling, both in makeRequest()
+// 20250702 1424 Franz fixed my misunderstanding of the chunk encoding - the HTTP Connector handles all that
 //
 // This is the class that provides methods for making HTTP requests
 //
 // NOTES:
 //			* It uses its own this.logmsg() for more control over logging
-
-// Some fixer code in case this is being called from the 
 
 function RESTCLIENT(args) {
 	this.baseUrl = (args.baseUrl || "").trim();
@@ -3947,7 +3888,8 @@ function RESTCLIENT(args) {
 		
 		//Prepare call to get CSRFToken
 		myHttpConn.setParam("url",this.baseUrl + "/itim/rest/systemusers/me");
-		myHttpConn.setParam("method","POST");
+		myHttpConn.setParam("method","GET");
+//		myHttpConn.setParam("method","POST");
 		myHttpConn.initialize(null);
 		
 		//Configure the call
@@ -4093,8 +4035,6 @@ function RESTCLIENT(args) {
 //		var contextRoot = params.contextRoot || this.contextRoot;
 		var contextRoot = (typeof(params.contextRoot) == "undefined") ? this.contextRoot : params.contextRoot;
 		
-		var chunks = new java.lang.StringBuilder(); // For chunk encoded replies
- 
 		var returnType = params.expectedReturnType || "JS object";
 		
 		var alreadyImportedCert = false;
@@ -4227,40 +4167,6 @@ function RESTCLIENT(args) {
 				
 				var retCode = retEntry.getString("http.responseCode");
 				
-				// If transfer encoding is chunked, then we have to continue reading until we get a 0-length reply signaling the end
-				if (retCode == "200" && retEntry["http.Transfer-Encoding"].getValue() == "chunked") {
-					var chunking = false;
-					var encodedData = "";
-					var cnt = 0;
-					
-					// Loop while getting chunks
-					do {
-						// Let's start with a little garbage collection because this will use memory
-						//java.lang.Runtime.getRuntime().gc();
-		
-						chunking = false;
-						encodedData = retEntry.getString("http.bodyAsString");
-						
-						// Check the return code as well inside this loop
-						retCode = retEntry.getString("http.responseCode");
-						
-						if (retCode == "200" && encodedData != null) {
-							chunking = true;
-							chunks.append("\r\n" + encodedData);
-							
-							task.logmsg(">>>" + ("chunk #") + (++cnt) 
-										+ " | Length: " + encodedData.length 
-										+ " | Length of chunks so far: " + chunks.length() 
-										+ " | Free mem: " + java.lang.Runtime.getRuntime().freeMemory()
-										+ " | snippet:" + encodedData.substring(256,286));
-							
-							// Get next chunk
-							retEntry = this.http.getNextEntry();
-						}
-					} while (chunking && cnt < 3);
-					
-					returnType = "chunks"
-				} else
 				// Are we getting redirected?
 				if (retCode.startsWith("3") && false) { //@@TODO could be an ITIM thing 
 					this.requestEntry["http.url"] = retEntry.getString("http.location");
@@ -4270,12 +4176,9 @@ function RESTCLIENT(args) {
 				// If not retrying then figure out what to return
 				if (!retry) {
 					// Decide what to return, based on the returnType argument passed in and continue processing this request
-					if (returnType == "chunks") {
-						reply = chunks.toString()
-					} else	
 					if (returnType == "JS object") {
 						reply = this.parseReply(retEntry);
-					} else {
+					} else { // returnType == "entry"
 						reply = retEntry
 					}
 				}	
@@ -4471,7 +4374,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
     <Script name="RESTIFY library class">
-            <ModTime>1749648469953</ModTime>
+            <ModTime>1751459018178</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20241127 2024 Created
 
@@ -4518,7 +4421,7 @@ function RESTIFY () {
 }]]></parameter>
         </Script>
         <Script name="temp">
-            <ModTime>1749648470025</ModTime>
+            <ModTime>1751459018066</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
 	this.getToken = function() {
@@ -4614,7 +4517,7 @@ function RESTIFY () {
 	}]]></parameter>
         </Script>
         <Script name="itim_swagger.json">
-            <ModTime>1749648470012</ModTime>
+            <ModTime>1751459018394</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[{
     "openapi": "3.0.3",
@@ -17587,7 +17490,7 @@ function RESTIFY () {
 }]]></parameter>
         </Script>
         <Script name="_Franz output">
-            <ModTime>1749648469969</ModTime>
+            <ModTime>1751459018145</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[Request1 : {
       "http.Content-Type": "application/x-www-form-urlencoded",
@@ -17637,7 +17540,7 @@ function RESTIFY () {
 }]]></parameter>
         </Script>
         <Script name="OAuth Class">
-            <ModTime>1749648470066</ModTime>
+            <ModTime>1751459018206</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[var OAUTH = null; // Will be instantiated below
 
@@ -17800,12 +17703,13 @@ function fullStacktrace(e, delimArg) {
 }]]></parameter>
         </Script>
         <Script name="SCHEMA class">
-            <ModTime>1749648469973</ModTime>
+            <ModTime>1751459841887</ModTime>
             <parameter name="enabled">true</parameter>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250121 1145 Change parseOpenAPIschema so the argument openApiSchema can be either JSON or JS object
 // 20250128 1552 Updated replaceEmbeddedUID() to accept either an Entry or a string value as the criteria argument
 // 20250129 1645 Fixing getChildren so it works (again) - stumbled on "parameters"
+// 20250702 1334 Fixed fatal flow in getChildren()
 
 function SCHEMA(schema, format) {
 	_WHERE = "SCHEMA class";	/* Global variable available for error reporting */
@@ -17920,22 +17824,26 @@ function SCHEMA(schema, format) {
         }
         
         subtree = this.schemaObj[path[0]];
-        for (var i = 1; i < path.length && subtree; i++) {
-        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
-        		if (subtree instanceof Array) {
-	        		for (var j = 0; j < subtree.length; j++) {
-	        			if (subtree[j][path[i]]) {
-	        				subtree = subtree[j][path[i]];
-	        				break
-	        			}
+        if (subtree == null) {
+        	subtree = {}
+        } else {
+	        for (var i = 1; i < path.length; i++) {
+	        	if (!subtree[path[i]]) { // This could be an array, so lets look for where we can find path[i]
+	        		if (subtree instanceof Array) {
+		        		for (var j = 0; j < subtree.length; j++) {
+		        			if (subtree[j][path[i]]) {
+		        				subtree = subtree[j][path[i]];
+		        				break
+		        			}
+		        		}
 	        		}
-        		}
-        		
-        		// subtree does not exist
-        		subtree = {}; // return empty
-        	} else {
-        		subtree = subtree[path[i]]
-        	}
+	        		
+	        		// subtree does not exist
+	        		subtree = {}; // return empty
+	        	} else {
+	        		subtree = subtree[path[i]]
+	        	}
+	        }
         }
 
         return subtree;
@@ -17948,7 +17856,7 @@ function SCHEMA(schema, format) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class_backup">
-            <ModTime>1749648470066</ModTime>
+            <ModTime>1751459018290</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -18550,6 +18458,19 @@ function RESTCLIENT(args) {
                 <RawConnector>
                     <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
                     <parameter name="collectionType">System-Properties</parameter>
+                </RawConnector>
+                <Key>key</Key>
+                <Value>value</Value>
+                <ReadOnly>false</ReadOnly>
+                <InitialLoad>true</InitialLoad>
+                <CacheTimeout>0</CacheTimeout>
+            </PropertyStore>
+            <PropertyStore name="_Restify_new">
+                <Parser/>
+                <RawConnector>
+                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
+                    <parameter name="collection">@SUBSTITUTE{config.$directory}/_Restify_new.properties</parameter>
+                    <parameter name="collectionType">_Restify_new</parameter>
                 </RawConnector>
                 <Key>key</Key>
                 <Value>value</Value>
