@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-06-26" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Tue Jul 22 19:42:47 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Wed Jul 23 14:01:42 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
             <ModTime>1751459018091</ModTime>
@@ -2143,6 +2143,495 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
             </InitParams>
         </AssemblyLine>
         <AssemblyLine name="ISVG_LCR_TEST">
+            <ModTime>1753269762044</ModTime>
+            <Settings>
+                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
+                <parameter name="automapattributes">false</parameter>
+                <parameter name="createTombstones">false</parameter>
+                <parameter name="includeGlobalPrologs">true</parameter>
+                <parameter name="includePrologs">ENTRYLIST class</parameter>
+                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
+            </Settings>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="ITIMRestClientConnector" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1753269626754</ModTime>
+                <Connector name="ITIMRestClientConnector">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
+                    <ModTime>1753269626754</ModTime>
+                    <ConnectorMode>Iterator</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="action">GET</parameter>
+                        <parameter encrypted="true" name="password">DW/eQAol5ID4vig4JF6VZ+wm8WwMK72PE2TuHPSKYY4grbFuPfmBe0ZR9U7R1AkcLelL5IaruTGzNhuKDotrJMdGitjxMs5Q7c4nn5bI96K4uqN1zMcWJo+ZW4eRZUHk3R/kfEk8hI7L2FDkSnvMowU6Tly1zL14NRTDgsat8EU=</parameter>
+                        <parameter name="path">/lifecyclerule</parameter>
+                        <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
+                        <parameter name="username">itim manager</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <UniqueAttribute/>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753269626754</ModTime>
+                        <Hook name="before_initialize">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>before_initialize</Name>
+                            <Script><![CDATA[resthost = "https://192.168.252.3:30943";
+
+entryList = new ENTRYLIST(task.getShortName()); // eddie
+	
+	//Setup connector 
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+/*
+	//Prepare call to get JSESSIONID
+	myHttpConn.setParam("url",resthost + "/itim/restlogin/login.jsp");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	//Perform call
+	httpReply = myHttpConn.queryReply(null);
+	//Retrieve JSESSIONID
+	JSESSIONID = httpReply.getString("http.Set-Cookie");
+
+ * 
+ */
+	//Prepare call to get LTPAToken2
+	myHttpConn.setParam("url",resthost + "/itim/j_security_check");
+	myHttpConn.setParam("method","POST");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+	httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
+//	httpcall.setAttribute("http.Cookie",JSESSIONID);
+	//Set body to userid/password
+	httpcall.setAttribute("http.body","j_username=itim manager&j_password=Passw0rd");
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	entryList.write(httpcall);  // eddie
+	entryList.write(httpReply); // eddie
+	task.logmsg("Request1 : " + httpcall + "\n Reply1 : " + httpReply);
+
+
+
+
+	//Retrieve LTPAToken2
+	LTPAToken2 = httpReply.getString("http.Set-Cookie");
+	
+	//Prepare call to get CSRFToken
+	myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
+//	myHttpConn.setParam("method","POST");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+//	httpcall.setAttribute("http.Cookie",[JSESSIONID,LTPAToken2]);
+	httpcall.setAttribute("http.Cookie",LTPAToken2);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	entryList.write(httpcall);  // eddie
+	entryList.write(httpReply); // eddie
+	task.logmsg("Request2 : " + httpcall + "\n Reply2 : " + httpReply);
+	//Retrieve CSRFToken
+	CSRFToken = httpReply.getString("http.CSRFToken");
+
+
+
+
+	
+//do a test call
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + "/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWRlbW8sZGM9aXZpZw");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	entryList.write(httpcall);  // eddie
+	entryList.write(httpReply); // eddie
+	task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
+
+
+
+
+
+	return;
+	
+	system.abortAssemblyLine("STOP")
+//get the schema
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + "/openapi");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request4 : " + httpcall + "\n Reply4 : " + httpReply);
+	task.logmsg(httpReply);]]></Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer"/>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    
+    <AssemblyLine name="_EntryList">
+            <ModTime>1753271285735</ModTime>
+            <Settings>
+                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
+                <parameter name="automapattributes">false</parameter>
+                <parameter name="createTombstones">false</parameter>
+                <parameter name="includeGlobalPrologs">true</parameter>
+                <parameter name="includePrologs">ENTRYLIST class</parameter>
+                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
+            </Settings>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="TheLDAPConnector" state="Enabled"/>
+                    <Component name="ENTRYLIST class" state="Enabled"/>
+                    <Component name="making JSON files" state="Enabled"/>
+                    <Component name="test ENTRYLIST saveEntry" state="Enabled"/>
+                    <Component name="ConnectorLoop" state="Enabled"/>
+                    <Component name="Write to entryList" state="Enabled"/>
+                    <Component name="testing compareFiles" state="Enabled"/>
+                    <Component name="compare files" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1753260997088</ModTime>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1753271285735</ModTime>
+                <Connector name="TheLDAPConnector">
+                    <InheritFrom>system:/Connectors/ibmdi.LDAP</InheritFrom>
+                    <ModTime>1753261016781</ModTime>
+                    <ConnectorMode>Iterator</ConnectorMode>
+                    <ConnectorState>Passive</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260995038</ModTime>
+                        <parameter name="ldapSearchBase">o=University at Buffalo,c=US</parameter>
+                        <parameter name="ldapUrl">ldap://ldap.buffalo.edu:389</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <ModTime>1753260997088</ModTime>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Script name="ENTRYLIST class">
+                    <InheritFrom>/Scripts/ENTRYLIST class</InheritFrom>
+                    <ModTime>1753201936073</ModTime>
+                </Script>
+                <Branch name="making JSON files">
+                    <ModTime>1753269929084</ModTime>
+                    <Script name="test ENTRYLIST saveEntry">
+                        <ModTime>1753259975625</ModTime>
+                        <parameter name="script"><![CDATA[var entryList = new ENTRYLIST("ISVG_LCR_TEST.json")
+
+cnt = 0;]]></parameter>
+                    </Script>
+                    <Loop name="ConnectorLoop">
+                        <ModTime>1753269929084</ModTime>
+                        <LoopType>1</LoopType>
+                        <LoopInitOption>0</LoopInitOption>
+                        <Connector name="ConnectorLoop">
+                            <InheritFrom>@TheLDAPConnector</InheritFrom>
+                            <ModTime>1753261485575</ModTime>
+                            <ConnectorMode>Iterator</ConnectorMode>
+                            <ConnectorState>Enabled</ConnectorState>
+                            <Configuration>
+                                <InheritFrom>[parent]</InheritFrom>
+                                <ModTime>1753261034010</ModTime>
+                                <parameter name="connectorType">@TheLDAPConnector</parameter>
+                                <parameter name="ldapSearchBase">o=University at Buffalo,c=US</parameter>
+                                <parameter name="ldapUrl">ldap://ldap.buffalo.edu:389</parameter>
+                                <parameter name="parserOption">Useless</parameter>
+                            </Configuration>
+                            <Parser>
+                                <InheritFrom>[parent]</InheritFrom>
+                            </Parser>
+                            <AttributeMap name="Input">
+                                <InheritFrom>[parent]</InheritFrom>
+                                <ModTime>1753199607546</ModTime>
+                                <AttributeMapItem>
+                                    <Name>*</Name>
+                                    <Type>simple</Type>
+                                    <Simple>*</Simple>
+                                </AttributeMapItem>
+                            </AttributeMap>
+                            <AttributeMap name="Output"/>
+                            <DeltaSettings>
+                                <ModTime>1753199386419</ModTime>
+                                <UniqueAttribute/>
+                                <WhenToCommit>After every database operation</WhenToCommit>
+                                <RowLocking>SERIALIZABLE</RowLocking>
+                                <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                            </DeltaSettings>
+                            <Schema name="Input">
+                                <InheritFrom>[parent]</InheritFrom>
+                            </Schema>
+                            <Schema name="Output">
+                                <UserComment>{extsyntax=TEXTAREA, name=userComment}</UserComment>
+                                <InheritFrom>[no inheritance]</InheritFrom>
+                                <ModTime>1753199385516</ModTime>
+                                <SchemaItem>
+                                    <Name>automapADPassword</Name>
+                                    <NativeSyntax>boolean</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>connectorFlags</Name>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>debug</Name>
+                                    <NativeSyntax>boolean</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>jndiExtraProviderParams</Name>
+                                    <NativeSyntax>textarea</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapAddAttr</Name>
+                                    <NativeSyntax>BOOLEAN</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapAuthenticationMethod</Name>
+                                    <NativeSyntax>DROPLIST</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapBERTrace</Name>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapBinaryAttributes</Name>
+                                    <NativeSyntax>textarea</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapPageSize</Name>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapPassword</Name>
+                                    <NativeSyntax>PASSWORD</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapReferrals</Name>
+                                    <NativeSyntax>droplist</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapReturnAttributes</Name>
+                                    <NativeSyntax>textarea</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapSearchBase</Name>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapSearchFilter</Name>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapSearchScope</Name>
+                                    <NativeSyntax>droplist</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapSizeLimit</Name>
+                                    <NativeSyntax>string</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapSortAttribute</Name>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapTimeLimit</Name>
+                                    <NativeSyntax>string</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapUrl</Name>
+                                    <NativeSyntax>panel</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapUseSSL</Name>
+                                    <NativeSyntax>BOOLEAN</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapUsername</Name>
+                                    <NativeSyntax>DN</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>ldapVLVPageSize</Name>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>setOprAttributes</Name>
+                                    <NativeSyntax>BOOLEAN</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>simulateRename</Name>
+                                    <NativeSyntax>boolean</NativeSyntax>
+                                </SchemaItem>
+                                <SchemaItem>
+                                    <Name>userComment</Name>
+                                    <NativeSyntax>TEXTAREA</NativeSyntax>
+                                </SchemaItem>
+                            </Schema>
+                            <LinkCriteria/>
+                            <Hooks>
+                                <InheritFrom>[parent]</InheritFrom>
+                                <ModTime>1753261485575</ModTime>
+                                <Hook name="after_getnext">
+                                    <InheritFrom>[no inheritance]</InheritFrom>
+                                    <Name>after_getnext</Name>
+                                    <Script><![CDATA[cnt++
+
+if (cnt > 2) entryList = new ENTRYLIST("Restify.json")]]></Script>
+                                    <Enabled>true</Enabled>
+                                </Hook>
+                            </Hooks>
+                            <CheckpointConfig/>
+                            <SandboxConfig/>
+                            <Reconnect>
+                                <InheritFrom>[parent]</InheritFrom>
+                                <ReconnectRules/>
+                            </Reconnect>
+                            <Operations/>
+                            <PoolDefinition>
+                                <InheritFrom>[parent]</InheritFrom>
+                            </PoolDefinition>
+                            <PoolInstance/>
+                            <LookupLimit>4</LookupLimit>
+                        </Connector>
+                        <Branch name="ConnectorLoop">
+                            <ModTime>1753269929084</ModTime>
+                            <Script name="Write to entryList">
+                                <ModTime>1753269929084</ModTime>
+                                <parameter name="script">entryList.write(work);</parameter>
+                            </Script>
+                            <Conditions/>
+                            <MatchAny>false</MatchAny>
+                            <Enabled>true</Enabled>
+                            <Type>0</Type>
+                        </Branch>
+                    </Loop>
+                    <Conditions/>
+                    <MatchAny>false</MatchAny>
+                    <Enabled>false</Enabled>
+                    <Type>0</Type>
+                </Branch>
+                <Branch name="testing compareFiles">
+                    <ModTime>1753271285735</ModTime>
+                    <Script name="compare files">
+                        <ModTime>1753271285735</ModTime>
+                        <parameter name="script"><![CDATA[entryList = new ENTRYLIST()
+
+entryList.compareFiles(["ISVG_LCR_TEST", "_testITIMRestConnector"])]]></parameter>
+                    </Script>
+                    <Conditions/>
+                    <MatchAny>false</MatchAny>
+                    <Enabled>true</Enabled>
+                    <Type>0</Type>
+                </Branch>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    
+    <AssemblyLine name="ISVG_LCR_TEST 20252307 1317">
             <ModTime>1751459019108</ModTime>
             <Settings/>
             <Hooks/>
@@ -2164,7 +2653,7 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
                         <parameter name="action">GET</parameter>
-                        <parameter encrypted="true" name="password">FYgZdkGBqkxGcyRMZR3UpGBXrWsqHzuolypA9w+fY86nD8QvxLTHttX4vr9qZTWOD0bcJYO2A4vIYRdLJh/O1/IShvnMep4S6cT9zJ7+8oFPloQD103k4g+Jx3i8OWrWLgMibP/EoLqM8y5r85lSLVBvHD9ZUCJfebtdCkOq7JA=</parameter>
+                        <parameter encrypted="true" name="password">jUlbZnpaPrbhyWshKDLsmm1ts6WATlEsWBcNDcUuomqEs0UmQ2U10KxDKV/meFxU8RwBr+QfY/wpFaWQAwM9/t9zAJ602DVdCNf5HIMCwQEcuExbmlligIZ56gOjSNoYmDhtzAwscP1RrOPxNRQAiR2MRobff6UlhP4e6gALpg4=</parameter>
                         <parameter name="path">/lifecyclerule</parameter>
                         <parameter name="url">https://192.168.2.39:30943/openapi/ui/#</parameter>
                         <parameter name="username">itim manager</parameter>
@@ -2308,9 +2797,8 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
-    
-    <AssemblyLine name="_EntryList">
-            <ModTime>1753205885748</ModTime>
+        <AssemblyLine name="_EntryList 20252703 13155">
+            <ModTime>1753271285735</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -2324,46 +2812,108 @@ task.logmsg(work.fromJSON(toJson(obj)));]]></parameter>
             <SandboxConfig/>
             <SimulationConfig>
                 <SimulationStates>
+                    <Component name="TheLDAPConnector" state="Enabled"/>
                     <Component name="ENTRYLIST class" state="Enabled"/>
-                    <Component name="test ENTRYLIST saveEntry" state="Enabled"/>
                     <Component name="making JSON files" state="Enabled"/>
+                    <Component name="test ENTRYLIST saveEntry" state="Enabled"/>
                     <Component name="ConnectorLoop" state="Enabled"/>
                     <Component name="Write to entryList" state="Enabled"/>
-                    <Component name="close entryList" state="Enabled"/>
                     <Component name="testing compareFiles" state="Enabled"/>
                     <Component name="compare files" state="Enabled"/>
                 </SimulationStates>
                 <ProxySettings/>
             </SimulationConfig>
             <LogConfig/>
-            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1753260997088</ModTime>
+            </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1753205885748</ModTime>
+                <ModTime>1753271285735</ModTime>
+                <Connector name="TheLDAPConnector">
+                    <InheritFrom>system:/Connectors/ibmdi.LDAP</InheritFrom>
+                    <ModTime>1753261016781</ModTime>
+                    <ConnectorMode>Iterator</ConnectorMode>
+                    <ConnectorState>Passive</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260995038</ModTime>
+                        <parameter name="ldapSearchBase">o=University at Buffalo,c=US</parameter>
+                        <parameter name="ldapUrl">ldap://ldap.buffalo.edu:389</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <ModTime>1753260997088</ModTime>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1753260957845</ModTime>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
                 <Script name="ENTRYLIST class">
                     <InheritFrom>/Scripts/ENTRYLIST class</InheritFrom>
                     <ModTime>1753201936073</ModTime>
                 </Script>
-                <Script name="test ENTRYLIST saveEntry">
-                    <ModTime>1753205824572</ModTime>
-                    <parameter name="script"><![CDATA[var entryList = new ENTRYLIST("Buffalo.json")
+                <Branch name="making JSON files">
+                    <ModTime>1753269929084</ModTime>
+                    <Script name="test ENTRYLIST saveEntry">
+                        <ModTime>1753259975625</ModTime>
+                        <parameter name="script"><![CDATA[var entryList = new ENTRYLIST("ISVG_LCR_TEST.json")
 
 cnt = 0;]]></parameter>
-                </Script>
-                <Branch name="making JSON files">
-                    <ModTime>1753205718151</ModTime>
+                    </Script>
                     <Loop name="ConnectorLoop">
-                        <ModTime>1753204385456</ModTime>
+                        <ModTime>1753269929084</ModTime>
                         <LoopType>1</LoopType>
+                        <LoopInitOption>0</LoopInitOption>
                         <Connector name="ConnectorLoop">
-                            <InheritFrom>system:/Connectors/ibmdi.LDAP</InheritFrom>
-                            <ModTime>1753201968360</ModTime>
+                            <InheritFrom>@TheLDAPConnector</InheritFrom>
+                            <ModTime>1753261485575</ModTime>
                             <ConnectorMode>Iterator</ConnectorMode>
                             <ConnectorState>Enabled</ConnectorState>
                             <Configuration>
                                 <InheritFrom>[parent]</InheritFrom>
-                                <ModTime>1753199402687</ModTime>
+                                <ModTime>1753261034010</ModTime>
+                                <parameter name="connectorType">@TheLDAPConnector</parameter>
                                 <parameter name="ldapSearchBase">o=University at Buffalo,c=US</parameter>
                                 <parameter name="ldapUrl">ldap://ldap.buffalo.edu:389</parameter>
+                                <parameter name="parserOption">Useless</parameter>
                             </Configuration>
                             <Parser>
                                 <InheritFrom>[parent]</InheritFrom>
@@ -2489,6 +3039,15 @@ cnt = 0;]]></parameter>
                             <LinkCriteria/>
                             <Hooks>
                                 <InheritFrom>[parent]</InheritFrom>
+                                <ModTime>1753261485575</ModTime>
+                                <Hook name="after_getnext">
+                                    <InheritFrom>[no inheritance]</InheritFrom>
+                                    <Name>after_getnext</Name>
+                                    <Script><![CDATA[cnt++
+
+if (cnt > 2) entryList = new ENTRYLIST("Restify.json")]]></Script>
+                                    <Enabled>true</Enabled>
+                                </Hook>
                             </Hooks>
                             <CheckpointConfig/>
                             <SandboxConfig/>
@@ -2501,17 +3060,13 @@ cnt = 0;]]></parameter>
                                 <InheritFrom>[parent]</InheritFrom>
                             </PoolDefinition>
                             <PoolInstance/>
-                            <LookupLimit>6</LookupLimit>
+                            <LookupLimit>4</LookupLimit>
                         </Connector>
                         <Branch name="ConnectorLoop">
-                            <ModTime>1753204385456</ModTime>
+                            <ModTime>1753269929084</ModTime>
                             <Script name="Write to entryList">
-                                <ModTime>1753204385456</ModTime>
-                                <parameter name="script"><![CDATA[entryList.saveEntry(work);
-
-if (++cnt == 3)  {
-	entryList.switchFile(entryList.filename)
-}]]></parameter>
+                                <ModTime>1753269929084</ModTime>
+                                <parameter name="script">entryList.write(work);</parameter>
                             </Script>
                             <Conditions/>
                             <MatchAny>false</MatchAny>
@@ -2519,20 +3074,18 @@ if (++cnt == 3)  {
                             <Type>0</Type>
                         </Branch>
                     </Loop>
-                    <Script name="close entryList">
-                        <ModTime>1753199642599</ModTime>
-                        <parameter name="script">entryList.close()</parameter>
-                    </Script>
                     <Conditions/>
                     <MatchAny>false</MatchAny>
                     <Enabled>false</Enabled>
                     <Type>0</Type>
                 </Branch>
                 <Branch name="testing compareFiles">
-                    <ModTime>1753205885748</ModTime>
+                    <ModTime>1753271285735</ModTime>
                     <Script name="compare files">
-                        <ModTime>1753205885748</ModTime>
-                        <parameter name="script">entryList.compareFiles(["1_Buffalo.json", "2_Buffalo.json"])</parameter>
+                        <ModTime>1753271285735</ModTime>
+                        <parameter name="script"><![CDATA[entryList = new ENTRYLIST()
+
+entryList.compareFiles(["ISVG_LCR_TEST", "_testITIMRestConnector"])]]></parameter>
                     </Script>
                     <Conditions/>
                     <MatchAny>false</MatchAny>
@@ -2550,12 +3103,12 @@ if (++cnt == 3)  {
     <Folder name="Connectors">
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1751529669704</ModTime>
+            <ModTime>1753270235678</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1751529669704</ModTime>
+                <ModTime>1753270235678</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="816" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Apr 11 16:29:01 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1744381739943</ModTime>
@@ -3065,7 +3618,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">guxV7DsWIx9bynyjIC8xcAwV3c8PgGuk93w4f8MT+GhTq/s7AEQcdGSQ3gmLL+/O/AfVvEYoakPaZ35aQUB92HfHkHIIfIjd354PferG4HsuGNNQoap9ZmpwWsxA9I+chpW8qiQMJPuUxYs6WiO2Hf7Cr48cvkRsGV9hqKax6x4=</parameter>
+                <parameter encrypted="true" name="apikey">JRRyQ7HtoztKG98jdGXASXzL84YingJurBaSjjE2SdRY63yfJMW8Xw8ReVBRi+ZNRXV5tpNSOe+iWiSLleZkWGP9x2/gVsWlzbXEfwaysrzykjNcX/JU/9qMFyI9HbY0eSN0rziC6OBi5knXuSHSGIGxSXBm/O4HP3svMiYBK/o=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -3076,7 +3629,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">XTgM+dWkkk58d3/k6tCZ1OTYWp8qMIW7R2JS5v4qD8XGgAy5f+mjeryr/bERbUMFYNi1Rc1MS/9DILnasm9vKY3EYib8Y911c+ABcd0VPWbjPMcHJRdNwen/OYLEVWOu2IV7yfoV6KxE/SApDBOHozPCYblBuubZZR+fBMsOhMY=</parameter>
+                <parameter encrypted="true" name="password">PjJLEkOMuzJ6bmw0nWbUnkKrVJeb2DEHbc9sBP5gediyYu7CAKkXxJqYBur8NPhwwLhWyd+u8XX/XY7G9X06O9GPVvpsNHH6Thi4+uPggm9f86WintSLD7v3uu+B8y6PSbZf+SvOziE+utglOoGg4Jh9+4nIRcp3GMwi5uQPtvM=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
@@ -3814,7 +4367,7 @@ function querySchema(queryMode) {
 	return list
 }]]></parameter>
                 <parameter name="searchCrit">itim manager</parameter>
-                <parameter name="url">https://192.168.2.39:30943</parameter>
+                <parameter name="url">https://149.81.9.250:31014</parameter>
                 <parameter name="username">itim manager</parameter>
             </Configuration>
             <Parser>
@@ -18053,7 +18606,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1751531871265</ModTime>
+            <ModTime>1753271019132</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -18329,6 +18882,16 @@ function RESTCLIENT(args) {
 
 				retEntry["http.url"] = url; // Another fix from @@Chat
 				
+if (gettingToken) {
+	if (typeof(ENTRYLIST) == "undefined") {
+		ENTRYLIST = eval(system.getScriptText("ENTRYLIST class"));
+		entryList = new ENTRYLIST(task.getShortName())
+	}
+	
+	entryList.write(this.requestEntry);
+	entryList.write(retEntry);
+}	
+
 				if (this.debug) {
 					this.logDetails({msg : "Response from itim", 
 								obj : this.httpEntry(retEntry),
@@ -19127,13 +19690,12 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
     <Script name="ENTRYLIST class">
-            <ModTime>1753206152614</ModTime>
+            <ModTime>1753271970595</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[var ENTRYLIST = function(filenameArg) {
 	this.filename = filenameArg || "EntryList.json",
 	this.file = null,
 	this.cnt = 0,
-	this.map = new java.util.HashMap,
 	
 	this.logmsg = function(lvl, msg) {
 		var useLvl = "INFO";
@@ -19148,7 +19710,7 @@ function RESTCLIENT(args) {
 		task.logmsg(useLvl, msg)
 	}
 	
-	this.initialize = function() {
+	this.openFile = function() {
 		var ndx = 0;
 		var useFilename = (++ndx) + "_" + this.filename;
 		var testFile = null;
@@ -19161,22 +19723,22 @@ function RESTCLIENT(args) {
 		} while (testFile.exists())
 		
 		this.file = system.openFileForOutput(useFilename);
-		this.file.write("[\n"); // Open the JSON list
 		
 		this.logmsg("-> Writing to " + testFile.getAbsoluteFile())
 	},
 
-	this.saveEntry = function(entry) {
-		if (this.file === null) {
-			this.initialize()
+	this.write = function(entry, filename) {
+		if (typeof(filename) != "undefined" && filename) {
+			this.filename = filename;
 		}
-		
-		if (this.cnt > 0) {
-			this.file.write(",")
-		}
-		
+				
+		this.openFile()
+
 		this.file.write(entry.toString());
 		this.file.flush();
+		
+		this.close();
+		this.file = null
 	},
 	
 	this.close = function() {
@@ -19184,7 +19746,6 @@ function RESTCLIENT(args) {
 			return
 		}
 		
-		this.file.write("]");
 		this.file.flush();
 		this.file.close()
 	},
@@ -19194,7 +19755,7 @@ function RESTCLIENT(args) {
 		
 		this.filename = newFilename || "EntryList.json";
 		
-		this.initialize()
+		this.openFile()
 	},
 	
 	this.LJ = function(txt, len) {
@@ -19205,24 +19766,31 @@ function RESTCLIENT(args) {
 		return (txt + buff).substring(0, Math.max(len, txtLen))
 	},
 	
-	this.compareEntries = function(entryArray) {
+	this.compareEntries = function(entries) {
 		var attNames = null;
 		
-		if (typeof(filenameArray.length) != "number" || filenameArray.length != 2) {
-			throw "ENTRYLIST.compareEntries() expects the argument passed to be an array of 2 Entry objects"
+		var map = new java.util.HashMap();
+		for (var filename in entries) {
+			var attNames = entries[filename].getAttributeNames()
+			for (var name in attNames) {
+				var mapValue = {};
+				if (map.containsKey(name)) {
+					mapValue = map.get(name)
+				}
+				mapValue[filename] = entries[filename].getAttribute(name).getValue(0);
+				
+				map.put(name, mapValue)
+			}
 		}
 		
-		this.map = new java.util.HashMap();
-		for (var ndx = 0; ndx < 2; ndx++) {
-			attNames = entryArray[ndx].getAttributeNames()
-			for (var name in attNames) {
-				var diffVal = {};
-				if (this.map.containsKey(name)) {
-					diffVal = this.map.get(name)
-				}
-				diffVal[ndx] = entry[ndx].getAttribute(name).getValue(0);
-				
-				this.map.put(name, diffVal)
+		var keys = map.keySet().toArray();
+		java.util.Arrays.sort(keys);
+		
+		for (var key in keys) {
+			var mapValue = map.get(key);
+			
+			for (var value in mapValue) {
+				task.logmsg("==>  " + key + ": " + toJson(value))
 			}
 		}
 	},
@@ -19231,15 +19799,205 @@ function RESTCLIENT(args) {
 		if (typeof(filenameArray.length) != "number" || filenameArray.length != 2) {
 			throw "ENTRYLIST.compareFiles() expects the argument passed to be an array of 2 filenames"
 		}
+
+		// Look for all files with these <cnt>_<name>
+		for (var cnt = 1; cnt < 21; cnt++) {
+			var filenames = [];
+			for (var ndx = 0; ndx < filenameArray.length; ndx++) {
+				var filename = cnt + "_" + filenameArray[ndx]
+				var file = new java.io.File(filename);
+				
+				if (!file.exists()) {
+					return;
+				}
+				
+				filenames[ndx] = filename
+			}
+			
+			this.compareSpecificFiles(filenames)
+		}
+	}
+	
+	this.compareSpecificFiles = function(filenameArray) {
+		if (typeof(filenameArray.length) != "number" || filenameArray.length != 2) {
+			throw "ENTRYLIST.compareSpecificFiles() expects the argument passed to be an array of 2 filenames"
+		}
+		
+		var entries = {};
 		
 		for (var ndx = 0; ndx < 2; ndx++) {
-			var file = system.openFileForInput(filenameArray[ndx]);
-			var json = 0;
+			var file = new java.io.File(filenameArray[ndx]);
+			if (!file.exists()) throw "File not found: " + file.getAbsolutePath()
 			
+			file = system.openFileForInput(filenameArray[ndx]);
+			var json = new java.lang.StringBuffer();
 			do {
 				var line = file.readLine();
+				if (line != null) json.append(line + "\n") 
+			} while (line != null);
+			
+			file.close();
+			
+			entries[filenameArray[ndx]] = work.fromJSON(json.toString())
+		}
+		
+		this.compareEntries(entries)
+	}
+}]]></parameter>
+        </Script>
+    
+    
+    <Script name="ENTRYLIST class 20252703 1355">
+            <ModTime>1753271605309</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[var ENTRYLIST = function(filenameArg) {
+	this.filename = filenameArg || "EntryList.json",
+	this.file = null,
+	this.cnt = 0,
+	
+	this.logmsg = function(lvl, msg) {
+		var useLvl = "INFO";
+		if (typeof(lvl) == "undefined") {
+			msg = lvl;
+		} else
+		if (typeof(msg) == "undefined") {
+			msg = "";
+		}
+		
+		useLvl = lvl || useLvl;
+		task.logmsg(useLvl, msg)
+	}
+	
+	this.openFile = function() {
+		var ndx = 0;
+		var useFilename = (++ndx) + "_" + this.filename;
+		var testFile = null;
+		
+		do {
+			testFile = new java.io.File(useFilename);
+			if (testFile.exists()) {
+				useFilename = (++ndx) + "_" + this.filename
+			}
+		} while (testFile.exists())
+		
+		this.file = system.openFileForOutput(useFilename);
+		
+		this.logmsg("-> Writing to " + testFile.getAbsoluteFile())
+	},
+
+	this.write = function(entry, filename) {
+		if (typeof(filename) != "undefined" && filename) {
+			this.filename = filename;
+		}
+				
+		this.openFile()
+
+		this.file.write(entry.toString());
+		this.file.flush();
+		
+		this.close();
+		this.file = null
+	},
+	
+	this.close = function() {
+		if (this.file === null) {
+			return
+		}
+		
+		this.file.flush();
+		this.file.close()
+	},
+	
+	this.switchFile = function(newFilename) {
+		this.close();
+		
+		this.filename = newFilename || "EntryList.json";
+		
+		this.openFile()
+	},
+	
+	this.LJ = function(txt, len) {
+		txt = txt || "";
+		var txtLen = txt.length;
+		var buff = "                                              ";
+		
+		return (txt + buff).substring(0, Math.max(len, txtLen))
+	},
+	
+	this.compareEntries = function(entries) {
+		var attNames = null;
+		
+		var map = new java.util.HashMap();
+		for (var filename in entries) {
+			var attNames = entries[filename].getAttributeNames()
+			for (var name in attNames) {
+				var mapValue = {};
+				if (map.containsKey(name)) {
+					mapValue = map.get(name)
+				}
+				mapValue[filename] = entries[filename].getAttribute(name).getValue(0);
+				
+				map.put(name, mapValue)
 			}
 		}
+		
+		var keys = map.keySet().toArray();
+		java.util.Arrays.sort(keys);
+		
+		for (var key in keys) {
+			var mapValue = map.get(key);
+			
+			task.logmsg("==>  " + key + ": " + toJson(mapValue))
+		}
+	},
+	
+	this.compareFiles = function(filenameArray) {
+		if (typeof(filenameArray.length) != "number" || filenameArray.length != 2) {
+			throw "ENTRYLIST.compareFiles() expects the argument passed to be an array of 2 filenames"
+		}
+
+		// Look for all files with these <cnt>_<name>
+		for (var cnt = 1; cnt < 21; cnt++) {
+			var filenames = [];
+			for (var ndx = 0; ndx < filenameArray.length; ndx++) {
+				var filename = cnt + "_" + filenameArray[ndx]
+				var file = new java.io.File(filename);
+				
+				if (!file.exists()) {
+					return;
+				}
+				
+				filenames[ndx] = filename
+			}
+			
+			this.compareSpecificFiles(filenames)
+		}
+	}
+	
+	this.compareSpecificFiles = function(filenameArray) {
+		if (typeof(filenameArray.length) != "number" || filenameArray.length != 2) {
+			throw "ENTRYLIST.compareSpecificFiles() expects the argument passed to be an array of 2 filenames"
+		}
+		
+		var entries = {};
+		
+		for (var ndx = 0; ndx < 2; ndx++) {
+			var file = new java.io.File(filenameArray[ndx]);
+			if (!file.exists()) throw "File not found: " + file.getAbsolutePath()
+			
+			file = system.openFileForInput(filenameArray[ndx]);
+			var json = new java.lang.StringBuffer();
+			do {
+				var line = file.readLine();
+				if (line != null) json.append(line + "\n") 
+			} while (line != null);
+			
+			file.close();
+			
+			entries[filenameArray[ndx]] = work.fromJSON(json.toString())
+		}
+		
+		this.compareEntries(entries)
 	}
 }]]></parameter>
         </Script>
