@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Tue Aug 19 11:05:17 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Tue Aug 19 21:51:02 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
             <ModTime>1751459018091</ModTime>
@@ -3287,8 +3287,8 @@ task.logmsg("Request9 : " + httpcall + "\n Reply9 : " + httpReply);]]></paramete
     <Folder name="Connectors">
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1755591903960</ModTime>
-            <ConnectorMode>Lookup</ConnectorMode>
+            <ModTime>1755593033657</ModTime>
+            <ConnectorMode>Delta</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
@@ -3802,7 +3802,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">FoDobnwRFW1vOgZrovZ8gMZh6CyZE1EBBuK08nKFdQ3IgltA6EvsANPITu0O4JDncxQcX6F/1RoALaxoWHaaGhXf6d6rKLbNjNZ0LQQP4+ru4KnlCExu1uOUwOU5NyJDAlR/hygiRsVvie8EX/uT7+2c77D4NbTG1T/DC3AmWw4=</parameter>
+                <parameter encrypted="true" name="apikey">g57xHsKuY69OlbjD3vy3kaMq3X53RI4c2yyx5mwX3ZrRsXUGytq9xXPjMPR8ZG3pZmobcHZwQlz+3n37NRuP97dcYP6FnkmBuQiqJbUde6ZIIuhxLNMrH7KjSgeXo3oxy/vmHm2/3zc/hS0k+loK6NVRHADP/28KSMBRE7gPrmc=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -3813,7 +3813,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">kW3EPkg11oOqHp9vUUrzyAjuJUsgy/coHE9hcNwoQH+cfQ+m5tyvJ07Q1fsX9lv0HiUfP2no7UJKki8Qal4yYjA7yNuwAP2dpawSSqWQfcKhHnS/SDu8RzWUIZgT18tfvPvjLVo6EYERbq1ZqedLHXWokB8yZEInEZzUnIfeEeg=</parameter>
+                <parameter encrypted="true" name="password">pl1FMPyOqo36elI6iQ2zh5P+qXOZLF8G3Oe8SN8oNPkHCvFMp4wRu4QmhyVO5ai4O2KbLsD7I42xjQLmuT0vrr9p6L3XnavScLooJsW+2nRVdhX9mlXULHRfdfUxvtiL3JTMKME1xvlBIwEDAUa3aFiaBxnsezxZ7OI/TUSTl0w=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
