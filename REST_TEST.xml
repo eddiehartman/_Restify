@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Wed Aug 13 14:31:17 CEST 2025" createdBy="eddiehartman" modified="Tue Aug 19 11:07:32 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+    <Folder name="AssemblyLines">
+        <AssemblyLine name="PeoplePost_Demo">
+            <ModTime>1755593370876</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="Script" state="Enabled"/>
+                    <Component name="HTTPClientConnector" state="Simulated"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1755593370876</ModTime>
+                <Script name="Script">
+                    <ModTime>1755593370876</ModTime>
+                    <parameter name="script"><![CDATA[resthost = "https://192.168.252.3:30943";
+myUserID = "itim manager";
+myPassword = "Passw0rd";
+	
+	//Setup connector 
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	//Prepare call to get LTPAToken2
+	myHttpConn.setParam("url",resthost + "/itim/j_security_check");
+	myHttpConn.setParam("method","POST");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+	httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
+	//Set body to userid/password
+	httpcall.setAttribute("http.body","j_username=" + myUserID + "&j_password=" + myPassword);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request1 : " + httpcall + "\n Reply1 : " + httpReply);
+	
+//Get LTPAToken2 from the Set-Cookie set of tokens
+	var myTokens = httpReply.getAttribute("http.Set-Cookie");
+	for (var myToken in myTokens){
+		if (myToken.startsWith("LtpaToken2=")){
+			LTPAToken2 = myToken;
+			task.logmsg("LTPAToken2 : " + LTPAToken2);
+			break;		
+		}
+	}
+
+
+
+
+
+
+	
+	//Prepare call to get CSRFToken
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+	httpcall.setAttribute("http.Cookie",LTPAToken2);
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	httpcall.setAttribute("http.fromISC","true");
+
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request2 : " + httpcall + "\n Reply2 : " + httpReply);
+
+
+	//Retrieve CSRFToken
+	CSRFToken = httpReply.getString("http.CSRFToken");
+	task.logmsg("CSRFToken : " + CSRFToken)
+	
+	//What other cookies ?
+	myCookies = httpReply.getAttribute("http.Set-Cookie");
+	
+	
+	
+	
+	
+	
+	
+
+//do a person add
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + "/itim/rest/people");
+	myHttpConn.setParam("method","POST");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	
+	httpcall.setAttribute("http.body",system.getScriptText("personAddJSON"));
+/*
+	This is content of personAddJSON
+ 	{
+	  "profileName": "Person",
+	  "_attributes": {
+	    "sn": "Doe",
+	    "cn": "John Doe"
+	  },
+	  "orgID": "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1kZW1vLGRjPWl2aWc"
+	}
+ *  * 
+ */
+	//Add LTPAToken2 to cookies received on /systemusers/me call
+	myCookies.addValue(LTPAToken2);
+	httpcall.setAttribute("http.Cookie",myCookies);
+	httpcall.setAttribute("http.CSRFToken",CSRFToken);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
+	
+//Sleep to allow the user to be created
+	system.sleep(3);
+
+	
+//find the created user
+	var mySearchCriteria = "?cn=John Doe"
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + "/itim/rest/people" + mySearchCriteria);
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	//Add cookies received on /systemusers/me call and LTPAToken2
+	httpcall.setAttribute("http.Cookie",myCookies);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request4 : " + httpcall + "\n Reply4 : " + httpReply);
+	myJSONResponse = fromJson(httpReply.getString("http.bodyAsString"));
+	var myUser = myJSONResponse[0]._links.self.href;
+	task.logmsg("myUser : " + system.base64Decode(myUser));
+
+//lookup the created user
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + myUser);
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	//Add cookies received on /systemusers/me call and LTPAToken2
+	httpcall.setAttribute("http.Cookie",myCookies);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request5 : " + httpcall + "\n Reply5 : " + httpReply);
+
+//modify the created user
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + myUser);
+	myHttpConn.setParam("method","PUT");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	httpcall.setAttribute("http.body",system.getScriptText("personModifyJSON"));
+/*
+ * 
+{
+  "_attributes": {
+    "givenname": "John"
+  }
+}
+ */
+	//Add cookies received on /systemusers/me call and LTPAToken2
+	httpcall.setAttribute("http.Cookie",myCookies);
+	httpcall.setAttribute("http.CSRFToken",CSRFToken);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request6 : " + httpcall + "\n Reply6 : " + httpReply);
+
+//delete the created user
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + myUser);
+	myHttpConn.setParam("method","DELETE");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	//Add cookies received on /systemusers/me call and LTPAToken2
+	httpcall.setAttribute("http.Cookie",myCookies);
+	httpcall.setAttribute("http.CSRFToken",CSRFToken);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request9 : " + httpcall + "\n Reply9 : " + httpReply);]]></parameter>
+                </Script>
+                <Connector name="HTTPClientConnector">
+                    <InheritFrom>system:/Connectors/ibmdi.HTTPClient</InheritFrom>
+                    <ModTime>1753356574748</ModTime>
+                    <ConnectorMode>AddOnly</ConnectorMode>
+                    <ConnectorState>Disabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="contentType"/>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings/>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+        <AssemblyLine name="PeoplePost_Local">
+            <ModTime>1755088277681</ModTime>
+            <Settings/>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="Script" state="Enabled"/>
+                    <Component name="HTTPClientConnector" state="Simulated"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
+                <Script name="Script">
+                    <ModTime>1755082317750</ModTime>
+                    <parameter name="script"><![CDATA[resthost = "https://192.168.2.39:30943";
+	
+myUserID = "itim manager";
+myPassword = "secret";
+	
+	//Setup connector 
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	//Prepare call to get LTPAToken2
+	myHttpConn.setParam("url",resthost + "/itim/j_security_check");
+	myHttpConn.setParam("method","POST");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+	httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
+	//Set body to userid/password
+	httpcall.setAttribute("http.body","j_username=" + myUserID + "&j_password=" + myPassword);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request1 : " + httpcall + "\n Reply1 : " + httpReply);
+
+	//Get LTPAToken2 from the Set-Cookie set of tokens
+	var myTokens = httpReply.getAttribute("http.Set-Cookie");
+	for (var myToken in myTokens){
+		if (myToken.startsWith("LtpaToken2=")){
+			LTPAToken2 = myToken;
+			task.logmsg("LTPAToken2 : " + LTPAToken2);
+			break;		
+		}
+	}
+	
+	//Prepare call to get CSRFToken
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	
+	//Configure the call
+	var httpcall = system.newEntry();
+	httpcall.setAttribute("http.Cookie",LTPAToken2);
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	httpcall.setAttribute("http.fromISC","true");
+
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request2 : " + httpcall + "\n Reply2 : " + httpReply);
+
+
+	//Retrieve CSRFToken
+	CSRFToken = httpReply.getString("http.CSRFToken");
+	task.logmsg("CSRFToken : " + CSRFToken)
+	
+	//What other cookies ?
+	myCookies = httpReply.getAttribute("http.Set-Cookie");
+
+//do a person add
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + "/itim/rest/people");
+	myHttpConn.setParam("method","POST");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	
+	httpcall.setAttribute("http.body",system.getScriptText("personAddJSON_local"));
+/*
+{
+  "scheduledTime" :"01/01/2017 12:30",
+  "profileName":"Person",
+  "orgID":"ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc",
+  "_attributes": {
+    "sn": "Doe",
+    "cn": "John Doe"
+  },
+  "justification":"A suitable reason for creating person"
+}
+ */
+	//Add LTPAToken2 to cookies received on /systemusers/me call
+	myCookies.addValue(LTPAToken2);
+	httpcall.setAttribute("http.Cookie",myCookies);
+	httpcall.setAttribute("http.CSRFToken",CSRFToken);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
+	
+//Sleep to allow the user to be created
+	system.sleep(3);
+
+	
+//find the created user
+	var mySearchCriteria = "?cn=John Doe"
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + "/itim/rest/people" + mySearchCriteria);
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	//Add cookies received on /systemusers/me call and LTPAToken2
+	httpcall.setAttribute("http.Cookie",myCookies);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request4 : " + httpcall + "\n Reply4 : " + httpReply);
+	myJSONResponse = fromJson(httpReply.getString("http.bodyAsString"));
+	var myUser = myJSONResponse[0]._links.self.href;
+	task.logmsg("myUser : " + system.base64Decode(myUser));
+
+//lookup the created user
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + myUser);
+	myHttpConn.setParam("method","GET");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	//Add cookies received on /systemusers/me call and LTPAToken2
+	httpcall.setAttribute("http.Cookie",myCookies);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request5 : " + httpcall + "\n Reply5 : " + httpReply);
+
+//modify the created user
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + myUser);
+	myHttpConn.setParam("method","PUT");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	httpcall.setAttribute("http.body",system.getScriptText("personModifyJSON_local"));
+/*
+ * 
+{
+  "_attributes": {
+    "givenname": "John"
+  }
+}
+ */
+	//Add cookies received on /systemusers/me call and LTPAToken2
+	httpcall.setAttribute("http.Cookie",myCookies);
+	httpcall.setAttribute("http.CSRFToken",CSRFToken);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request6 : " + httpcall + "\n Reply6 : " + httpReply);
+
+//delete the created user
+	myHttpConn = system.getConnector("ibmdi.HTTPClient");
+	var httpcall = system.newEntry();
+	myHttpConn.setParam("url",resthost + myUser);
+	myHttpConn.setParam("method","DELETE");
+	myHttpConn.initialize(null);
+	httpcall.setAttribute("http.Content-Type","application/json");
+	httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+	//Add cookies received on /systemusers/me call and LTPAToken2
+	httpcall.setAttribute("http.Cookie",myCookies);
+	httpcall.setAttribute("http.CSRFToken",CSRFToken);
+	//Perform call
+	httpReply = myHttpConn.queryReply(httpcall);
+	task.logmsg("Request9 : " + httpcall + "\n Reply9 : " + httpReply);]]></parameter>
+                </Script>
+                <Connector name="HTTPClientConnector">
+                    <InheritFrom>system:/Connectors/ibmdi.HTTPClient</InheritFrom>
+                    <ModTime>1753356574748</ModTime>
+                    <ConnectorMode>AddOnly</ConnectorMode>
+                    <ConnectorState>Disabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <parameter name="contentType"/>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings/>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
+    </Folder>
+    <Folder name="Connectors"/>
+    <Folder name="Parsers"/>
+    <Folder name="Scripts">
+        <Script name="personModifyJSON_local">
+            <ModTime>1755088277575</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[{
+  "_attributes": {
+    "givenname": "John"
+  }
+}]]></parameter>
+        </Script>
+        <Script name="personAddJSON">
+            <ModTime>1755088277657</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[{
+  "profileName": "Person",
+  "_attributes": {
+    "sn": "Doe",
+    "cn": "John Doe"
+  },
+  "orgID": "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1kZW1vLGRjPWl2aWc"
+}]]></parameter>
+        </Script>
+        <Script name="personAddJSON_local">
+            <ModTime>1755088277665</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[{
+  "scheduledTime" :"01/01/2017 12:30",
+  "profileName":"Person",
+  "orgID":"ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc",
+  "_attributes": {
+    "sn": "Doe",
+    "cn": "John Doe"
+  },
+  "justification":"A suitable reason for creating person"
+}]]></parameter>
+        </Script>
+        <Script name="personModifyJSON">
+            <ModTime>1755088277671</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[{
+  "_attributes": {
+    "givenname": "John"
+  }
+}]]></parameter>
+        </Script>
+    </Folder>
+    <JavaLibraries/>
+    <JavaProperties/>
+    <Folder name="Includes"/>
+    <Folder name="Config">
+        <LogConfig name="Logging"/>
+        <InstanceProperties name="AutoStart">
+            <AutoStart/>
+        </InstanceProperties>
+        <TombstonesConfig name="Tombstones"/>
+        <SolutionInterface name="SolutionInterface">
+            <ModTime>1753342187221</ModTime>
+            <PollInterval>-1</PollInterval>
+            <InstanceID>_Restify_Tests</InstanceID>
+            <enabled>true</enabled>
+        </SolutionInterface>
+    </Folder>
+    <Folder name="Functions"/>
+    <Folder name="AttributeMaps"/>
+    <Properties name="Properties">
+        <Stores>
+            <PropertyStore name="Solution-Properties">
+                <Parser/>
+                <RawConnector>
+                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
+                    <parameter name="collectionType">Solution-Properties</parameter>
+                </RawConnector>
+                <Key>key</Key>
+                <Value>value</Value>
+                <ReadOnly>false</ReadOnly>
+                <InitialLoad>true</InitialLoad>
+                <CacheTimeout>0</CacheTimeout>
+            </PropertyStore>
+            <PropertyStore name="Global-Properties">
+                <Parser/>
+                <RawConnector>
+                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
+                    <parameter name="collectionType">Global-Properties</parameter>
+                </RawConnector>
+                <Key>key</Key>
+                <Value>value</Value>
+                <ReadOnly>false</ReadOnly>
+                <InitialLoad>true</InitialLoad>
+                <CacheTimeout>0</CacheTimeout>
+            </PropertyStore>
+            <PropertyStore name="System-Properties">
+                <Parser/>
+                <RawConnector>
+                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
+                    <parameter name="collectionType">System-Properties</parameter>
+                </RawConnector>
+                <Key>key</Key>
+                <Value>value</Value>
+                <ReadOnly>false</ReadOnly>
+                <InitialLoad>true</InitialLoad>
+                <CacheTimeout>0</CacheTimeout>
+            </PropertyStore>
+            <PropertyStore name="REST_TEST">
+                <Parser/>
+                <RawConnector>
+                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
+                    <parameter name="collection">@SUBSTITUTE{config.$directory}/REST_TEST.properties</parameter>
+                    <parameter name="collectionType">REST_TEST</parameter>
+                </RawConnector>
+                <Key>key</Key>
+                <Value>value</Value>
+                <ReadOnly>false</ReadOnly>
+                <InitialLoad>true</InitialLoad>
+                <CacheTimeout>0</CacheTimeout>
+            </PropertyStore>
+            <PropertyStore name="Java-Properties">
+                <Parser/>
+                <RawConnector>
+                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
+                    <parameter name="collection">@SUBSTITUTE{config.$directory}/REST_TEST.properties</parameter>
+                    <parameter name="collectionType">Java-Properties</parameter>
+                </RawConnector>
+                <Key>key</Key>
+                <Value>value</Value>
+                <ReadOnly>false</ReadOnly>
+                <InitialLoad>true</InitialLoad>
+                <CacheTimeout>0</CacheTimeout>
+            </PropertyStore>
+            <PropertyStore name="_Restify_Tests">
+                <Parser/>
+                <RawConnector>
+                    <InheritFrom>system:/Connectors/ibmdi.Properties</InheritFrom>
+                    <parameter name="collection">@SUBSTITUTE{config.$directory}/_Restify_Tests.properties</parameter>
+                    <parameter name="collectionType">_Restify_Tests</parameter>
+                </RawConnector>
+                <Key>key</Key>
+                <Value>value</Value>
+                <ReadOnly>false</ReadOnly>
+                <InitialLoad>true</InitialLoad>
+                <CacheTimeout>0</CacheTimeout>
+            </PropertyStore>
+        </Stores>
+    </Properties>
+    <Folder name="Schedules"/>
+    <Folder name="Sequences"/>
+</MetamergeConfig>

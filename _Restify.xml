@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Sun Aug 03 20:43:33 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Tue Aug 19 11:05:17 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
             <ModTime>1751459018091</ModTime>
@@ -200,7 +200,7 @@ task.dumpEntry(work);
             </InitParams>
         </AssemblyLine>
         <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1753274977917</ModTime>
+            <ModTime>1755591839707</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -300,10 +300,10 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1753274977917</ModTime>
+                <ModTime>1755591839707</ModTime>
                 <Connector name="ITIMRestClientConnector_add">
                     <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1753274977917</ModTime>
+                    <ModTime>1755591839707</ModTime>
                     <ConnectorMode>AddOnly</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
@@ -319,7 +319,7 @@ task.logmsg("---- After GetNext: " + conn);
                     </AttributeMap>
                     <AttributeMap name="Output">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1753274977917</ModTime>
+                        <ModTime>1755591839707</ModTime>
                         <AttributeMapItem>
                             <Name>OrgId</Name>
                             <Type>advanced</Type>
@@ -328,34 +328,15 @@ task.logmsg("---- After GetNext: " + conn);
                         </AttributeMapItem>
                         <AttributeMapItem>
                             <Name>cn</Name>
-                            <Type>simple</Type>
+                            <Type>advanced</Type>
+                            <Script>"John Doe"</Script>
                             <Simple>cn</Simple>
                         </AttributeMapItem>
                         <AttributeMapItem>
                             <Name>givenname</Name>
-                            <Type>simple</Type>
-                            <Simple>givenname</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>mail</Name>
-                            <Type>simple</Type>
-                            <Simple>mail</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>manager</Name>
-                            <Type>simple</Type>
-                            <Simple>manager</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
                             <Type>advanced</Type>
-                            <Script>searchVal</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>sn</Name>
-                            <Type>simple</Type>
-                            <Simple>sn</Simple>
+                            <Script>"John"</Script>
+                            <Simple>givenname</Simple>
                         </AttributeMapItem>
                     </AttributeMap>
                     <DeltaSettings>
@@ -3099,16 +3080,219 @@ entryList.compareFiles(["ISVG_LCR_TEST", "_testITIMRestConnector"])]]></paramete
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
+    <AssemblyLine name="ISVG_LCR_TEST Revised">
+            <ModTime>1755088187669</ModTime>
+            <Settings>
+                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
+                <parameter name="automapattributes">false</parameter>
+                <parameter name="createTombstones">false</parameter>
+                <parameter name="includeGlobalPrologs">true</parameter>
+                <parameter name="includePrologs">ENTRYLIST class</parameter>
+                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
+            </Settings>
+            <Hooks/>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="Do it" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1755085623814</ModTime>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1755088187669</ModTime>
+                <Script name="Do it">
+                    <ModTime>1755088187669</ModTime>
+                    <parameter name="script"><![CDATA[resthost = "https://192.168.252.3:30943";
+myUserID = "itim manager";
+myPassword = "Passw0rd"; a = 42
+
+// Set up the connector
+myHttpConn = system.getConnector("ibmdi.HTTPClient");
+//Prepare call to get LTPAToken2
+myHttpConn.setParam("url",resthost + "/itim/j_security_check");
+myHttpConn.setParam("method","POST");
+myHttpConn.initialize(null);
+
+//Configure the call
+var httpcall = system.newEntry();
+httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
+//Set body to userid/password
+httpcall.setAttribute("http.body","j_username=" + myUserID + "&j_password=" + myPassword);
+//Perform call
+httpReply = myHttpConn.queryReply(httpcall);
+task.logmsg("Request1 : " + httpcall + "\n Reply1 : " + httpReply);
+
+responseCode = httpReply.getString("responseCode");
+if (!responseCode.startsWith("2")) throw "Got reponseCode: " + responseCode;
+
+//Get LTPAToken2 from the Set-Cookie set of tokens
+var myTokens = httpReply.getAttribute("http.Set-Cookie");
+for (var myToken in myTokens){
+  if (myToken.startsWith("LtpaToken2=")){
+    LTPAToken2 = myToken;
+    task.logmsg("LTPAToken2 : " + LTPAToken2);
+    break;
+  }
+}
+
+//Prepare call to get CSRFToken
+myHttpConn = system.getConnector("ibmdi.HTTPClient");
+myHttpConn.setParam("url",resthost + "/itim/rest/systemusers/me");
+myHttpConn.setParam("method","GET");
+myHttpConn.initialize(null);
+
+//Configure the call
+var httpcall = system.newEntry();
+httpcall.setAttribute("http.Cookie",LTPAToken2);
+httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+httpcall.setAttribute("http.fromISC","true");
+
+//Perform call
+httpReply = myHttpConn.queryReply(httpcall);
+task.logmsg("Request2 : " + httpcall + "\n Reply2 : " + httpReply);
+
+responseCode = httpReply.getString("responseCode");
+if (!responseCode.startsWith("2")) throw "Got reponseCode: " + responseCode;
+
+//Retrieve CSRFToken
+CSRFToken = httpReply.getString("http.CSRFToken");
+task.logmsg("CSRFToken : " + CSRFToken)
+
+//What other cookies ?
+myCookies = httpReply.getAttribute("http.Set-Cookie");
+
+//do a person add
+myHttpConn = system.getConnector("ibmdi.HTTPClient");
+var httpcall = system.newEntry();
+myHttpConn.setParam("url",resthost + "/itim/rest/people");
+myHttpConn.setParam("method","POST");
+myHttpConn.initialize(null);
+httpcall.setAttribute("http.Content-Type","application/json");
+httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+
+httpcall.setAttribute("http.body",system.getScriptText("personAddJSON"));
+
+body = '{"_attributes": {"givenname": "John",'
+		+ '"sn": "Doe",'
+		+ '"cn": "John Doe"'
+		+ '}}'
+		
+payload = '{"profileName": "Person",'
+			+ body
+			+ '"orgID": "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1kZW1vLGRjPWl2aWc"';
+
+//Add LTPAToken2 to cookies received on /systemusers/me call
+myCookies.addValue(LTPAToken2);
+httpcall.setAttribute("http.Cookie",myCookies);
+httpcall.setAttribute("http.CSRFToken",CSRFToken);
+//Perform call
+httpReply = myHttpConn.queryReply(httpcall);
+task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
+
+responseCode = httpReply.getString("responseCode");
+if (!responseCode.startsWith("2")) throw "Got reponseCode: " + responseCode;
+
+//Sleep to allow the user to be created
+task.logmsg("Sleeping for 3 seconds...");
+system.sleep(3);
+task.logmsg("Continuing on to lookup new user")
+
+
+//find the created user
+var mySearchCriteria = "?cn=John Doe"
+myHttpConn = system.getConnector("ibmdi.HTTPClient");
+var httpcall = system.newEntry();
+myHttpConn.setParam("url",resthost + "/itim/rest/people" + mySearchCriteria);
+myHttpConn.setParam("method","GET");
+myHttpConn.initialize(null);
+httpcall.setAttribute("http.Content-Type","application/json");
+httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+//Add cookies received on /systemusers/me call and LTPAToken2
+httpcall.setAttribute("http.Cookie",myCookies);
+//Perform call
+httpReply = myHttpConn.queryReply(httpcall);
+task.logmsg("Request4 : " + httpcall + "\n Reply4 : " + httpReply);
+
+responseCode = httpReply.getString("responseCode");
+if (!responseCode.startsWith("2")) throw "Got reponseCode: " + responseCode;
+
+myJSONResponse = fromJson(httpReply.getString("http.bodyAsString"));
+var myUser = myJSONResponse[0]._links.self.href;
+task.logmsg("myUser : " + system.base64Decode(myUser));
+
+//lookup the created user
+myHttpConn = system.getConnector("ibmdi.HTTPClient");
+var httpcall = system.newEntry();
+myHttpConn.setParam("url",resthost + myUser);
+myHttpConn.setParam("method","GET");
+myHttpConn.initialize(null);
+httpcall.setAttribute("http.Content-Type","application/json");
+httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+//Add cookies received on /systemusers/me call and LTPAToken2
+httpcall.setAttribute("http.Cookie",myCookies);
+//Perform call
+httpReply = myHttpConn.queryReply(httpcall);
+task.logmsg("Request5 : " + httpcall + "\n Reply5 : " + httpReply);
+
+//modify the created user
+myHttpConn = system.getConnector("ibmdi.HTTPClient");
+var httpcall = system.newEntry();
+myHttpConn.setParam("url",resthost + myUser);
+myHttpConn.setParam("method","PUT");
+myHttpConn.initialize(null);
+httpcall.setAttribute("http.Content-Type","application/json");
+httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+
+changedBody = '{"_attributes": {"givenname": "Johnny",'
+		+ '"sn": "Doe",'
+		+ '"cn": "John Doe"'
+		+ '}}'
+
+httpcall.setAttribute("http.body", body);
+//Add cookies received on /systemusers/me call and LTPAToken2
+httpcall.setAttribute("http.Cookie",myCookies);
+httpcall.setAttribute("http.CSRFToken",CSRFToken);
+//Perform call
+httpReply = myHttpConn.queryReply(httpcall);
+task.logmsg("Request6 : " + httpcall + "\n Reply6 : " + httpReply);
+
+//delete the created user
+myHttpConn = system.getConnector("ibmdi.HTTPClient");
+var httpcall = system.newEntry();
+myHttpConn.setParam("url",resthost + myUser);
+myHttpConn.setParam("method","DELETE");
+myHttpConn.initialize(null);
+httpcall.setAttribute("http.Content-Type","application/json");
+httpcall.setAttribute("http.accept","application/vnd.ibm.isim-v1+json");
+//Add cookies received on /systemusers/me call and LTPAToken2
+httpcall.setAttribute("http.Cookie",myCookies);
+httpcall.setAttribute("http.CSRFToken",CSRFToken);
+//Perform call
+httpReply = myHttpConn.queryReply(httpcall);
+task.logmsg("Request9 : " + httpcall + "\n Reply9 : " + httpReply);]]></parameter>
+                </Script>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
     </Folder>
     <Folder name="Connectors">
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1754245489417</ModTime>
+            <ModTime>1755591903960</ModTime>
             <ConnectorMode>Lookup</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1754245489417</ModTime>
+                <ModTime>1755591903960</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="816" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Apr 11 16:29:01 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1744381739943</ModTime>
@@ -3618,7 +3802,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">OSntMb5+4x/TbbFpVqlA8pVcpJbPdyDXJUVqQzfQup9HD40tttLSMbL1+k18R0hMaM8N5FOXcijSFiW0EGJf71TvFgNnw9xqRKQ9Eg3EY9h4/I0n77NwuCWaoQmirvK4KLCv3cbJ3W7wUqApElgMi7z70AH/VLW7nnDemFckucQ=</parameter>
+                <parameter encrypted="true" name="apikey">FoDobnwRFW1vOgZrovZ8gMZh6CyZE1EBBuK08nKFdQ3IgltA6EvsANPITu0O4JDncxQcX6F/1RoALaxoWHaaGhXf6d6rKLbNjNZ0LQQP4+ru4KnlCExu1uOUwOU5NyJDAlR/hygiRsVvie8EX/uT7+2c77D4NbTG1T/DC3AmWw4=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -3629,7 +3813,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">Z60RUST+y5JdtRa7V4Cq/rczW/LMMvX/JA3qjcJNaeDqTvePxfxtI0mkhaGYMEtKINXOPyhf+fB0dKY7mphZhWz+ipRmXliy+j7p8sBndaZgv0eyFflAfhSCFaP2WgKodmhnxk+OzqMSMLVEjffX9k5lUqjmyJRph9VCOMoAQlI=</parameter>
+                <parameter encrypted="true" name="password">kW3EPkg11oOqHp9vUUrzyAjuJUsgy/coHE9hcNwoQH+cfQ+m5tyvJ07Q1fsX9lv0HiUfP2no7UJKki8Qal4yYjA7yNuwAP2dpawSSqWQfcKhHnS/SDu8RzWUIZgT18tfvPvjLVo6EYERbq1ZqedLHXWokB8yZEInEZzUnIfeEeg=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
@@ -4134,12 +4318,13 @@ function putEntry(entryArg) {
 	var useEntry = entry.clone(entry);
 	var orgId = useEntry.getString("orgId");
 	if (orgId) useEntry.removeAttribute("orgId");
+	useEntry.removeAttribute("personId");
 
 	var body = 	{
 				  "profileName": "Person",
-				  "justification": "string",
-				  "_attributes": useEntry.toJSON(),
-				  "orgid": orgId || connector.getParam("orgid") || "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t"
+//				  "justification": "string",
+				  "_attributes": fromJson(useEntry.toJSON()),
+				  "orgID": orgId || connector.getParam("orgid") || "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t"
 				}
 	
 	// Always get the latest parameter settings
@@ -18620,7 +18805,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1754245248262</ModTime>
+            <ModTime>1755594021680</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -18645,6 +18830,7 @@ function RESTCLIENT(args) {
 // 20250523 1159 Changed the handling of the CSRFToken read as "http.CSRFToken"
 // 20250629 2222 Added garbage collection and chunk handling, both in makeRequest()
 // 20250702 1424 Franz fixed my misunderstanding of the chunk encoding - the HTTP Connector handles all that
+// 20250819 1029 Changed handling of cookies after seeing how Franz does it - using just Attributes and values
 //
 // This is the class that provides methods for making HTTP requests
 //
@@ -18659,7 +18845,7 @@ function RESTCLIENT(args) {
 	this.username = args.username || ""; 
 	this.password = args.password || "";
 	this.debug = false //args.debug || false;
-	this.cookieArrayList = new java.util.ArrayList();
+	this.cookies = system.newAttribute("http.Cookie");
 	
 	this.gettingToken = false;
 	this.gotToken = false;
@@ -18681,7 +18867,7 @@ function RESTCLIENT(args) {
 		var retEntry;
 		
 		// Get rid of cookies
-		this.cookieArrayList.clear();
+		this.cookies.clear();
 		
 		// First the LTPAToken2
 		retEntry = this.makeRequest({
@@ -18711,25 +18897,7 @@ function RESTCLIENT(args) {
 	
 	// Get the currently set Cookies
 	this.getCookies = function() {
-		var cookiesAtt = system.newAttribute("http.Cookie");
-		// Add CSRFToken if set
-		if (this.CSRFToken != null) {
-			cookiesAtt.addValue(this.CSRFToken)
-		}
- 
-		// Add remaining cookies picked up
-		var cookieArray = this.cookieArrayList.toArray();
-		for (var cookie in cookieArray) {
-			cookiesAtt.addValue(cookie)
-		}	
-			
-		// Return it
-		if (cookiesAtt.size() > 1){
-			var cookies = cookiesAtt.getValues().toString();
-			return "[" + cookies + "]"; 			
-		} else {
-			return cookiesAtt.getValue(0);
-		}		
+		return this.cookies
 	}
  
  	// Put together a URL from an array of parts
@@ -18868,10 +19036,9 @@ function RESTCLIENT(args) {
 				//this.alert("\nMaking call:" + this.reduceEntry(this.requestEntry) + "\n");
 				
 				// Set cookies
-				var cookies = this.getCookies();
-				if (cookies && cookies.length > 0) {
-					this.requestEntry.setAttribute("http.Cookie",this.getCookies()); // In case these have been changed since last time
-				}	
+ 				this.requestEntry.setAttribute("http.Cookie",this.getCookies())
+				
+				
 				if (this.CSRFToken) {
 					this.requestEntry["http.CSRFToken"] = this.CSRFToken
 				}
@@ -18906,10 +19073,12 @@ function RESTCLIENT(args) {
 							    entry : retEntry});
 				}
 
-				// Grab any cookies if found - also made more robust thanks to @@Chat
 				if (retEntry["http.Set-Cookie"]) {
-					var cookies = retEntry.getString("http.Set-Cookie");
-					this.cookieArrayList.add(cookies)
+					for (var cookie in retEntry["http.Set-Cookie"]) {
+						if (cookie.indexOf("WASReq") < 0) {
+							this.cookies.addValue(cookie)
+						}	
+					}	
 				}
 				
 				if (retEntry["http.CSRFToken"]) {
@@ -20006,6 +20175,18 @@ function RESTCLIENT(args) {
 		
 		this.compareEntries(entries)
 	}
+}]]></parameter>
+        </Script>
+    <Script name="personAddJSON">
+            <ModTime>1755088277657</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[{
+  "profileName": "Person",
+  "_attributes": {
+    "sn": "Doe",
+    "cn": "John Doe"
+  },
+  "orgID": "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1kZW1vLGRjPWl2aWc"
 }]]></parameter>
         </Script>
     </Folder>
