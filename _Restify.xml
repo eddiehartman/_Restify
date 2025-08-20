@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Tue Aug 19 21:51:02 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Wed Aug 20 13:36:19 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
             <ModTime>1751459018091</ModTime>
@@ -3287,12 +3287,12 @@ task.logmsg("Request9 : " + httpcall + "\n Reply9 : " + httpReply);]]></paramete
     <Folder name="Connectors">
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1755593033657</ModTime>
+            <ModTime>1755689674231</ModTime>
             <ConnectorMode>Delta</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1755591903960</ModTime>
+                <ModTime>1755689674231</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="816" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Apr 11 16:29:01 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1744381739943</ModTime>
@@ -3802,7 +3802,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">g57xHsKuY69OlbjD3vy3kaMq3X53RI4c2yyx5mwX3ZrRsXUGytq9xXPjMPR8ZG3pZmobcHZwQlz+3n37NRuP97dcYP6FnkmBuQiqJbUde6ZIIuhxLNMrH7KjSgeXo3oxy/vmHm2/3zc/hS0k+loK6NVRHADP/28KSMBRE7gPrmc=</parameter>
+                <parameter encrypted="true" name="apikey">jxGj42p4Tt1kwH1dtbTwThwKqtHwsn3fTMOfdTTJVuogleC7rrS9h+mgjsWvxiOkW2nNDvj3A9M+b+xREzssC6zJiFV3LgXtzIseLgPdD7KKSi7cOFRsOB2RhCn0mwqkE+oNW/vxut9UHP3P7wkhUBlbZVEGIOO5VtPR8w7gGLQ=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -3813,7 +3813,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">pl1FMPyOqo36elI6iQ2zh5P+qXOZLF8G3Oe8SN8oNPkHCvFMp4wRu4QmhyVO5ai4O2KbLsD7I42xjQLmuT0vrr9p6L3XnavScLooJsW+2nRVdhX9mlXULHRfdfUxvtiL3JTMKME1xvlBIwEDAUa3aFiaBxnsezxZ7OI/TUSTl0w=</parameter>
+                <parameter encrypted="true" name="password">ME3KizLgxUidddUJUAsyc7Rto6lEuFBKGH5BA+Gqgd19LHFQYbiOh5pNpLjvzY2Y7wvTkMWdmHcR03yaT1NSHReHPcnOo9eV5ZLN84n+b9dzb/7e/Si/8q0T+QYAeHXpXY1IDkj1vvA4KRKMlrMkYQi/1nRhd5tb4pko3PmUbNY=</parameter>
                 <parameter name="path">/people/{personId}</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
@@ -4048,7 +4048,7 @@ function fetchSchema() {
 	})
     
     // Load the SCHEMA class
-    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    eval(system.getScriptText("SCHEMA c__hlass")) // Load SCHEMA handling class
     
     //alert("Creating SCHEMA object");
     __schema = new SCHEMA(schemaSpec, "YAML");
@@ -4066,15 +4066,14 @@ function parseSchema() {
 	if (__schema) return __schema;
 
 	debugMsg("Fetching schema...")
-	//var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
-	//var schemaJSON = fetchSchema();
+	//__schema = __lib.loadFileToString("_Restify/itim_swagger.json");
 
 	//debugMsg("Creating SCHEMA object");
 	__schema = fetchSchema();
 
-	//var toplvl = "";
-	//for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
-	//debugMsg("SCHEMA -> " + toplvl)
+
+	// Force RESTClient to get the tokens again
+	//__http.gotToken = false;
 
 	//debugMsg("Got it!");
 	return __schema
@@ -4322,24 +4321,24 @@ function putEntry(entryArg) {
 
 	var body = 	{
 				  "profileName": "Person",
-//				  "justification": "string",
-				  "_attributes": fromJson(useEntry.toJSON()),
+//				  "_attributes": fromJson(useEntry.toJSON()),
+				  "_attributes": useEntry.toJSON(),
 				  "orgID": orgId || connector.getParam("orgid") || "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t"
 				}
+				
+	body = system.getScriptText("personAddJSON");
 	
 	// Always get the latest parameter settings
 	var connParams = refreshParameters();
 	// Get the parameters for this path + actoin
 	var epParams = getParameters(connParams.path, connParams.action);
 
-/*	
-	var usePath = replaceEmbeddedUID(connParams.path, entry);
-*/
 	try {	
 		// Make the REST call 
 		var reply = __http.makeRequest({
 				verb: "POST",
 				url: connParams.path,
+			//	accept: "application/vnd.ibm.isim-v1+json",
 				returnType: "entry",
 				ctype: "application/json",
 				where: "putEntry()",
@@ -18805,7 +18804,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1755594021680</ModTime>
+            <ModTime>1755689653048</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -18850,9 +18849,6 @@ function RESTCLIENT(args) {
 	this.gettingToken = false;
 	this.gotToken = false;
 
-	this.CSRFToken = null;
-	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
-		
 	// The HTTP Client Connector to use
 	this.http = system.getConnector("ibmdi.HTTPClient");
 	
@@ -18863,11 +18859,12 @@ function RESTCLIENT(args) {
 	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
 
 	// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
-	this.getToken = function() {
+	this.getToken = function(where) {
 		var retEntry;
 		
 		// Get rid of cookies
 		this.cookies.clear();
+		this.CSRFToken = null;
 		
 		// First the LTPAToken2
 		retEntry = this.makeRequest({
@@ -18896,7 +18893,7 @@ function RESTCLIENT(args) {
 	}
 	
 	// Get the currently set Cookies
-	this.getCookies = function() {
+	this.getCookies = function(where) {
 		return this.cookies
 	}
  
@@ -18932,7 +18929,7 @@ function RESTCLIENT(args) {
 		// Get token if necessary
 		if (!this.gotToken && !this.gettingToken) {
 			this.gettingToken = true;
-			this.getToken();
+			this.getToken(params.where || null);
 			this.gettingToken = false;
 			this.gotToken = true;
 		} 
@@ -18946,7 +18943,7 @@ function RESTCLIENT(args) {
 		var ctype = params.ctype || "application/json";
 		var where = params.where || "";
 		var headers = params.headers || {};
-		var accept = params.accept || "application/json";
+		var accept = params.accept || "application/vnd.ibm.isim-v1+json";
 		var gettingToken = params.gettingToken || false;
 		var username = params.username || "";
 		var password = params.password || "";
@@ -18973,6 +18970,14 @@ function RESTCLIENT(args) {
 
 		if (url == this.assembleUrl([this.baseUrl, contextRoot])){
 			url = this.assembleUrl([this.baseUrl, contextRoot, "me"])
+		}
+		
+		// @@TODO Is there a better way to handle this?
+		if ("POST".equals(verb)) {
+			p = url.indexOf("{");
+			if (p > 0) {
+				url = url.substring(0, p-1)
+			}
 		}	
 		
 /* old code - can be deleted - I think		
@@ -19008,10 +19013,10 @@ function RESTCLIENT(args) {
 		this.requestEntry["http.url"] = url;
 		this.requestEntry["http.method"] = verb.toUpperCase();
 		this.requestEntry["http.Content-Type"] = ctype;
-//		this.requestEntry["http.Accept"] = accept;
+		this.requestEntry["http.Accept"] = accept;
 //		this.requestEntry["http.Connection"] = "keep-alive";
-		this.requestEntry["http.referrer"] = origUrl;
-		this.requestEntry["http.header.User-Agent"] = "Mozilla/5.0";
+//		this.requestEntry["http.referrer"] = origUrl;
+//		this.requestEntry["http.header.User-Agent"] = "Mozilla/5.0";
 		
 		// if credentials set then send them
 		if (username != ""){
@@ -19036,7 +19041,7 @@ function RESTCLIENT(args) {
 				//this.alert("\nMaking call:" + this.reduceEntry(this.requestEntry) + "\n");
 				
 				// Set cookies
- 				this.requestEntry.setAttribute("http.Cookie",this.getCookies())
+ 				this.requestEntry.setAttribute("http.Cookie",this.getCookies(where))
 				
 				
 				if (this.CSRFToken) {
