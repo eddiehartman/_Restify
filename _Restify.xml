@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Wed Aug 20 13:36:19 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Thu Aug 21 22:41:39 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
             <ModTime>1751459018091</ModTime>
@@ -200,7 +200,7 @@ task.dumpEntry(work);
             </InitParams>
         </AssemblyLine>
         <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1755591839707</ModTime>
+            <ModTime>1755806238070</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -223,24 +223,25 @@ SCHEMA class]]></parameter>
             <SimulationConfig>
                 <SimulationStates>
                     <Component name="ITIMRestClientConnector_add" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_delete" state="Simulated"/>
                     <Component name="ITIMRestClientConnector_lookup" state="Enabled"/>
+                    <Component name="ITIMRestClientConnector_delete" state="Simulated"/>
                     <Component name="ITIMRestClientConnector_update_add" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_update_modify_fails_as_not_supported_yet" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_callReply" state="Enabled"/>
                     <Component name="ITIMRestClientConnector_iterate" state="Enabled"/>
                 </SimulationStates>
                 <ProxySettings/>
             </SimulationConfig>
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer">
+                <ModTime>1755806238070</ModTime>
                 <Connector name="ITIMRestClientConnector_iterate">
-                    <InheritFrom>/Connectors/ITIMRestClientConnector_TEST</InheritFrom>
-                    <ModTime>1751457625163</ModTime>
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1755806238070</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
+                    <ConnectorState>Passive</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755806238070</ModTime>
+                        <parameter name="path">/people/person</parameter>
                         <parameter name="searchCrit">ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWRlbW8sZGM9aXZpZw</parameter>
                     </Configuration>
                     <Parser>
@@ -248,10 +249,16 @@ SCHEMA class]]></parameter>
                     </Parser>
                     <AttributeMap name="Input">
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755691238642</ModTime>
                         <AttributeMapItem>
                             <Name>*</Name>
                             <Type>simple</Type>
                             <Simple>*</Simple>
+                        </AttributeMapItem>
+                        <AttributeMapItem>
+                            <Name>JohnDoe</Name>
+                            <Type>simple</Type>
+                            <Simple>JohnDoe</Simple>
                         </AttributeMapItem>
                     </AttributeMap>
                     <AttributeMap name="Output">
@@ -300,16 +307,17 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1755591839707</ModTime>
+                <ModTime>1755805747440</ModTime>
                 <Connector name="ITIMRestClientConnector_add">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1755591839707</ModTime>
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1755805413506</ModTime>
                     <ConnectorMode>AddOnly</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
+                    <ConnectorState>Disabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
+                        <ModTime>1755805413506</ModTime>
+                        <parameter name="action">post</parameter>
+                        <parameter name="path">/people</parameter>
                     </Configuration>
                     <Parser>
                         <InheritFrom>[parent]</InheritFrom>
@@ -374,15 +382,14 @@ task.logmsg("---- After GetNext: " + conn);
                     </PoolDefinition>
                     <PoolInstance/>
                 </Connector>
-                <Connector name="ITIMRestClientConnector_delete">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1747921136747</ModTime>
-                    <ConnectorMode>Delete</ConnectorMode>
+                <Connector name="ITIMRestClientConnector_lookup">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1755805487855</ModTime>
+                    <ConnectorMode>Lookup</ConnectorMode>
                     <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
+                        <ModTime>1755805487855</ModTime>
                     </Configuration>
                     <Parser>
                         <InheritFrom>[parent]</InheritFrom>
@@ -411,13 +418,83 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
-                        <AdvancedLinkMode>true</AdvancedLinkMode>
+                        <ModTime>1755693861542</ModTime>
+                        <AdvancedLinkMode>false</AdvancedLinkMode>
                         <Script>searchVal /*defined in AL prolog*/</Script>
                         <LinkCriteriaItem>
-                            <Key>1951e416282</Key>
-                            <Attribute>personId</Attribute>
+                            <Key>198c759650e</Key>
+                            <Attribute>cn</Attribute>
                             <Operator>equals</Operator>
-                            <Value>itim manager</Value>
+                            <Value>John Doe</Value>
+                        </LinkCriteriaItem>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_lookup">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_lookup</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After Lookup: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Connector name="ITIMRestClientConnector_delete">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1755805747440</ModTime>
+                    <ConnectorMode>Delete</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805619909</ModTime>
+                        <parameter name="action">delete</parameter>
+                        <parameter name="path">/people/{personId}</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805747440</ModTime>
+                        <AdvancedLinkMode>false</AdvancedLinkMode>
+                        <Script>cn = "John Doe"</Script>
+                        <LinkCriteriaItem>
+                            <Key>1951e416282</Key>
+                            <Attribute>cn</Attribute>
+                            <Operator>equals</Operator>
+                            <Value>John Doe</Value>
                         </LinkCriteriaItem>
                     </LinkCriteria>
                     <Hooks>
@@ -441,75 +518,15 @@ task.logmsg("---- After GetNext: " + conn);
                     </PoolDefinition>
                     <PoolInstance/>
                 </Connector>
-                <Connector name="ITIMRestClientConnector_lookup">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1747921144432</ModTime>
-                    <ConnectorMode>Lookup</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AdvancedLinkMode>true</AdvancedLinkMode>
-                        <Script>searchVal /*defined in AL prolog*/</Script>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_lookup">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_lookup</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- After Lookup: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
                 <Connector name="ITIMRestClientConnector_update_add">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744477641443</ModTime>
+                    <InheritFrom>@ITIMRestClientConnector_add</InheritFrom>
+                    <ModTime>1755805724347</ModTime>
                     <ConnectorMode>Update</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
+                    <ConnectorState>Disabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
+                        <ModTime>1755805332573</ModTime>
+                        <parameter name="connectorType">@ITIMRestClientConnector_add</parameter>
                         <parameter name="parserOption">Useless</parameter>
                     </Configuration>
                     <Parser>
@@ -520,20 +537,7 @@ task.logmsg("---- After GetNext: " + conn);
                     </AttributeMap>
                     <AttributeMap name="Output">
                         <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Enabled>true</Enabled>
-                            <Add>true</Add>
-                            <Modify>true</Modify>
-                            <Script>"itim manager"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
+                        <ModTime>1755805724347</ModTime>
                     </AttributeMap>
                     <DeltaSettings>
                         <WhenToCommit>After every database operation</WhenToCommit>
@@ -548,11 +552,12 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805702574</ModTime>
                         <LinkCriteriaItem>
                             <Key>1951e434bee</Key>
-                            <Attribute>personId</Attribute>
+                            <Attribute>cn</Attribute>
                             <Operator>equals</Operator>
-                            <Value>johnny nobody</Value>
+                            <Value>John Doe</Value>
                         </LinkCriteriaItem>
                     </LinkCriteria>
                     <Hooks>
@@ -600,163 +605,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </PoolDefinition>
                     <PoolInstance/>
                 </Connector>
-                <Connector name="ITIMRestClientConnector_update_modify_fails_as_not_supported_yet">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1747921167153</ModTime>
-                    <ConnectorMode>Update</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Script>"itim manager"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AdvancedLinkMode>true</AdvancedLinkMode>
-                        <Script>searchVal /*defined in AL prolog*/</Script>
-                        <LinkCriteriaItem>
-                            <Key>1951e850c0a</Key>
-                            <Attribute>personId</Attribute>
-                            <Operator>equals</Operator>
-                            <Value>itim manager</Value>
-                        </LinkCriteriaItem>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_modify">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_modify</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- After Modify: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_modify">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_modify</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- update_modify Before Lookup: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="default_fail">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>default_fail</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add Default On Error: " + error)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Connector name="ITIMRestClientConnector_callReply">
-                    <InheritFrom>@ITIMRestClientConnector_iterate</InheritFrom>
-                    <ModTime>1744477137700</ModTime>
-                    <ConnectorMode>CallReply</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <parameter name="connectorType">@ITIMRestClientConnector_iterate</parameter>
-                        <parameter name="parserOption">Useless</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <AttributeMapItem>
-                            <Name>*</Name>
-                            <Type>simple</Type>
-                            <Simple>*</Simple>
-                        </AttributeMapItem>
-                        <AttributeMapItem>
-                            <Name>personId</Name>
-                            <Type>advanced</Type>
-                            <Script>"itim manager"</Script>
-                            <Simple>personId</Simple>
-                        </AttributeMapItem>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <Hook name="after_reply">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>after_reply</Name>
-                            <Script>task.logmsg(thisConnector.getName() + " ---- After CallReply: " + conn)</Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                        <Hook name="before_call">
-                            <InheritFrom>[no inheritance]</InheritFrom>
-                            <Name>before_call</Name>
-                            <Script><![CDATA[conn.merge(saveWork);
-task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Script>
-                            <Enabled>true</Enabled>
-                        </Hook>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
             </ContainerDF>
             <ThreadOptions/>
             <Operations/>
@@ -765,7 +613,7 @@ task.logmsg(thisConnector.getName() + " ---- Before CallReply: " + conn)]]></Scr
             </InitParams>
         </AssemblyLine>
         <AssemblyLine name="_testScriptConnectorCode">
-            <ModTime>1751459019187</ModTime>
+            <ModTime>1755708691426</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -799,8 +647,9 @@ RESTCLIENT class
             <LogConfig/>
             <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
+                <ModTime>1755708691426</ModTime>
                 <Script name="SpoofLib">
-                    <ModTime>1739287846076</ModTime>
+                    <ModTime>1755708691426</ModTime>
                     <parameter name="script"><![CDATA[function spoofing(args) {
 	this.querymode = args.querymode || 0;
 }
@@ -839,7 +688,8 @@ form = {
 			case "debug": 	 	return control(true);
 			case "path": 	 	return control("/people/{personId}");
 			case "password": 	return control("R0kz");
-			case "url": 	 	return control("http://localhost:8080");
+			case "contextroot": return control("/itim/rest");
+			case "url": 	 	return control("https://192.168.252.3:30943");
 			case "username": 	return control("edbird");
 			case "item": 		return new control("/people");
 			case "action": 		return new control("post");	
@@ -889,13 +739,16 @@ entry = system.newEntry();
 entry[""]]]></parameter>
                 </Script>
                 <Script name="Connector Form Event Script">
-                    <ModTime>1738095914651</ModTime>
-                    <parameter name="enabled">false</parameter>
+                    <ModTime>1755708483984</ModTime>
+                    <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[// 20250104 1959 Initial
 // 20250121 1154 Created RESTCLIENT class and used that instead of lots of functions
 // 20250121 2047 Copied back test Event Script after _testScriptConnectorCode succeeded in testing Form code
 // 20250121 2103 Form Working! Now to look at Mode ops (putEntry, findEntry, ...)
 // 20250128 1608 Hardened the fetchActions and fetchItems so it checks for schema first
+// 20250219 1802 Finished Fetch for parameters in Connections tab
+// 20250220 1321 Added some description to Parameters when fetched
+// 20250411 1524 Added handling of root conext parameter
 //
 //						GLOBAL VARIABLES
 //
@@ -913,8 +766,8 @@ function debug() {
 }
 
 function alert(msg) {
-	if (debug()) alert(msg);
-	main.logmsg(msg)
+	main.logmsg(msg);
+	java.lang.System.out.println(msg)
 }
 
 function alertObject(objName, obj) {
@@ -938,12 +791,12 @@ function initialize() {
 	
 	// Recreate in case parameters are changed
 	__http = new RESTCLIENT({
-						baseUrl:  form.getControl("url").getText(),
-						authUrl:  form.getControl("authUrl").getText(),
-						apikey:   form.getControl("apikey").getText(),
-						username: form.getControl("username").getText(),
-						password: form.getControl("password").getText(),
-						schemaUrl: form.getControl("schema").getText(),
+						baseUrl:  	 form.getControl("url").getText(),
+						contextRoot: form.getControl("contextRoot").getText() || "/itim/rest",
+						apikey:      form.getControl("apikey").getText(),
+						username:    form.getControl("username").getText(),
+						password:    form.getControl("password").getText(),
+						schemaUrl:   form.getControl("schema").getText(),
 						debug: debug() // true => debug output
 				})		
 }
@@ -959,7 +812,7 @@ function fetchSchema() {
 //	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
 	var schemaJSON = __http.makeRequest({
 			verb: "GET",
-			url: "/schema",
+			url: form.getControl("schema").getText(),
 			authUrl: form.getControl("authUrl").getText(),
 			ctype: "application/json",
 			where: "fetchSchema()"		
@@ -1007,6 +860,73 @@ function fetchActions() {
     updateDropdown("action",
         ["paths", selectedItem],
         "Cannot fetch actions for Path: " + selectedItem)
+}
+
+// Fetch the parameters (with descriptions) and populate the text box - appending to what is already there
+function fetchParameters() {
+	if (!__schema) throw java.lang.Exception("You must request the Schema first")
+
+	var params = __schema.getParameters(form.getControl("path").getText(),
+										form.getControl("action").getText());
+
+	updateTextBox("parameters", params)
+}
+
+// Updating a textbox control
+function updateTextBox(controlName, paramsArray) {
+	// First get the existing value and parse it (if possible)
+	var oldValue = form.getControl(controlName).getText().trim();
+	var useParams = {};
+	
+	//alert("     paramsArray: " + paramsArray.length);
+	
+	// Go through the passed parameters and set those that are not already set
+	for (var i = 0; i < paramsArray.length; i++) {
+		var param = paramsArray[i];
+		//alert("Found " + i + " " + param.name + ": " + param.description);
+		if (param["in"] != "path") {
+			// Add to the list if not something for the path itself
+			useParams[param.name] = system.splitString(param.description, ".")[0]
+									+ (system.splitString(param.description, ".")[1]);	
+		}
+	}
+	
+	// Parse the old text value into individual parameter settings and put in an Entry
+	if (oldValue) {
+		var lines = system.splitString(oldValue, "\n");
+		for (var line in lines) {
+			var parts = system.splitString(line, "=");
+			if (parts.length > 1) {
+				// Overwrite any discovered parameters with previously set values
+				useParams[parts[0].trim()] = parts[1].trim();
+			}
+		}
+	}
+	
+	alert("---- Final list of params: " + toJson(useParams))
+
+	// Get the useParams property names (param names) and sort them
+	var paramList = new java.util.ArrayList();
+	for (var propName in useParams) {
+		alert("    Adding " + propName)
+		paramList.add(propName);
+	}
+	
+	paramNames = paramList.toArray();
+	java.util.Arrays.sort(paramNames);
+	alert("    ParamNames: " + paramNames.length + " item(s)")
+
+	var newParamText = "";
+	for (var i = 0; i < paramNames.length; i++) {
+		var paramName = paramNames[i];
+		alert("    Getting " + paramName)
+		newParamText += paramName + "=" + useParams[paramName] + "\n"
+	}
+	
+	//alert(">>>> Setting Parameters value:\n" + newParamText);
+	
+	// Finally, update the control
+	form.getControl(controlName).setText(newParamText)
 }
 
 // Update dropdown based api
@@ -1077,8 +997,8 @@ function write(fname, str) {
 }]]></parameter>
                 </Script>
                 <Script name="Test Form Event Script">
-                    <ModTime>1738095916831</ModTime>
-                    <parameter name="enabled">false</parameter>
+                    <ModTime>1755707656174</ModTime>
+                    <parameter name="enabled">true</parameter>
                     <parameter name="script"><![CDATA[//initialize();
 fetchSchema();
 fetchItems();
@@ -1737,9 +1657,9 @@ function querySchema() {
                 </Script>
                 <Connector name="ITIMRestClientConnector">
                     <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1739890833962</ModTime>
+                    <ModTime>1755707640812</ModTime>
                     <ConnectorMode>AddOnly</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
+                    <ConnectorState>Disabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
                     </Configuration>
@@ -1825,8 +1745,8 @@ function querySchema() {
                     <PoolInstance/>
                 </Connector>
                 <Script name="DumpWorkEntry">
-                    <ModTime>1739367299329</ModTime>
-                    <parameter name="enabled">true</parameter>
+                    <ModTime>1755707643198</ModTime>
+                    <parameter name="enabled">false</parameter>
                     <parameter name="script"><![CDATA[// Dump the work entry
 task.dumpEntry(work);
 ]]></parameter>
@@ -2778,310 +2698,9 @@ entryList.compareFiles(["ISVG_LCR_TEST", "_testITIMRestConnector"])]]></paramete
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
-        <AssemblyLine name="_EntryList 20252703 13155">
-            <ModTime>1753271285735</ModTime>
-            <Settings>
-                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
-                <parameter name="automapattributes">false</parameter>
-                <parameter name="createTombstones">false</parameter>
-                <parameter name="includeGlobalPrologs">true</parameter>
-                <parameter name="includePrologs">ENTRYLIST class</parameter>
-                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
-            </Settings>
-            <Hooks/>
-            <CheckpointConfig/>
-            <SandboxConfig/>
-            <SimulationConfig>
-                <SimulationStates>
-                    <Component name="TheLDAPConnector" state="Enabled"/>
-                    <Component name="ENTRYLIST class" state="Enabled"/>
-                    <Component name="making JSON files" state="Enabled"/>
-                    <Component name="test ENTRYLIST saveEntry" state="Enabled"/>
-                    <Component name="ConnectorLoop" state="Enabled"/>
-                    <Component name="Write to entryList" state="Enabled"/>
-                    <Component name="testing compareFiles" state="Enabled"/>
-                    <Component name="compare files" state="Enabled"/>
-                </SimulationStates>
-                <ProxySettings/>
-            </SimulationConfig>
-            <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <ModTime>1753260997088</ModTime>
-            </ContainerEF>
-            <ContainerDF name="DataFlowContainer">
-                <ModTime>1753271285735</ModTime>
-                <Connector name="TheLDAPConnector">
-                    <InheritFrom>system:/Connectors/ibmdi.LDAP</InheritFrom>
-                    <ModTime>1753261016781</ModTime>
-                    <ConnectorMode>Iterator</ConnectorMode>
-                    <ConnectorState>Passive</ConnectorState>
-                    <Configuration>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1753260995038</ModTime>
-                        <parameter name="ldapSearchBase">o=University at Buffalo,c=US</parameter>
-                        <parameter name="ldapUrl">ldap://ldap.buffalo.edu:389</parameter>
-                    </Configuration>
-                    <Parser>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1753260957845</ModTime>
-                    </Parser>
-                    <AttributeMap name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1753260957845</ModTime>
-                    </AttributeMap>
-                    <AttributeMap name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1753260957845</ModTime>
-                    </AttributeMap>
-                    <DeltaSettings>
-                        <ModTime>1753260997088</ModTime>
-                        <WhenToCommit>After every database operation</WhenToCommit>
-                        <RowLocking>SERIALIZABLE</RowLocking>
-                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                    </DeltaSettings>
-                    <Schema name="Input">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1753260957845</ModTime>
-                    </Schema>
-                    <Schema name="Output">
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1753260957845</ModTime>
-                    </Schema>
-                    <LinkCriteria>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1753260957845</ModTime>
-                    </LinkCriteria>
-                    <Hooks>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1753260957845</ModTime>
-                    </Hooks>
-                    <CheckpointConfig/>
-                    <SandboxConfig/>
-                    <Reconnect>
-                        <InheritFrom>[parent]</InheritFrom>
-                        <ReconnectRules/>
-                    </Reconnect>
-                    <Operations/>
-                    <PoolDefinition>
-                        <InheritFrom>[parent]</InheritFrom>
-                    </PoolDefinition>
-                    <PoolInstance/>
-                </Connector>
-                <Script name="ENTRYLIST class">
-                    <InheritFrom>/Scripts/ENTRYLIST class</InheritFrom>
-                    <ModTime>1753201936073</ModTime>
-                </Script>
-                <Branch name="making JSON files">
-                    <ModTime>1753269929084</ModTime>
-                    <Script name="test ENTRYLIST saveEntry">
-                        <ModTime>1753259975625</ModTime>
-                        <parameter name="script"><![CDATA[var entryList = new ENTRYLIST("ISVG_LCR_TEST.json")
-
-cnt = 0;]]></parameter>
-                    </Script>
-                    <Loop name="ConnectorLoop">
-                        <ModTime>1753269929084</ModTime>
-                        <LoopType>1</LoopType>
-                        <LoopInitOption>0</LoopInitOption>
-                        <Connector name="ConnectorLoop">
-                            <InheritFrom>@TheLDAPConnector</InheritFrom>
-                            <ModTime>1753261485575</ModTime>
-                            <ConnectorMode>Iterator</ConnectorMode>
-                            <ConnectorState>Enabled</ConnectorState>
-                            <Configuration>
-                                <InheritFrom>[parent]</InheritFrom>
-                                <ModTime>1753261034010</ModTime>
-                                <parameter name="connectorType">@TheLDAPConnector</parameter>
-                                <parameter name="ldapSearchBase">o=University at Buffalo,c=US</parameter>
-                                <parameter name="ldapUrl">ldap://ldap.buffalo.edu:389</parameter>
-                                <parameter name="parserOption">Useless</parameter>
-                            </Configuration>
-                            <Parser>
-                                <InheritFrom>[parent]</InheritFrom>
-                            </Parser>
-                            <AttributeMap name="Input">
-                                <InheritFrom>[parent]</InheritFrom>
-                                <ModTime>1753199607546</ModTime>
-                                <AttributeMapItem>
-                                    <Name>*</Name>
-                                    <Type>simple</Type>
-                                    <Simple>*</Simple>
-                                </AttributeMapItem>
-                            </AttributeMap>
-                            <AttributeMap name="Output"/>
-                            <DeltaSettings>
-                                <ModTime>1753199386419</ModTime>
-                                <UniqueAttribute/>
-                                <WhenToCommit>After every database operation</WhenToCommit>
-                                <RowLocking>SERIALIZABLE</RowLocking>
-                                <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
-                            </DeltaSettings>
-                            <Schema name="Input">
-                                <InheritFrom>[parent]</InheritFrom>
-                            </Schema>
-                            <Schema name="Output">
-                                <UserComment>{extsyntax=TEXTAREA, name=userComment}</UserComment>
-                                <InheritFrom>[no inheritance]</InheritFrom>
-                                <ModTime>1753199385516</ModTime>
-                                <SchemaItem>
-                                    <Name>automapADPassword</Name>
-                                    <NativeSyntax>boolean</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>connectorFlags</Name>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>debug</Name>
-                                    <NativeSyntax>boolean</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>jndiExtraProviderParams</Name>
-                                    <NativeSyntax>textarea</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapAddAttr</Name>
-                                    <NativeSyntax>BOOLEAN</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapAuthenticationMethod</Name>
-                                    <NativeSyntax>DROPLIST</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapBERTrace</Name>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapBinaryAttributes</Name>
-                                    <NativeSyntax>textarea</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapPageSize</Name>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapPassword</Name>
-                                    <NativeSyntax>PASSWORD</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapReferrals</Name>
-                                    <NativeSyntax>droplist</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapReturnAttributes</Name>
-                                    <NativeSyntax>textarea</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapSearchBase</Name>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapSearchFilter</Name>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapSearchScope</Name>
-                                    <NativeSyntax>droplist</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapSizeLimit</Name>
-                                    <NativeSyntax>string</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapSortAttribute</Name>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapTimeLimit</Name>
-                                    <NativeSyntax>string</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapUrl</Name>
-                                    <NativeSyntax>panel</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapUseSSL</Name>
-                                    <NativeSyntax>BOOLEAN</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapUsername</Name>
-                                    <NativeSyntax>DN</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>ldapVLVPageSize</Name>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>setOprAttributes</Name>
-                                    <NativeSyntax>BOOLEAN</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>simulateRename</Name>
-                                    <NativeSyntax>boolean</NativeSyntax>
-                                </SchemaItem>
-                                <SchemaItem>
-                                    <Name>userComment</Name>
-                                    <NativeSyntax>TEXTAREA</NativeSyntax>
-                                </SchemaItem>
-                            </Schema>
-                            <LinkCriteria/>
-                            <Hooks>
-                                <InheritFrom>[parent]</InheritFrom>
-                                <ModTime>1753261485575</ModTime>
-                                <Hook name="after_getnext">
-                                    <InheritFrom>[no inheritance]</InheritFrom>
-                                    <Name>after_getnext</Name>
-                                    <Script><![CDATA[cnt++
-
-if (cnt > 2) entryList = new ENTRYLIST("Restify.json")]]></Script>
-                                    <Enabled>true</Enabled>
-                                </Hook>
-                            </Hooks>
-                            <CheckpointConfig/>
-                            <SandboxConfig/>
-                            <Reconnect>
-                                <InheritFrom>[parent]</InheritFrom>
-                                <ReconnectRules/>
-                            </Reconnect>
-                            <Operations/>
-                            <PoolDefinition>
-                                <InheritFrom>[parent]</InheritFrom>
-                            </PoolDefinition>
-                            <PoolInstance/>
-                            <LookupLimit>4</LookupLimit>
-                        </Connector>
-                        <Branch name="ConnectorLoop">
-                            <ModTime>1753269929084</ModTime>
-                            <Script name="Write to entryList">
-                                <ModTime>1753269929084</ModTime>
-                                <parameter name="script">entryList.write(work);</parameter>
-                            </Script>
-                            <Conditions/>
-                            <MatchAny>false</MatchAny>
-                            <Enabled>true</Enabled>
-                            <Type>0</Type>
-                        </Branch>
-                    </Loop>
-                    <Conditions/>
-                    <MatchAny>false</MatchAny>
-                    <Enabled>false</Enabled>
-                    <Type>0</Type>
-                </Branch>
-                <Branch name="testing compareFiles">
-                    <ModTime>1753271285735</ModTime>
-                    <Script name="compare files">
-                        <ModTime>1753271285735</ModTime>
-                        <parameter name="script"><![CDATA[entryList = new ENTRYLIST()
-
-entryList.compareFiles(["ISVG_LCR_TEST", "_testITIMRestConnector"])]]></parameter>
-                    </Script>
-                    <Conditions/>
-                    <MatchAny>false</MatchAny>
-                    <Enabled>true</Enabled>
-                    <Type>0</Type>
-                </Branch>
-            </ContainerDF>
-            <ThreadOptions/>
-            <Operations/>
-            <InitParams>
-                <Schema name="AssemblyLineInitParams"/>
-            </InitParams>
-        </AssemblyLine>
+        
     <AssemblyLine name="ISVG_LCR_TEST Revised">
-            <ModTime>1755088187669</ModTime>
+            <ModTime>1755808136701</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -3104,9 +2723,9 @@ entryList.compareFiles(["ISVG_LCR_TEST", "_testITIMRestConnector"])]]></paramete
                 <ModTime>1755085623814</ModTime>
             </ContainerEF>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1755088187669</ModTime>
+                <ModTime>1755808136701</ModTime>
                 <Script name="Do it">
-                    <ModTime>1755088187669</ModTime>
+                    <ModTime>1755808136701</ModTime>
                     <parameter name="script"><![CDATA[resthost = "https://192.168.252.3:30943";
 myUserID = "itim manager";
 myPassword = "Passw0rd"; a = 42
@@ -3127,8 +2746,12 @@ httpcall.setAttribute("http.body","j_username=" + myUserID + "&j_password=" + my
 httpReply = myHttpConn.queryReply(httpcall);
 task.logmsg("Request1 : " + httpcall + "\n Reply1 : " + httpReply);
 
-responseCode = httpReply.getString("responseCode");
-if (!responseCode.startsWith("2")) throw "Got reponseCode: " + responseCode;
+
+
+
+
+responseCode = httpReply.getString("http.responseCode");
+if (!responseCode.startsWith("3") && !responseCode.startsWith("2")) throw "Got reponseCode: " + responseCode;
 
 //Get LTPAToken2 from the Set-Cookie set of tokens
 var myTokens = httpReply.getAttribute("http.Set-Cookie");
@@ -3155,8 +2778,7 @@ httpcall.setAttribute("http.fromISC","true");
 //Perform call
 httpReply = myHttpConn.queryReply(httpcall);
 task.logmsg("Request2 : " + httpcall + "\n Reply2 : " + httpReply);
-
-responseCode = httpReply.getString("responseCode");
+responseCode = httpReply.getString("http.responseCode");
 if (!responseCode.startsWith("2")) throw "Got reponseCode: " + responseCode;
 
 //Retrieve CSRFToken
@@ -3165,6 +2787,13 @@ task.logmsg("CSRFToken : " + CSRFToken)
 
 //What other cookies ?
 myCookies = httpReply.getAttribute("http.Set-Cookie");
+
+
+
+
+
+
+
 
 //do a person add
 myHttpConn = system.getConnector("ibmdi.HTTPClient");
@@ -3194,7 +2823,7 @@ httpcall.setAttribute("http.CSRFToken",CSRFToken);
 httpReply = myHttpConn.queryReply(httpcall);
 task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
 
-responseCode = httpReply.getString("responseCode");
+responseCode = httpReply.getString("http.responseCode");
 if (!responseCode.startsWith("2")) throw "Got reponseCode: " + responseCode;
 
 //Sleep to allow the user to be created
@@ -3218,7 +2847,7 @@ httpcall.setAttribute("http.Cookie",myCookies);
 httpReply = myHttpConn.queryReply(httpcall);
 task.logmsg("Request4 : " + httpcall + "\n Reply4 : " + httpReply);
 
-responseCode = httpReply.getString("responseCode");
+responseCode = httpReply.getString("http.responseCode");
 if (!responseCode.startsWith("2")) throw "Got reponseCode: " + responseCode;
 
 myJSONResponse = fromJson(httpReply.getString("http.bodyAsString"));
@@ -3283,16 +2912,428 @@ task.logmsg("Request9 : " + httpcall + "\n Reply9 : " + httpReply);]]></paramete
                 <Schema name="AssemblyLineInitParams"/>
             </InitParams>
         </AssemblyLine>
+    <AssemblyLine name="_testITIMRestConnector 20250821 2149">
+            <ModTime>1755805747440</ModTime>
+            <Settings>
+                <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
+                <parameter name="automapattributes">false</parameter>
+                <parameter name="createTombstones">false</parameter>
+                <parameter name="includeGlobalPrologs">true</parameter>
+                <parameter name="includePrologs"><![CDATA[RESTCLIENT class
+SCHEMA class]]></parameter>
+                <parameter name="nullBehaviorDialog">showNullBehavior</parameter>
+            </Settings>
+            <Hooks>
+                <Hook name="prolog0">
+                    <InheritFrom>[no inheritance]</InheritFrom>
+                    <Name>prolog0</Name>
+                    <Script>searchVal = "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw"</Script>
+                    <Enabled>true</Enabled>
+                </Hook>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <SimulationConfig>
+                <SimulationStates>
+                    <Component name="ITIMRestClientConnector_add" state="Simulated"/>
+                    <Component name="ITIMRestClientConnector_lookup" state="Enabled"/>
+                    <Component name="ITIMRestClientConnector_delete" state="Simulated"/>
+                    <Component name="ITIMRestClientConnector_update_add" state="Simulated"/>
+                    <Component name="ITIMRestClientConnector_iterate" state="Enabled"/>
+                </SimulationStates>
+                <ProxySettings/>
+            </SimulationConfig>
+            <LogConfig/>
+            <ContainerEF name="EntryFeedContainer">
+                <ModTime>1755805277194</ModTime>
+                <Connector name="ITIMRestClientConnector_iterate">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1755805277194</ModTime>
+                    <ConnectorMode>Iterator</ConnectorMode>
+                    <ConnectorState>Passive</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805277194</ModTime>
+                        <parameter name="searchCrit">ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWRlbW8sZGM9aXZpZw</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755691238642</ModTime>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                        <AttributeMapItem>
+                            <Name>JohnDoe</Name>
+                            <Type>simple</Type>
+                            <Simple>JohnDoe</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <UniqueAttribute/>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_getnext">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_getnext</Name>
+                            <Script><![CDATA[saveWork = system.newEntry();
+saveWork.merge(conn);
+
+task.logmsg("---- After GetNext: " + conn);
+
+// pass work on to add connector]]></Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerEF>
+            <ContainerDF name="DataFlowContainer">
+                <ModTime>1755805747440</ModTime>
+                <Connector name="ITIMRestClientConnector_add">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1755805413506</ModTime>
+                    <ConnectorMode>AddOnly</ConnectorMode>
+                    <ConnectorState>Disabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805413506</ModTime>
+                        <parameter name="action">post</parameter>
+                        <parameter name="path">/people</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755591839707</ModTime>
+                        <AttributeMapItem>
+                            <Name>OrgId</Name>
+                            <Type>advanced</Type>
+                            <Script>"ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1pdmlnLGRjPWl2aWc"</Script>
+                            <Simple>OrgId</Simple>
+                        </AttributeMapItem>
+                        <AttributeMapItem>
+                            <Name>cn</Name>
+                            <Type>advanced</Type>
+                            <Script>"John Doe"</Script>
+                            <Simple>cn</Simple>
+                        </AttributeMapItem>
+                        <AttributeMapItem>
+                            <Name>givenname</Name>
+                            <Type>advanced</Type>
+                            <Script>"John"</Script>
+                            <Simple>givenname</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="addonly_ok">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>addonly_ok</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- Add Successful: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Connector name="ITIMRestClientConnector_lookup">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1755805487855</ModTime>
+                    <ConnectorMode>Lookup</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805487855</ModTime>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755693861542</ModTime>
+                        <AdvancedLinkMode>false</AdvancedLinkMode>
+                        <Script>searchVal /*defined in AL prolog*/</Script>
+                        <LinkCriteriaItem>
+                            <Key>198c759650e</Key>
+                            <Attribute>cn</Attribute>
+                            <Operator>equals</Operator>
+                            <Value>John Doe</Value>
+                        </LinkCriteriaItem>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_lookup">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_lookup</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After Lookup: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Connector name="ITIMRestClientConnector_delete">
+                    <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
+                    <ModTime>1755805747440</ModTime>
+                    <ConnectorMode>Delete</ConnectorMode>
+                    <ConnectorState>Enabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805619909</ModTime>
+                        <parameter name="action">delete</parameter>
+                        <parameter name="path">/people/{personId}</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <AttributeMapItem>
+                            <Name>*</Name>
+                            <Type>simple</Type>
+                            <Simple>*</Simple>
+                        </AttributeMapItem>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805747440</ModTime>
+                        <AdvancedLinkMode>false</AdvancedLinkMode>
+                        <Script>cn = "John Doe"</Script>
+                        <LinkCriteriaItem>
+                            <Key>1951e416282</Key>
+                            <Attribute>cn</Attribute>
+                            <Operator>equals</Operator>
+                            <Value>John Doe</Value>
+                        </LinkCriteriaItem>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_delete">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_delete</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- After Delete: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+                <Connector name="ITIMRestClientConnector_update_add">
+                    <InheritFrom>@ITIMRestClientConnector_add</InheritFrom>
+                    <ModTime>1755805724347</ModTime>
+                    <ConnectorMode>Update</ConnectorMode>
+                    <ConnectorState>Disabled</ConnectorState>
+                    <Configuration>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805332573</ModTime>
+                        <parameter name="connectorType">@ITIMRestClientConnector_add</parameter>
+                        <parameter name="parserOption">Useless</parameter>
+                    </Configuration>
+                    <Parser>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Parser>
+                    <AttributeMap name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </AttributeMap>
+                    <AttributeMap name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805724347</ModTime>
+                    </AttributeMap>
+                    <DeltaSettings>
+                        <WhenToCommit>After every database operation</WhenToCommit>
+                        <RowLocking>SERIALIZABLE</RowLocking>
+                        <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+                    </DeltaSettings>
+                    <Schema name="Input">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <Schema name="Output">
+                        <InheritFrom>[parent]</InheritFrom>
+                    </Schema>
+                    <LinkCriteria>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ModTime>1755805702574</ModTime>
+                        <LinkCriteriaItem>
+                            <Key>1951e434bee</Key>
+                            <Attribute>cn</Attribute>
+                            <Operator>equals</Operator>
+                            <Value>John Doe</Value>
+                        </LinkCriteriaItem>
+                    </LinkCriteria>
+                    <Hooks>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <Hook name="after_add">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>after_add</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add After Add: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                        <Hook name="after_lookup">
+                            <Name>after_lookup</Name>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                        <Hook name="before_add">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>before_add</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " ---- update_add After Lookup: " + conn)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                        <Hook name="before_modify">
+                            <Name>before_modify</Name>
+                            <Enabled>false</Enabled>
+                        </Hook>
+                        <Hook name="before_update">
+                            <Name>before_update</Name>
+                            <Enabled>false</Enabled>
+                        </Hook>
+                        <Hook name="default_fail">
+                            <InheritFrom>[no inheritance]</InheritFrom>
+                            <Name>default_fail</Name>
+                            <Script>task.logmsg(thisConnector.getName() + " !!!! Error: " + error)</Script>
+                            <Enabled>true</Enabled>
+                        </Hook>
+                    </Hooks>
+                    <CheckpointConfig/>
+                    <SandboxConfig/>
+                    <Reconnect>
+                        <InheritFrom>[parent]</InheritFrom>
+                        <ReconnectRules/>
+                    </Reconnect>
+                    <Operations/>
+                    <PoolDefinition>
+                        <InheritFrom>[parent]</InheritFrom>
+                    </PoolDefinition>
+                    <PoolInstance/>
+                </Connector>
+            </ContainerDF>
+            <ThreadOptions/>
+            <Operations/>
+            <InitParams>
+                <Schema name="AssemblyLineInitParams"/>
+            </InitParams>
+        </AssemblyLine>
     </Folder>
     <Folder name="Connectors">
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1755689674231</ModTime>
+            <ModTime>1755808587265</ModTime>
             <ConnectorMode>Delta</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1755689674231</ModTime>
+                <ModTime>1755808587265</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="816" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Apr 11 16:29:01 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1744381739943</ModTime>
@@ -3802,7 +3843,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">jxGj42p4Tt1kwH1dtbTwThwKqtHwsn3fTMOfdTTJVuogleC7rrS9h+mgjsWvxiOkW2nNDvj3A9M+b+xREzssC6zJiFV3LgXtzIseLgPdD7KKSi7cOFRsOB2RhCn0mwqkE+oNW/vxut9UHP3P7wkhUBlbZVEGIOO5VtPR8w7gGLQ=</parameter>
+                <parameter encrypted="true" name="apikey">KKD52OwKk50FesX82NwuqCgYiyWVfFD2eKU9s+Ef1J1zAL4HWgx99hmwnUwwm2xDhCI+svX3GiH048POA2qrLEOXnwu+pnRp/seh5BE6cVdal4dT1h/yiHb6d8WWtx5CY9l0pgWhfjMULiFMhNQH1thONu/V+g/EBXgjpItBYjQ=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -3813,8 +3854,8 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">ME3KizLgxUidddUJUAsyc7Rto6lEuFBKGH5BA+Gqgd19LHFQYbiOh5pNpLjvzY2Y7wvTkMWdmHcR03yaT1NSHReHPcnOo9eV5ZLN84n+b9dzb/7e/Si/8q0T+QYAeHXpXY1IDkj1vvA4KRKMlrMkYQi/1nRhd5tb4pko3PmUbNY=</parameter>
-                <parameter name="path">/people/{personId}</parameter>
+                <parameter encrypted="true" name="password">gLf7/h0wu1x4XamsuTaKKJ+8SIDyDF0gnpZ783zr3JuQN0kxgrZgV9VPcW+dz9l/odzykLqsuDr65zq3MKR+kY5UzMu1vvwJytsG3bYvB191mb9EU0Yda8Hkr0ZVtipruN89kjo7mptdFi8vUTA7kx4HtZXk7QbhAx06V0SMSwQ=</parameter>
+                <parameter name="path">/people</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
                 <parameter name="script"><![CDATA[// 20250104 2008 Initial
@@ -3845,6 +3886,7 @@ RESTCLIENT class]]></parameter>
 // 20250411 1621 Making contextRoot a parameter
 // 20250423 1428 Sending contextRoot to RestClient constructor
 // 20250703 0951 Corrected putEntry() to use PUT not POST
+// 20250820 1813 Fixed deleteEntry and now working on support search via Link Crit
 //
 // --- TODO Freetext parameter where all the standard set of parameter values can be set
 //                                        
@@ -3911,26 +3953,9 @@ function craftQueryString(args) {
 	var connParams = args.connParams;
 	var useParams = args.epParams || {};
 	var entry = args.entry || __emptyEntry;
-	
-	var embeddedUID = __schema.getEmbeddedUID(path);
+	var filter = args.filter || "";
 
-	var paramsEntry = connParamField2Entry(connParams);
-	
-	var epParams = [];
-	for (var i in useParams) {
-		var param = useParams[i];
-		var paramName = param.name;
-		if (param["in"] == "query" || true) {
-			if (entry[paramName] != null || paramsEntry[paramName] != null) {
-				paramValue = paramsEntry[paramName] ? paramsEntry[paramName].getValue() : entry[paramName].getValue(0);
-				if (paramValue != null) {
-					epParams.push(paramName + "=" + paramValue)
-				}
-			}
-		}	
-	}
-	
-	return epParams.join("&")
+	return filter
 }
 
 function fixUrl(url) {
@@ -3950,12 +3975,15 @@ function resetConnector() {
 	__initialized = false;
 	__resultSetIndex = 0;
 	
-	
 	// Now zero out the __resultSet global ArrayList
-	__resultSet = new java.util.ArrayList();
+	if (!__resultSet) {
+		__resultSet = new java.util.ArrayList();
+	} else {
+		__resultSet.clear()
+	}
 
 	if (typeof list != "undefined") list.clear(); // so it works while spoofing
-	if (__http != null) __http.terminate();
+	//if (__http != null) __http.terminate(); @@TODO is this necessary?
 	
 	// Renew the RESTCLIENT with the currently set parameters
 	if (!RESTCLIENT) eval(system.getScriptText("RESTCLIENT class"));
@@ -4115,7 +4143,7 @@ function beautifyValue(val) {
 // If the entry passed is null, then don't go looking for the Attribute
 function extractUID(entry, epParams, connParams) {
 	var uid = "";
-	var uidAttName = "Unspecified";
+	var uidAttName = null;
 
 	for (var i in epParams) {
 		var param = epParams[i];
@@ -4162,7 +4190,7 @@ function replaceEmbeddedUID(path, entryUID) {
 
 function initialize() {
 	refreshParameters();
-	resetConnector();
+	if (!__http) resetConnector();
 	parseSchema()
 }
 
@@ -4218,8 +4246,10 @@ function queryReply() {
 function selectEntries(queryMode) {
 	queryMode = queryMode || "Data"; // defaults to data
 	// Clear out the selected array of entries and set the index to 0
-	__resultSetIndex = 0;
-	if (typeof(form) == "undefined") __resultSet.clear();
+
+	//resetConnector();@@TODO will not re-init with new params
+
+	//@@TODO is this necesary here: if (typeof(form) == "undefined") __resultSet.clear();
 	
 	// Always get the latest parameter settings
 	var connParams = refreshParameters();
@@ -4240,27 +4270,22 @@ function selectEntries(queryMode) {
 			entry[paramName] = beautifyValue(restParams[i]);
 		}
 		
-		__resultSet.add(entry)
+		__resultSet.add(entry.href)
 	} else {
 		// ...else work like getNextEntry() usually does and return data
 		
-		// This the search filter parameter in the Connections tab
-		var personId = connParams.searchCrit;
-		if (!personId) throw java.lang.Exception("Search criteria (personId) must be configured")
-		
 		// Get the path and replace id's as required
-		var usePath = replaceEmbeddedUID(connParams.path, personId);
-	
+		var usePath = connParams.path;
+		
 		// Now for queryParameters
 		var queryString = craftQueryString({
 			connParams: connParams,
 			path: usePath,
 			epParams: epParams,
-			action: connParams.action,
-			entry: entry
+			action: connParams.action
 		});
 		
-		// If there is a queryString, prepend it with ?
+c		// If there is a queryString, prepend it with ?
 		queryString = queryString ? "?" + queryString : "";
 		
 		//main.logmsg("selectEntries for Data - making call");
@@ -4269,15 +4294,15 @@ function selectEntries(queryMode) {
 			// Make the REST call @@TODO Only does GET for now
 			var reply = __http.makeRequest({
 					verb: "GET",
-					url: usePath + queryString,
+					url: usePath,
 					ctype: "application/json",
 					where: "selectEntries()"
 			});
 		
-			//main.logmsg("selectEntries for Data - Reply: " + com.ibm.di.entry.Entry.fromJSON(toJson(reply)));
-	
-			// Update the global 'entry' variable with these values
-			var entry = toEntry(reply);
+			// Update the global __resultSet
+			var resultSetObj = reply;
+			
+			
 			
 			//main.logmsg("selectEntries for Data - toEntry(): " + entry);
 	
@@ -4362,6 +4387,10 @@ function modEntry() {
 }
 
 function deleteEntry(entryArg) {
+	var scriptedCrit = searchCriteria.getScriptFilter();
+	var ldapFilter = searchCriteria.getLDAPFilter();
+	var filter = ldapFilter || scriptedCrit;
+	
 	// entryArg is optional and is for easier testing
 	entry = entry || entryArg;
 	
@@ -4370,20 +4399,21 @@ function deleteEntry(entryArg) {
 	// Get the parameters for this path + actoin
 	var epParams = getParameters(connParams.path, connParams.action);
 	
+	// Check parameters for the one in the path(base) - the UID
+	var uidObj = extractUID(null, epParams, connParams);
+	
+	var entryUID = uidObj.value;
+	var entryUIDattName = uidObj.name;
+	
 	// Now for queryParameters
 	var queryString = craftQueryString({
 		connParams: connParams,
 		path: usePath,
 		epParams: epParams,
 		action: connParams.action,
-		entry: entry
+		entry: entry,
+		filter: filter
 	});
-	
-	// Check parameters for the one in the path(base) - the UID
-	var uidObj = extractUID(null, epParams, connParams);
-	
-	var entryUID = uidObj.value;
-	var entryUIDattName = uidObj.name;
 	
 	// If there is a queryString, prepend it with ?
 	queryString = queryString ? "?" + queryString : "";
@@ -4413,50 +4443,14 @@ function findEntry(searchCriteria) {
 	// Allows you to pass in the search criteria for easier testing	
 	searchCriteria = searchCriteria || search;
 
-	var critValue,
-		critName;
-	var critMatch = com.ibm.di.server.SearchCriteria.EXACT;
-	var crit = searchCriteria.getScriptFilter();
+	var scriptedCrit = searchCriteria.getScriptFilter();
+	var ldapFilter = searchCriteria.getLDAPFilter();
+	var filter = ldapFilter || scriptedCrit;
 
 	// Always get the latest parameter settings
 	var connParams = refreshParameters();
 	// Get the parameters for this path + actoin
 	var epParams = getParameters(connParams.path, connParams.action);
-	
-	// Check parameters for the one in the path(base) - the UID
-	uidObj = extractUID(null, epParams, connParams); // Passing null for the first argument stifles any "UID must be mapped" problems
-	
-	// If there is a scripted filter then use this
-	if (crit) {
-		var parts = system.splitString(crit, "="); // @@TODO No need to handle other operators - for now :)
-		if (parts.length >= 2) {
-			critName = parts[0].trim();
-			critValue = parts[1].trim();
-			critValue = system.remove("\"\'", (critValue || "")) // Remove quotes from the value
-		} else {
-			critName = uidObj.name;
-			critValue = crit
-		}
-
-		// Set up the criteria
-		crit = {
-			name: critName || "Unspecified",
-			match: critMatch,
-			value: critValue
-		}
-	} 
-	else { // If no scripted filter, then grab the first Link Criteria //@@TODO Again, only handling one Link Crit for now
-		try {
-			crit = searchCriteria.getCriteria(0);
-		} catch (ex) {
-			throw new java.lang.Exception("You must configure at least one Link Criteria, or provide a script filter")
-		}
-	}
-
-	// Now check that the attribute name in the filter is the UID parameter name from the OpenAPI schema
-	if (!crit.name.equalsIgnoreCase(uidObj.name)) {
-		throw new java.lang.Exception("Search criteria must be for the UID attribute: " + uidObj.name)
-	}
 	
 	// Now for queryParameters
 	var queryString = craftQueryString({
@@ -4464,15 +4458,12 @@ function findEntry(searchCriteria) {
 		path: usePath,
 		epParams: epParams,
 		action: connParams.action,
-		entry: entry
+		entry: entry,
+		filter: filter
 	});
 	
 	// If there is a queryString, prepend it with ?
 	queryString = queryString ? "?" + queryString : "";
-	
-	// Get the path and replace id's as required
-	var entryUID = crit.value;
-	var usePath = replaceEmbeddedUID(connParams.path, entryUID);
 
 	//main.logmsg("putEntry - making call");
 
@@ -4565,7 +4556,7 @@ function querySchema(queryMode) {
 	return list
 }]]></parameter>
                 <parameter name="searchCrit">itim manager</parameter>
-                <parameter name="url">https://149.81.9.250:31014</parameter>
+                <parameter name="url">https://192.168.252.3:30943</parameter>
                 <parameter name="username">itim manager</parameter>
             </Configuration>
             <Parser>
@@ -4806,6 +4797,1377 @@ function querySchema(queryMode) {
             <PoolDefinition>
                 <InheritFrom>[parent]</InheritFrom>
                 <ModTime>1750927198808</ModTime>
+                <Enabled>false</Enabled>
+                <MinPoolSize>0</MinPoolSize>
+                <MaxPoolSize>0</MaxPoolSize>
+                <PurgeInterval>0</PurgeInterval>
+                <InitializeAttempts>1</InitializeAttempts>
+                <InitializeSleepInterval>0</InitializeSleepInterval>
+            </PoolDefinition>
+            <PoolInstance/>
+        </Connector>
+    
+    <Connector name="ITIMRestClientConnector 20250821 2240">
+            <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
+            <ModTime>1755808587265</ModTime>
+            <ConnectorMode>Delta</ConnectorMode>
+            <ConnectorState>Enabled</ConnectorState>
+            <Configuration>
+                <InheritFrom>[parent]</InheritFrom>
+                <ModTime>1755808587265</ModTime>
+                <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="816" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Apr 11 16:29:01 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+    <Form name="Form">
+        <ModTime>1744381739943</ModTime>
+        <FormItemNames>
+            <ListItem>$GLOBAL.script</ListItem>
+            <ListItem>keepGlobalState</ListItem>
+            <ListItem>$GLOBAL.includeFiles</ListItem>
+            <ListItem>includePrologs</ListItem>
+            <ListItem>$GLOBAL.debug</ListItem>
+            <ListItem>$GLOBAL.help</ListItem>
+            <ListItem>PathToObjects</ListItem>
+            <ListItem>Clear</ListItem>
+            <ListItem>apikey</ListItem>
+            <ListItem>action</ListItem>
+            <ListItem>username</ListItem>
+            <ListItem>password</ListItem>
+            <ListItem>authUrl</ListItem>
+            <ListItem>path</ListItem>
+            <ListItem>schema</ListItem>
+            <ListItem>url</ListItem>
+            <ListItem>debug</ListItem>
+            <ListItem>searchCrit</ListItem>
+            <ListItem>includeUIDs</ListItem>
+            <ListItem>parameters</ListItem>
+            <ListItem>contextRoot</ListItem>
+        </FormItemNames>
+        <FormSectionNames>
+            <ListItem>General</ListItem>
+            <ListItem>Advanced</ListItem>
+        </FormSectionNames>
+        <FormItem name="APIKey"/>
+        <FormItem name="Action">
+            <ModTime>1735050078962</ModTime>
+            <parameter name="description">Operation to apply to the selected Item</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchActions</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="Clear">
+            <ModTime>1737024086705</ModTime>
+            <parameter name="label"/>
+            <parameter name="noLabel">true</parameter>
+            <parameter name="script">clearDropdowns</parameter>
+            <parameter name="scriptLabel">Clear Path and Action</parameter>
+            <parameter name="syntax">static</parameter>
+        </FormItem>
+        <FormItem name="Item">
+            <ModTime>1734098635211</ModTime>
+            <parameter name="description">The resource item to operation on</parameter>
+            <parameter name="label">Item</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="script2"/>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="scriptLabel2"/>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="Object">
+            <ModTime>1733572441046</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Item to perform operations on</parameter>
+            <parameter name="label">	formdata.items = formdata.items || {};</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel"/>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="Operation">
+            <ModTime>1733750352248</ModTime>
+            <parameter name="description">Operation to apply to the selected Object</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchOperations</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="PathToObjects">
+            <ModTime>1733398344461</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">The openAPIschema is hierarchical, so at what level in the tree do resource items appear. Separate tree branches by pipe symbol (|)</parameter>
+            <parameter name="label">Path to Items</parameter>
+            <parameter name="script"/>
+            <parameter name="scriptLabel"/>
+        </FormItem>
+        <FormItem name="Show">
+            <ModTime>1733312883681</ModTime>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="action">
+            <ModTime>1736017096799</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Operation to apply to the selected path (resource item)</parameter>
+            <parameter name="label">Action</parameter>
+            <parameter name="script">fetchActions</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="apikey">
+            <ModTime>1737489711326</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">API Key provided for access to the service</parameter>
+            <parameter name="label">API Key</parameter>
+            <parameter name="syntax">password</parameter>
+        </FormItem>
+        <FormItem name="authUrl">
+            <ModTime>1738951255789</ModTime>
+            <parameter name="description">Path to the authentication service, often with 'token' in its name</parameter>
+            <parameter name="label">Auth URL</parameter>
+        </FormItem>
+        <FormItem name="baseUrl">
+            <ModTime>1737024040596</ModTime>
+            <parameter name="description">The first part of the URL, http://&lt;domain&gt;:&lt;port&gt;, with colon and port number required only if not port 80</parameter>
+            <parameter name="label">var __emptyEntry = system.newEntry();</parameter>
+        </FormItem>
+        <FormItem name="contextRoot">
+            <ModTime>1744381423808</ModTime>
+            <parameter name="description">Default value if left blank is: /itim/rest</parameter>
+            <parameter name="label">Context Root</parameter>
+        </FormItem>
+        <FormItem name="dashes">
+            <ModTime>1734099205004</ModTime>
+            <parameter name="label">_________________________________________________________________________________</parameter>
+            <parameter name="script"/>
+            <parameter name="scriptLabel"/>
+            <parameter name="syntax">static</parameter>
+        </FormItem>
+        <FormItem name="debug">
+            <ModTime>1737459130079</ModTime>
+            <parameter name="description">Yes or no</parameter>
+            <parameter name="label">Debug output</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="dropdown"/>
+        <FormItem name="includePrologs">
+            <parameter name="description">pro_desc</parameter>
+            <parameter name="label">pro_label</parameter>
+            <parameter name="script">selectGlobalProlog</parameter>
+            <parameter name="scriptLabel">pro_script_label</parameter>
+            <parameter name="scripthelp">pro_script_help</parameter>
+            <parameter name="syntax">textarea</parameter>
+        </FormItem>
+        <FormItem name="includeUIDs">
+            <ModTime>1738499699708</ModTime>
+            <parameter name="description">Should UIDs for the entry and associated data be included in the returned data</parameter>
+            <parameter name="label">Include UIDs</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="item">
+            <ModTime>1735050022484</ModTime>
+            <parameter name="description">The resource to act on</parameter>
+            <parameter name="label">Item</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="keepGlobalState">
+            <parameter name="description">SCRIPT_CONN_KEEP_GLOBAL_STATE_DESC</parameter>
+            <parameter name="label">SCRIPT_CONN_KEEP_GLOBAL_STATE_LABEL</parameter>
+            <parameter name="syntax">boolean</parameter>
+        </FormItem>
+        <FormItem name="parameters">
+            <ModTime>1739974569312</ModTime>
+            <parameter name="description">Free-text list of &lt;parameter&gt;=&lt;value&gt;, one line for each parameter</parameter>
+            <parameter name="label">Parameters</parameter>
+            <parameter name="script">fetchParameters</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">textarea</parameter>
+        </FormItem>
+        <FormItem name="password">
+            <ModTime>1736017137163</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Authorization password</parameter>
+            <parameter name="label">Password</parameter>
+            <parameter name="syntax">password</parameter>
+        </FormItem>
+        <FormItem name="path">
+            <ModTime>1737024268372</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">The URL path representing the resource item to work with</parameter>
+            <parameter name="label">Path</parameter>
+            <parameter name="script">fetchItems</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+            <parameter name="syntax">dropedit</parameter>
+        </FormItem>
+        <FormItem name="queryMode">
+            <ModTime>1739287744378</ModTime>
+            <Values>
+                <ListItem>Parameters</ListItem>
+                <ListItem>Data</ListItem>
+            </Values>
+            <parameter name="description">Pressing Next in the Attribute Schema pane will either return available parameters for the selected Path, or the schema of the data</parameter>
+            <parameter name="label">Query Schema mode</parameter>
+            <parameter name="syntax">droplist</parameter>
+        </FormItem>
+        <FormItem name="schema">
+            <ModTime>1737024188497</ModTime>
+            <parameter name="description">The REST endpoint that returns the schema for this API</parameter>
+            <parameter name="label">Schema</parameter>
+            <parameter name="script">fetchSchema</parameter>
+            <parameter name="scriptLabel">Fetch</parameter>
+        </FormItem>
+        <FormItem name="searchCrit">
+            <ModTime>1737544048218</ModTime>
+            <parameter name="description">The Id of the Resource Item you want to retrieve</parameter>
+            <parameter name="label">Search for ID</parameter>
+        </FormItem>
+        <FormItem name="url">
+            <ModTime>1742563224992</ModTime>
+            <parameter name="description">The first part of the URL, http://&lt;domain&gt;:&lt;port&gt;, with colon and port number, which is not required if the port is 80</parameter>
+            <parameter name="label">REST Host</parameter>
+        </FormItem>
+        <FormItem name="username">
+            <ModTime>1736017120599</ModTime>
+            <parameter name="Required">true</parameter>
+            <parameter name="description">Authorization username</parameter>
+            <parameter name="label">Username</parameter>
+        </FormItem>
+        <FormSection name="Advanced">
+            <FormSectionNames>
+                <ListItem>authUrl</ListItem>
+                <ListItem>contextRoot</ListItem>
+                <ListItem>schema</ListItem>
+                <ListItem>parameters</ListItem>
+                <ListItem>$GLOBAL.userComment</ListItem>
+                <ListItem>$GLOBAL.script</ListItem>
+                <ListItem>Clear</ListItem>
+            </FormSectionNames>
+            <parameter name="initiallyExpanded">false</parameter>
+            <parameter name="title">Advanced</parameter>
+        </FormSection>
+        <FormSection name="Debug">
+            <FormSectionNames>
+                <ListItem>Clear</ListItem>
+            </FormSectionNames>
+        </FormSection>
+        <FormSection name="General">
+            <FormSectionNames>
+                <ListItem>apikey</ListItem>
+                <ListItem>username</ListItem>
+                <ListItem>password</ListItem>
+                <ListItem>url</ListItem>
+                <ListItem>path</ListItem>
+                <ListItem>action</ListItem>
+                <ListItem>searchCrit</ListItem>
+            </FormSectionNames>
+        </FormSection>
+        <parameter name="formevents"><![CDATA[// 20250104 1959 Initial
+// 20250121 1154 Created RESTCLIENT class and used that instead of lots of functions
+// 20250121 2047 Copied back test Event Script after _testScriptConnectorCode succeeded in testing Form code
+// 20250121 2103 Form Working! Now to look at Mode ops (putEntry, findEntry, ...)
+// 20250128 1608 Hardened the fetchActions and fetchItems so it checks for schema first
+// 20250219 1802 Finished Fetch for parameters in Connections tab
+// 20250220 1321 Added some description to Parameters when fetched
+// 20250411 1524 Added handling of root conext parameter
+//
+//						GLOBAL VARIABLES
+//
+var __schema = null;
+var __initialized = false;
+//var __lib = null;
+
+//
+//							FUNCTIONS
+//
+
+function debug() {
+	return false;
+	return form.getControl("debug").getText()
+}
+
+function alert(msg) {
+	main.logmsg(msg);
+	java.lang.System.out.println(msg)
+}
+
+function alertObject(objName, obj) {
+	alert("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	alert(arr.toString())
+} 
+
+function initialize() {
+	if (__initialized) return;
+	__initialized = true;
+	
+	//alert("Initializing...");
+	//eval(system.getScriptText("RESTIFY library class")); // Load script library class
+	//__lib = new RESTIFY();
+
+	eval(system.getScriptText("RESTCLIENT class")); // Load HTTP Client class
+	
+	// Recreate in case parameters are changed
+	__http = new RESTCLIENT({
+						baseUrl:  	 form.getControl("url").getText(),
+						contextRoot: form.getControl("contextRoot").getText() || "/itim/rest",
+						apikey:      form.getControl("apikey").getText(),
+						username:    form.getControl("username").getText(),
+						password:    form.getControl("password").getText(),
+						schemaUrl:   form.getControl("schema").getText(),
+						debug: debug() // true => debug output
+				})		
+}
+
+// Return the openAPI schema - @TEST hardcoded for now
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	initialize();
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaJSON = __http.makeRequest({
+			verb: "GET",
+			url: form.getControl("schema").getText(),
+			authUrl: form.getControl("authUrl").getText(),
+			ctype: "application/json",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA class")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaJSON, "JSON");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Update the dropdown with paths
+function fetchItems() {
+	if (!__schema) throw java.lang.Exception("You must request the Schema first")
+	//alert("---> fetchItems");
+
+	initialize();
+
+	path = "paths";
+
+    updateDropdown("path",
+        [path],
+        "Cannot fetch actions for Path");
+        
+	fetchActions()
+}
+
+// Update the dropdown with opera tions for the selected path
+function fetchActions() {
+	if (!__schema) throw java.lang.Exception("You must request the Schema first")
+	
+	initialize();
+	
+    var selectedItem = form.getControl("path").getText() || "";
+	// alert("fetchActions() for " + selectedItem);
+
+    updateDropdown("action",
+        ["paths", selectedItem],
+        "Cannot fetch actions for Path: " + selectedItem)
+}
+
+// Fetch the parameters (with descriptions) and populate the text box - appending to what is already there
+function fetchParameters() {
+	if (!__schema) throw java.lang.Exception("You must request the Schema first")
+
+	var params = __schema.getParameters(form.getControl("path").getText(),
+										form.getControl("action").getText());
+
+	updateTextBox("parameters", params)
+}
+
+// Updating a textbox control
+function updateTextBox(controlName, paramsArray) {
+	// First get the existing value and parse it (if possible)
+	var oldValue = form.getControl(controlName).getText().trim();
+	var useParams = {};
+	
+	//alert("     paramsArray: " + paramsArray.length);
+	
+	// Go through the passed parameters and set those that are not already set
+	for (var i = 0; i < paramsArray.length; i++) {
+		var param = paramsArray[i];
+		//alert("Found " + i + " " + param.name + ": " + param.description);
+		if (param["in"] != "path") {
+			// Add to the list if not something for the path itself
+			useParams[param.name] = system.splitString(param.description, ".")[0]
+									+ (system.splitString(param.description, ".")[1]);	
+		}
+	}
+	
+	// Parse the old text value into individual parameter settings and put in an Entry
+	if (oldValue) {
+		var lines = system.splitString(oldValue, "\n");
+		for (var line in lines) {
+			var parts = system.splitString(line, "=");
+			if (parts.length > 1) {
+				// Overwrite any discovered parameters with previously set values
+				useParams[parts[0].trim()] = parts[1].trim();
+			}
+		}
+	}
+	
+	alert("---- Final list of params: " + toJson(useParams))
+
+	// Get the useParams property names (param names) and sort them
+	var paramList = new java.util.ArrayList();
+	for (var propName in useParams) {
+		alert("    Adding " + propName)
+		paramList.add(propName);
+	}
+	
+	paramNames = paramList.toArray();
+	java.util.Arrays.sort(paramNames);
+	alert("    ParamNames: " + paramNames.length + " item(s)")
+
+	var newParamText = "";
+	for (var i = 0; i < paramNames.length; i++) {
+		var paramName = paramNames[i];
+		alert("    Getting " + paramName)
+		newParamText += paramName + "=" + useParams[paramName] + "\n"
+	}
+	
+	//alert(">>>> Setting Parameters value:\n" + newParamText);
+	
+	// Finally, update the control
+	form.getControl(controlName).setText(newParamText)
+}
+
+// Update dropdown based api
+function updateDropdown(controlName, path, errorMsg) {
+    try {
+    	alert("updateDropdown("
+    			+ controlName
+    			+ ", " + path + ", errmsg)");
+
+	    initialize();
+		
+        if (!path) {
+        	alert("updateDropdown() - Path parameter must be set");
+        	return	
+        };
+
+        var subtree = __schema.getChildren(path);
+        
+        if (subtree == null) {
+        	path.shift();
+        	alert("Invalid item path: " + path.toString());
+        	return
+        }
+        
+		combo = form.getControl(controlName);
+		combo.removeAll(); // Empty drop-down
+
+		var arrList = java.util.ArrayList();
+        for (var propName in subtree) {
+        	arrList.add(propName);
+        }
+        var arr = arrList.toArray();
+        java.util.Arrays.sort(arr);
+    			
+        for (var propName in arr) {
+            //alert("   ..adding " + res);
+            combo.add(propName)
+        }
+
+        alert("drop-down updated!");
+
+        combo.select(0)
+
+    } catch (ex) {
+        var msg = "Cannot get API schema - " + ex;
+        alert(msg);
+        throw msg
+    }
+}
+
+// Empty out both Item and Object dropdowns
+function clearDropdowns() {
+	form.getControl("path").removeAll();
+	form.getControl("action").removeAll()	
+}
+
+// For debugging from inside 
+function write(fname, str) {
+    var bw = new java.io.BufferedWriter(new java.io.FileWriter("_Restify/Log_" + fname))
+    //	for (var m in obj.getClass().getMethods()) {
+    //		bw.write(m)
+    //		bw.newLine()
+    //	}
+
+    bw.write(str)
+    bw.newLine()
+    bw.close()
+}]]]]><![CDATA[></parameter>
+        <parameter name="formscript"/>
+        <parameter name="title">CONN_TITLE</parameter>
+        <TranslationFile>NLS/idi_conn_scriptconn</TranslationFile>
+    </Form>
+</MetamergeConfig>]]></parameter>
+                <parameter name="Action"/>
+                <parameter name="Item"/>
+                <parameter name="Object"/>
+                <parameter name="Operation">servers</parameter>
+                <parameter name="PathToObjects">paths</parameter>
+                <parameter name="action">get</parameter>
+                <parameter encrypted="true" name="apikey">Tnc+XInTwRPU4yXJVH0wGcPljg7yIb71DLECC6vyVTJ7YO0i361ahYfJqvh1lM8So4z6vfOVOTtT/w/UE3HJHkRGOZBq4z5qAYgDgGd+ez9GUTxT22SOqg4Zo7hUt4Rr8kh0J+RvMTNDy81Yo6QETw94UbVDBa/bTBaFXrxMMlU=</parameter>
+                <parameter name="authUrl">/itim/j_security_check</parameter>
+                <parameter name="contextRoot">/itim/rest</parameter>
+                <parameter name="debug">false</parameter>
+                <parameter name="includeFiles"/>
+                <parameter name="includePrologs"><![CDATA[SCHEMA class
+RESTCLIENT class]]></parameter>
+                <parameter name="includeUIDs">true</parameter>
+                <parameter name="item">/people</parameter>
+                <parameter name="parameters"><![CDATA[
+]]></parameter>
+                <parameter encrypted="true" name="password">hG68g4PgcWRdD5Pw1bB9gN/Y3GENT+Vguq4n1Ne+mtdzqk9qPcotqPq6SsuCZXUUJib8+od38X7Usl56KWh/ILRRvJCM/Cax+LKmXq/MEUIItgB9qmNDX55jJAND7ESgyLsPu/HaNm+HZ61j07nEFnlInsl4PhEYJTi1MHWgd60=</parameter>
+                <parameter name="path">/people</parameter>
+                <parameter name="queryMode">Data</parameter>
+                <parameter name="schema">/openapi</parameter>
+                <parameter name="script"><![CDATA[// 20250104 2008 Initial
+// 20250111 1915 Handling queryParameters in url
+// 20250126 1901 Adding queryMode for querySchema to return either params, or schema of data
+// 20250127 1346 initialize(), terminate(), selectEntries() and a test queryReply() in place
+// 20250127	1854 maded querySchema drop the token in the parameters returned
+// 20250128 1503 selectEntries and getNextEntry implemented - ready for more testing I'm sure :)
+// 20250128 1705 Added the check for spoofing
+// 20250128 2136 querySchema() can now return either parameters or data when you press Connect and Next in the Schema pane
+// 20250130 1207 Hopefully now
+// 20250130 1221 Fixing it in place in the Connector
+// 20250131 1928 Gonna get querySchema to work right
+// 20250131 2009 Now looking at getNextEntry() so I can return parameter descriptions with Connect + Next if querySchemaMode == Parameters
+// 20250131 2033 Something still not right - alas, tomorrow
+// 20250202 1313 Looking for my "entry not found" error when Connect while queryMode == Data
+// 20250202 1407 Connect working for both settings!!!! 
+// 20250202 1453 getNextEntry for Connect + Next now it's working!
+// 20250207 1819 looking at selectEntries and getNextEntry, as well as findEntry, putEntry and modEntry. Tonight!!!
+//          1917 Nope - manana
+// 20250211 2024 Fixed mock server for people put, delete and servers - I hope
+// 20250212 1142 Adding putEntry, deleteEntry and findEntry
+// 20250214 1758 Finishing putEntry, deleteEntry and findEntry
+// 20250214 1924 all Connector functions in place
+// 20250219 1419 Removing Query Schema Mode 
+// 20250219 2023 All connector modes supported except modify
+// 20250402 1423 Added __contextRoot global param - @@TODO: Should be a parameter
+// 20250411 1621 Making contextRoot a parameter
+// 20250423 1428 Sending contextRoot to RestClient constructor
+// 20250703 0951 Corrected putEntry() to use PUT not POST
+// 20250820 1813 Fixed deleteEntry and now working on support search via Link Crit
+//
+// --- TODO Freetext parameter where all the standard set of parameter values can be set
+//                                        
+//
+//						GLOBAL VARIABLES
+//
+var __parameters = {};						// params for the chosen path and action
+var __debug = connector.getParam("debug");	// debug output?
+var __schema = null;						// shared openAPI schema object (SCHEMA class)
+var __initialized = false;					// Do I need this?
+var __emptyEntry = system.newEntry();		// for craftQueryString
+var __http = null; 							// for the RESTCLIENT we will use for the calls
+var __resultSet = null;						// A container for returned entries (selectEntries/findEntry)
+var __resultSetIndex = 0;					// Index into the result set
+var __formEventCalling = false;
+var __contextRoot = "/itim/rest" || connector.getParam("contextRoot");
+
+// REMEMBER if you add a parameter, must update this obj
+var __paramNames = {
+	action: true,
+	apikey: true,
+	schema: true,
+	authUrl: true,
+	debug: true,
+	path: true,
+	password: true,
+	url: true,
+	username: true,
+	item: true,
+	action: true,
+	searchCrit: true,
+	includeUIDs: true,
+	parameters: true,
+	contextRoot: true
+}
+
+//
+//							FUNCTIONS
+//
+
+
+
+function connParamField2Entry(connParams) {
+	var paramsEntry = system.newEntry();
+	var paramSetting = connParams.parameters;
+	var lines = paramSetting.split(/\r?\n|\r/);
+	for (var lineIndex = 0; lineIndex < lines.length; lineIndex++){
+		var thisLine = lines[lineIndex];
+		var parts = thisLine.split("=");
+		var paramName = parts[0].trim();
+		var paramValue = (parts.length > 1) ? parts[1].trim() : "";
+		
+		if (paramValue) {
+			paramsEntry[paramName] = paramValue
+		}
+	}
+	
+	return paramsEntry
+}
+
+function craftQueryString(args) {
+	var path = args.path;
+	var action = args.action;
+	var connParams = args.connParams;
+	var useParams = args.epParams || {};
+	var entry = args.entry || __emptyEntry;
+	var filter = args.filter || "";
+
+	return filter
+}
+
+function fixUrl(url) {
+	if (!url.endsWith("/")) {
+		return url + "/";
+	} else {
+		return url;
+	}
+}
+
+function debug() {
+	return __debug;
+}
+
+// Rest the connector and re-initialize it in case parameters have changed
+function resetConnector() {
+	__initialized = false;
+	__resultSetIndex = 0;
+	
+	// Now zero out the __resultSet global ArrayList
+	if (!__resultSet) {
+		__resultSet = new java.util.ArrayList();
+	} else {
+		__resultSet.clear()
+	}
+
+	if (typeof list != "undefined") list.clear(); // so it works while spoofing
+	//if (__http != null) __http.terminate(); @@TODO is this necessary?
+	
+	// Renew the RESTCLIENT with the currently set parameters
+	if (!RESTCLIENT) eval(system.getScriptText("RESTCLIENT class"));
+	__http = new RESTCLIENT({
+						baseUrl:   __parameters.url,
+						authUrl:   __parameters.authUrl,
+						apikey:    __parameters.apikey,
+						username:  __parameters.username,
+						password:  __parameters.password,
+						schemaUrl: __parameters.schema,
+						contextRoot: __parameters.contextRoot,
+						debug: 	   debug() // true => debug output		
+					})
+}
+
+// Change the URL path so the UID placeholder is replace with the Attribute value
+function replaceUID(path, entry) {
+	
+}
+
+// Turn the JS object returned from a call into the global entry object
+function toEntry(obj, entry) {
+	var connParams = refreshParameters();
+	entry = entry || system.newEntry();
+
+	//main.logmsg("toEntry() - includeUIDs: " + connector.getParam("includeUIDs"))
+	
+	for (var propName in obj) {
+		// skip _links
+		if (propName.equalsIgnoreCase("_links") && !connParams.includeUIDs) continue;
+		for (var subPropName in obj[propName]) {
+			if (typeof(subPropName) != "string") {
+				//main.logmsg("toEntry() - !!!!!!!! subPropName not string: " + subPropName);
+			} else {
+				var newVal = beautifyValue(obj[propName][subPropName]);
+				/*
+				var prepend = (propName.equalsIgnoreCase("_links") ? propName + "_" : "");
+				
+				// For _links we must prepend the propName to the Attribute name
+				subPropName = prepend + subPropName;
+				*/
+				if (newVal.toLowerCase().startsWith("erglobalid=")) {
+					//main.logmsg("FOUND erglobalid value for " + subPropName)
+					if (!connParams.includeUIDs) continue;	
+				}
+				
+				//main.logmsg("toEntry() - adding " + subPropName + " - " + obj[propName][subPropName]);
+				entry[subPropName] = newVal
+			}
+		}
+	}
+	
+	//main.logmsg("toEntry - Complete: \n" + entry)
+	
+	return entry // Not necessary, since entry is global in the Connector context - I just like doing it :)
+}
+
+function debugMsg(msg) {
+	if (__debug) {
+//		task.logmsg(msg);
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}
+}
+
+function alertObject(objName, obj) {
+	debugMsg("alertObj(" + objName + ", " + toJson(obj));
+	var arr = [objName + ": " + typeof(obj) + " ----------\n"];
+	for (var child in obj) {
+		arr.push("   " + child + "\n")
+	}
+	debugMsg(arr.toString())
+}
+
+// Return the openAPI schema
+function fetchSchema() {
+	//alert("Fetching schema...")
+	if (__schema) return __schema;
+
+	//alert("About to loadFileToString...");
+//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
+	var schemaSpec = __http.makeRequest({
+			verb: "GET",
+			url: __parameters.schema,
+			expectedReturnType: "body",
+			authUrl: __parameters.authUrl,
+			ctype: "application/json",
+			contextRoot: "",
+			where: "fetchSchema()"		
+	})
+    
+    // Load the SCHEMA class
+    eval(system.getScriptText("SCHEMA c__hlass")) // Load SCHEMA handling class
+    
+    //alert("Creating SCHEMA object");
+    __schema = new SCHEMA(schemaSpec, "YAML");
+    
+    //var toplvl = "";
+    //for (var tl in __schema) toplvl = (toplvl ? ", " + tl : tl);
+    //alert("SCHEMA -> " + toplvl)
+    
+    //alert("Got it!");
+	return __schema
+}
+
+// Parse the openAPI schema
+function parseSchema() {
+	if (__schema) return __schema;
+
+	debugMsg("Fetching schema...")
+	//__schema = __lib.loadFileToString("_Restify/itim_swagger.json");
+
+	//debugMsg("Creating SCHEMA object");
+	__schema = fetchSchema();
+
+
+	// Force RESTClient to get the tokens again
+	//__http.gotToken = false;
+
+	//debugMsg("Got it!");
+	return __schema
+}
+
+function refreshParameters() {
+	var path = connector.getParam("path");
+	//if (!path) throw new java.lang.RuntimeException("Path parameter has not been set")
+	var action = connector.getParam("action");
+	// if (!action) throw new java.lang.RuntimeException("Action parameter has not been set")
+
+	__parameters = {};
+	
+	for (var paramName in __paramNames) {
+		//java.lang.System.out.println("> " + paramName);
+		__parameters[paramName] = connector.getParam(paramName);
+	}
+	
+	return __parameters
+}
+
+function beautifyValue(val) {
+	//main.logmsg("beautifyValue() - " + val);
+	if (typeof(val) != "object") return val;
+	
+	try {
+		var newVal = toJson(val);
+		
+		//main.logmsg("!!! It IS JSON !!!");
+		if (val.description) newVal = val.description;
+		//main.logmsg("--- Returning: '" + newVal + "'");
+		return newVal;
+	} catch (ex) {
+		return val
+	}
+}
+
+// Figure out which endpoint param is for the base path and grab the value from the entry
+// If the entry passed is null, then don't go looking for the Attribute
+function extractUID(entry, epParams, connParams) {
+	var uid = "";
+	var uidAttName = null;
+
+	for (var i in epParams) {
+		var param = epParams[i];
+		if (param["in"] == "path") {
+			uidAttName = param.name;
+			break
+		}
+	}
+	
+	if (!entry) {
+		uid = "*not gonna be used for anything*"
+	} else
+	if (uidAttName) {
+		var uidAtt = entry[uidAttName];
+		if (uidAtt) uid = uidAtt.getValue(0)
+	}
+	
+	if (!uid) throw new java.lang.Exception("The UID attribute must be mapped out: " + uidAttName)
+	
+	return {
+		value: uid,
+		name: uidAttName
+	}
+}
+
+// Local function (for some reason)
+function getParameters(path, action) {
+	return __schema.getParameters(path, action)
+}
+
+// Here too
+function replaceEmbeddedUID(path, entryUID) {
+	return __schema.replaceEmbeddedUID(path, entryUID)
+}
+
+
+
+//
+// -------  Standard Connector functions 
+//
+
+
+
+
+function initialize() {
+	refreshParameters();
+	if (!__http) resetConnector();
+	parseSchema()
+}
+
+function terminate() {
+}
+
+// CallReply function
+function queryReply() {
+	// Always get the latest parameter settings
+	var connParams = refreshParameters();
+	// Get the parameters for this path + actoin
+	var epParams = getParameters(connParams.path, connParams.action);
+	
+	// Embed mapped parameters into the path
+	java.lang.System.out.println("queryReply() - entry: " + entry);
+	// main.logmsg("queryReply() - entry: " + entry);
+	
+	var usePath = replaceEmbeddedUID(connParams.path, entry);
+
+	// Now for queryParameters
+	var queryString = craftQueryString({
+		path: usePath,
+		connParams: connParams,
+		epParams: epParams,
+		action: connParams.action,
+		entry: entry
+	});
+	
+	// If there is a queryString, prepend it with ?
+	queryString = queryString ? "?" + queryString : "";
+	
+	try {
+		// Make the REST call @@TODO Only does GET for now
+		var reply = __http.makeRequest({
+				verb: "GET", // @@TODO Must figure out how to set the HTTP verb based on the schema
+				url: usePath + queryString,
+				ctype: "application/json",
+				where: "queryReply()"
+		});
+	
+		java.lang.System.out.println("Reply: " + entry.fromJSON(toJson(reply)));
+	
+		toEntry(reply, entry);
+		return entry
+	} catch (ex) {
+		task.logmsg("ERROR", ex);
+		throw ex
+	}	
+}
+
+// Since this function is being double-purposed, to also retrieve parameters for the Schema pane
+// I have to add more logic that is not necessary for normal connector operations.
+function selectEntries(queryMode) {
+	queryMode = queryMode || "Data"; // defaults to data
+	// Clear out the selected array of entries and set the index to 0
+
+	//resetConnector();@@TODO will not re-init with new params
+
+	//@@TODO is this necesary here: if (typeof(form) == "undefined") __resultSet.clear();
+	
+	// Always get the latest parameter settings
+	var connParams = refreshParameters();
+	// Get the parameters for this path + actoin
+	var epParams = getParameters(connParams.path, connParams.action);
+	
+	// So this code works in my testScriptConnectorCode AL
+	if (typeof(entry) == "undefined") var entry = system.newEntry();
+	
+	// Return either the parameters from the path + action from the openAPI schema, which means 
+	// you can use Connect + Next to list all available parameters w/ descriptions...
+	if (connParams.queryMode == "Parameters" || typeof(task) == "undefined") {
+		var restParams = getParameters(connParams.path, connParams.action);
+		
+		for (var i in restParams) {
+			var paramName = restParams[i].name;
+			//main.logmsg("getNextEntry() - " + paramName + " - " + beautifyValue(restParams[i]))
+			entry[paramName] = beautifyValue(restParams[i]);
+		}
+		
+		__resultSet.add(entry.href)
+	} else {
+		// ...else work like getNextEntry() usually does and return data
+		
+		// Get the path and replace id's as required
+		var usePath = connParams.path;
+		
+		// Now for queryParameters
+		var queryString = craftQueryString({
+			connParams: connParams,
+			path: usePath,
+			epParams: epParams,
+			action: connParams.action
+		});
+		
+c		// If there is a queryString, prepend it with ?
+		queryString = queryString ? "?" + queryString : "";
+		
+		//main.logmsg("selectEntries for Data - making call");
+		
+		try {
+			// Make the REST call @@TODO Only does GET for now
+			var reply = __http.makeRequest({
+					verb: "GET",
+					url: usePath,
+					ctype: "application/json",
+					where: "selectEntries()"
+			});
+		
+			// Update the global __resultSet
+			var resultSetObj = reply;
+			
+			
+			
+			//main.logmsg("selectEntries for Data - toEntry(): " + entry);
+	
+			var resultEntry = system.newEntry();
+			resultEntry.merge(entry);
+			__resultSet.add(resultEntry)
+		} catch (ex) {
+			task.logmsg("ERROR", ex);
+			throw ex
+		}	
+	}
+	return __resultSet	
+}
+
+function getNextEntry() {
+	//main.logmsg("@@getNextEntry - remaining in buffer: " + __resultSet.size());
+	if (__resultSetIndex >= __resultSet.size()) {
+		result.setStatus(0);
+		return null;
+	}
+
+	if (typeof(entry) == "undefined") entry = system.newEntry(); // only for testing
+	
+	//main.logmsg("getNextEntry() - getting index " + __resultSetIndex);
+	entry.merge(__resultSet.get(__resultSetIndex));
+	__resultSetIndex++;
+
+	result.setStatus(1);
+	//main.logmsg("@@getNextEntry: " + entry);
+	return entry
+}
+
+function putEntry(entryArg) {
+	// entryArg is optional and is for easier testing
+	entry = entry || entryArg;
+
+	var useEntry = entry.clone(entry);
+	var orgId = useEntry.getString("orgId");
+	if (orgId) useEntry.removeAttribute("orgId");
+	useEntry.removeAttribute("personId");
+
+	var body = 	{
+				  "profileName": "Person",
+//				  "_attributes": fromJson(useEntry.toJSON()),
+				  "_attributes": useEntry.toJSON(),
+				  "orgID": orgId || connector.getParam("orgid") || "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t"
+				}
+				
+	body = system.getScriptText("personAddJSON");
+	
+	// Always get the latest parameter settings
+	var connParams = refreshParameters();
+	// Get the parameters for this path + actoin
+	var epParams = getParameters(connParams.path, connParams.action);
+
+	try {	
+		// Make the REST call 
+		var reply = __http.makeRequest({
+				verb: "POST",
+				url: connParams.path,
+			//	accept: "application/vnd.ibm.isim-v1+json",
+				returnType: "entry",
+				ctype: "application/json",
+				where: "putEntry()",
+				body: body
+		});
+	
+		//main.logmsg("selectEntries for Data - Reply: " + com.ibm.di.entry.Entry.fromJSON(toJson(reply)));
+	
+		//var resultEntry = toEntry(reply);
+		//task.logmsg("putEntry() - " + entry.fromJSON(toJson(reply)));
+		
+		return entry
+	} catch (ex) {
+		task.logmsg("ERROR", ex);
+		throw ex
+	}	
+}
+
+function modEntry() {
+	throw new java.lang.Exception("The modify operation is not supported in the current API version")
+}
+
+function deleteEntry(entryArg) {
+	var scriptedCrit = searchCriteria.getScriptFilter();
+	var ldapFilter = searchCriteria.getLDAPFilter();
+	var filter = ldapFilter || scriptedCrit;
+	
+	// entryArg is optional and is for easier testing
+	entry = entry || entryArg;
+	
+	// Always get the latest parameter settings
+	var connParams = refreshParameters();
+	// Get the parameters for this path + actoin
+	var epParams = getParameters(connParams.path, connParams.action);
+	
+	// Check parameters for the one in the path(base) - the UID
+	var uidObj = extractUID(null, epParams, connParams);
+	
+	var entryUID = uidObj.value;
+	var entryUIDattName = uidObj.name;
+	
+	// Now for queryParameters
+	var queryString = craftQueryString({
+		connParams: connParams,
+		path: usePath,
+		epParams: epParams,
+		action: connParams.action,
+		entry: entry,
+		filter: filter
+	});
+	
+	// If there is a queryString, prepend it with ?
+	queryString = queryString ? "?" + queryString : "";
+	
+	// Get the path and replace id's as required
+	var usePath = replaceEmbeddedUID(connParams.path, entryUID);
+
+	try {	
+		// Make the REST call 
+		var reply = __http.makeRequest({
+				verb: "DELETE",
+				url: usePath + queryString,
+				ctype: "application/json",
+				where: "deleteEntry()",
+				body: entry.toJSON()
+		});
+	
+		return entry
+	} catch (ex) {
+		task.logmsg("ERROR", ex);
+		throw ex
+	}	
+}
+
+// Finding an entry only works as direct read using the UID
+function findEntry(searchCriteria) {
+	// Allows you to pass in the search criteria for easier testing	
+	searchCriteria = searchCriteria || search;
+
+	var scriptedCrit = searchCriteria.getScriptFilter();
+	var ldapFilter = searchCriteria.getLDAPFilter();
+	var filter = ldapFilter || scriptedCrit;
+
+	// Always get the latest parameter settings
+	var connParams = refreshParameters();
+	// Get the parameters for this path + actoin
+	var epParams = getParameters(connParams.path, connParams.action);
+	
+	// Now for queryParameters
+	var queryString = craftQueryString({
+		connParams: connParams,
+		path: usePath,
+		epParams: epParams,
+		action: connParams.action,
+		entry: entry,
+		filter: filter
+	});
+	
+	// If there is a queryString, prepend it with ?
+	queryString = queryString ? "?" + queryString : "";
+
+	//main.logmsg("putEntry - making call");
+
+	try {	
+		// Make the REST call 
+		var reply = __http.makeRequest({
+				verb: "GET",
+				url: usePath + queryString,
+				ctype: "application/json",
+				where: "findEntry()"
+		});
+	
+		//main.logmsg("selectEntries for Data - Reply: " + com.ibm.di.entry.Entry.fromJSON(toJson(reply)));
+	
+		resultEntry = toEntry(reply);
+		entry.merge(resultEntry);
+		
+		result.setStatus(1);
+		return entry
+	} catch (ex) {
+		task.logmsg("ERROR", ex);
+		result.setStatus(0);
+		throw ex
+	}	
+}
+
+function querySchema(queryMode) {
+	queryMode = queryMode || "Data"; // Defaults to "Data"
+	
+	//main.logmsg("@@querySchema...");
+	var connParams = refreshParameters();
+	var path = connParams.path;
+	var action = connParams.action;
+	
+	list.clear(); // For use in the _testScriptConnectorCode
+	
+	if (connParams.queryMode == "Parameters" /* || typeof(task) == "undefined" */ ) {
+/* don't think this is needed
+		var embeddedParameter = getEmbeddedUID(path);
+		if (embeddedParameter) {
+			var e = system.newEntry();
+			e.name = embeddedParameter;
+			e.syntax = "MUST/uid";
+			e.required = true;
+			e.mandatory = true;
+			list.add(e)
+		}
+*/
+		var parameters = getParameters(path, action);
+	
+		for (var i in parameters) {
+			var param = parameters[i];
+	   
+			if (param.name.equalsIgnoreCase("CSRFToken")) continue;
+			
+			var e = system.newEntry();
+			e.name = param.name;
+			e.syntax = "MUST/" + param.schema.type;
+			e.required = true;
+			e.mandatory = true;
+			//main.logmsg("@@adding " + param.name);
+			list.add(e)
+		}
+	} else { // queryMode is "Data"
+		selectEntries();
+		var dataEntry = getNextEntry();
+		// Remember to reset the index to the result set for any getNextEntry() called after
+		__resultSetIndex = Math.min(0, __resultSetIndex - 1);
+		
+		
+		for (var att in dataEntry) {
+			if (att instanceof com.ibm.di.entry.Entry) { // This is one of the links
+				var name = "link_";
+				throw "OOOOOOPS!! Connector Script line 373"
+			} else {
+				var name = att.getName();
+				var val = att.getValue(0);
+				
+				//main.logmsg("querySchema() adding " + name + " - " + val);
+				
+				e = system.newEntry();
+				e.name = name;
+				e.syntax = typeof(val);
+				list.add(e)
+			}	
+		}
+	}
+
+	result.setStatus(1);
+	return list
+}]]></parameter>
+                <parameter name="searchCrit">itim manager</parameter>
+                <parameter name="url">https://192.168.252.3:30943</parameter>
+                <parameter name="username">itim manager</parameter>
+            </Configuration>
+            <Parser>
+                <InheritFrom>[parent]</InheritFrom>
+            </Parser>
+            <AttributeMap name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <AttributeMap name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+            </AttributeMap>
+            <DeltaSettings>
+                <UniqueAttribute/>
+                <WhenToCommit>After every database operation</WhenToCommit>
+                <RowLocking>SERIALIZABLE</RowLocking>
+                <ChangeDetectionMode>DETECT_ALL</ChangeDetectionMode>
+            </DeltaSettings>
+            <Schema name="Input">
+                <InheritFrom>[parent]</InheritFrom>
+            </Schema>
+            <Schema name="Output">
+                <InheritFrom>[parent]</InheritFrom>
+                <SchemaItem>
+                    <Name>CSRFToken</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>_links_erparent</Name>
+                    <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>_links_formTemplate</Name>
+                    <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>_links_manager</Name>
+                    <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>_links_self</Name>
+                    <Syntax>com.ibm.jscript.std.ObjectObject</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>attributes</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>cn</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>counter</Name>
+                    <Syntax>java.lang.Integer</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>embedded</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>ercustomdisplay</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>erparent</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>erpersonstatus</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>ersupervisor</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>forms</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>givenname</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>mail</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>manager</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>name</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>personId</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>personType</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>self</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>sn</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+                <SchemaItem>
+                    <Name>uid</Name>
+                    <Syntax>java.lang.String</Syntax>
+                </SchemaItem>
+            </Schema>
+            <LinkCriteria>
+                <InheritFrom>[parent]</InheritFrom>
+            </LinkCriteria>
+            <Hooks>
+                <InheritFrom>[parent]</InheritFrom>
+            </Hooks>
+            <CheckpointConfig/>
+            <SandboxConfig/>
+            <Reconnect>
+                <InheritFrom>[parent]</InheritFrom>
+                <ReconnectRules/>
+            </Reconnect>
+            <Operations/>
+            <PoolDefinition>
+                <InheritFrom>[parent]</InheritFrom>
                 <Enabled>false</Enabled>
                 <MinPoolSize>0</MinPoolSize>
                 <MaxPoolSize>0</MaxPoolSize>
@@ -18804,7 +20166,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1755689653048</ModTime>
+            <ModTime>1755807852739</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -18839,7 +20201,7 @@ function RESTCLIENT(args) {
 function RESTCLIENT(args) {
 	this.baseUrl = (args.baseUrl || "").trim();
 //	this.authUrl = args.authUrl || ""; // not used
-	this.contextRoot = args.contextRoot || "";
+	this.contextRoot = args.contextRoot || "/itim/rest";
 	this.apikey = args.apikey || "";
 	this.username = args.username || ""; 
 	this.password = args.password || "";
@@ -18872,9 +20234,9 @@ function RESTCLIENT(args) {
 				verb: "POST",
 				url: "/itim/j_security_check", // @@TODO Should make this a parameter under Connections
 				ctype: "application/x-www-form-urlencoded",
-				headers: {
-					Authorization: "Bearer " + this.apikey
-				},
+//				headers: {
+//					Authorization: "Bearer " + this.apikey
+//				},
 				body: "j_username=" + this.username + "&j_password=" + this.password,
 				expectedReturnType: "entry",
 				where: "getToken()"
@@ -19086,10 +20448,6 @@ function RESTCLIENT(args) {
 					}	
 				}
 				
-				if (retEntry["http.CSRFToken"]) {
-					this.CSRFToken = retEntry.getString("http.CSRFToken")
-				}	
-
 				// Grab the CSRFToken if found
 				if (retEntry.getString("http.CSRFToken")) {
 					this.CSRFToken = retEntry.getString("http.CSRFToken");
@@ -19304,572 +20662,7 @@ function RESTCLIENT(args) {
 	}	
 }]]></parameter>
         </Script>
-        <Script name="RESTCLIENT class 20250702 1603 before getToken revert">
-            <ModTime>1751465316402</ModTime>
-            <parameter name="includeFiles"/>
-            <parameter name="script"><![CDATA[// 20250116 1116 Created
-// 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
-// 20250121 2104 RestClientConnector form working! RESTCLIENT class doing its job both in the test AL and in the Form
-// 20250123 1819 Tightening up code
-// 20250128 2122 Fixing httpEntry() so it does not fail on argument = null
-// 20250130 1243 Making sure this class works both inside and outside a Connector
-// 20250131 1942 Made this.logmsg() write to both System.out and main.logmsg
-// 20250319 1452 Franz and I made some changes to makeRequest(), adding support for redirection
-// 20250321 2041 Still working on it
-// 20250322 1443 Working now! Added Franz's code, plus made cookie handling better
-// 20250402 1345 Added "accept" arg to makeRequest method, else default is 'application/json'
-// 20250402 1429 Added handling of Redirect for makeRequest method
-// 20250411 1538 Removing this.sessionId since it is a cookie and handled elsewhere. Also renaming .token to .CSRFToken
-// 20250411 1626 Adding handling for contextRoot
-// 20250416 1512 Fixed broken code for retCode 302 and prevent only contextRoot calls
-// 20250423 1421 Fixed rootContext to contextRoot && fixed handling rootContext in makeRequest
-// 20250425 2031 Fixed makeRequest's handling of contextRoot passed in as an argument
-// 20250427 1646 Some fixes and improvements, thanks to suggestions from the TDI LabJam GPT
-// 20250520 1530 A number of changes together with Franz. Trying to figure out how my calls differ from Franz' TDI test AL script
-// 20250522 2241 Simplified cookie setting to just use .getString() - i.e. only first value
-// 20250523 1159 Changed the handling of the CSRFToken read as "http.CSRFToken"
-// 20250629 2222 Added garbage collection and chunk handling, both in makeRequest()
-// 20250702 1424 Franz fixed my misunderstanding of the chunk encoding - the HTTP Connector handles all that
-//
-// This is the class that provides methods for making HTTP requests
-//
-// NOTES:
-//			* It uses its own this.logmsg() for more control over logging
-
-function RESTCLIENT(args) {
-	this.baseUrl = (args.baseUrl || "").trim();
-//	this.authUrl = args.authUrl || ""; // not used
-	this.contextRoot = args.contextRoot || "";
-	this.apikey = args.apikey || "";
-	this.username = args.username || ""; 
-	this.password = args.password || "";
-	this.debug = false //args.debug || false;
-	this.cookieArrayList = new java.util.ArrayList();
-	
-	this.gettingToken = false;
-	this.gotToken = false;
-
-	this.CSRFToken = null;
-	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
-		
-	// The HTTP Client Connector to use
-	this.http = system.getConnector("ibmdi.HTTPClient");
-	
-	// Member variables
-	this.requestEntry = system.newEntry();
-	
-	this.CSRFToken = null;
-	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
-	
-	// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
-	this.getToken = function() {
-		//Prepare call to get LTPAToken2
-		var myHttpConn = this.http;
-		myHttpConn.setParam("url",this.baseUrl + "/itim/j_security_check");
-		myHttpConn.setParam("method","POST");
-		myHttpConn.initialize(null);
-		
-		//Configure the call
-		var httpcall = this.requestEntry;
-		httpcall.removeAllAttributes();
-		
-		httpcall.setAttribute("http.Content-Type","application/x-www-form-urlencoded");
-		//Set body to userid/password
-		httpcall.setAttribute("http.body","j_username=" + this.username + "&j_password=" + this.password);
-		//Perform call
-		httpReply = myHttpConn.queryReply(httpcall);
-		task.logmsg("\n\n--------------\nRequest1 : " + httpcall + "\n Reply1 : " + httpReply);
-		//Retrieve LTPAToken2
-		LTPAToken2 = httpReply.getString("http.Set-Cookie");
-		this.cookieArrayList.add(LTPAToken2);
-		
-		//Prepare call to get CSRFToken
-		myHttpConn.setParam("url",this.baseUrl + "/itim/rest/systemusers/me");
-		myHttpConn.setParam("method","GET");
-//		myHttpConn.setParam("method","POST");
-		myHttpConn.initialize(null);
-		
-		//Configure the call
-	//	var httpcall = system.newEntry();
-	//	httpcall.setAttribute("http.Cookie",[JSESSIONID,LTPAToken2]);
-		httpcall.removeAllAttributes();
-		httpcall.setAttribute("http.Cookie",LTPAToken2);
-		//Perform call
-		httpReply = myHttpConn.queryReply(httpcall);
-		task.logmsg("\n---------------\nRequest2 : " + httpcall + "\n Reply2 : " + httpReply);
-		//Retrieve CSRFToken
-		CSRFToken = httpReply.getString("http.CSRFToken");
-/*		
-	//do a test call
-	//	var httpcall = system.newEntry();
-		myHttpConn.setParam("url",resthost + "/itim/rest/people/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWl2aWcsZGM9aXZpZw");
-		myHttpConn.setParam("method","GET");
-		myHttpConn.initialize(null);
-		httpcall.setAttribute("http.Cookie",[CSRFToken,LTPAToken2]);
-		//Perform call
-		httpReply = myHttpConn.queryReply(httpcall);
-		task.logmsg("Request3 : " + httpcall + "\n Reply3 : " + httpReply);
-		task.logmsg(httpReply);
-		system.abortAssemblyLine("STOP")
-*/
-	}
-
-	// Get the currently set Cookies
-	this.getCookies = function() {
-		var cookiesAtt = system.newAttribute("http.Cookie");
-		// Add CSRFToken if set
-		if (this.CSRFToken != null) {
-			cookiesAtt.addValue(this.CSRFToken)
-		}
- 
-		// Add remaining cookies picked up
-		var cookieArray = this.cookieArrayList.toArray();
-		for (var cookie in cookieArray) {
-			cookiesAtt.addValue(cookie)
-		}	
-			
-		// Return it
-		if (cookiesAtt.size() > 1){
-			var cookies = cookiesAtt.getValues().toString();
-			return "[" + cookies + "]"; 			
-		} else {
-			return cookiesAtt.getValue(0);
-		}		
-	}
- 
-	this.getToken_old = function() {
-		var retEntry;
-		
-		// Get rid of cookies
-		this.cookieArrayList.clear();
-		
-		// First get session id
-		retEntry = this.makeRequest({
-				gettingToken: true, // Getting a token, so dont call getToken again
-				verb: "GET",
-				url: "/itim/restlogin/login.jsp", // @@TODO Should make this a parameter under Connections
-				expectedReturnType: "entry",
-				where: "getToken()"
-		});
-		
-		// Now for the LTPAToken2
-		retEntry = this.makeRequest({
-				gettingToken: true, // Getting a token, so dont call getToken again
-				verb: "POST",
-				url: "/itim/j_security_check", // @@TODO Should make this a parameter under Connections
-				ctype: "application/x-www-form-urlencoded",
-				headers: {
-					Authorization: "Bearer " + this.apikey
-				},
-				body: "j_username=" + this.username + "&j_password=" + this.password,
-				expectedReturnType: "entry",
-				where: "getToken()"
-		});
-		
-		// Get CSRFToken
-		retEntry = this.makeRequest({
-				gettingToken: true, // Getting a token, so dont call getToken again
-				expectedReturnType: "entry",
-				verb: "POST",
-				url: "/itim/rest/systemusers/me", // @@TODO Should make this a parameter under Connections
-				ctype: "application/json",
-				expectedReturnType: "entry",
-				where: "getToken()"
-		});
-		this.CSRFToken = retEntry.getString("http.CSRFToken")
-	}
- 
- 	// Put together a URL from an array of parts
-	this.assembleUrl = function(partsArray) {
-		if (!(partsArray instanceof Array)) partsArray = [partsArray]; // Note - instanceof works only for identifying JS arrays
-		var url = "";
-		
-		for (var i = 0; i < partsArray.length; i++) {
-			var part = (partsArray[i] || "").trim();
-			if (!part) continue; // skip empty string
-			
-			// Remove starting and/or ending slashes
-			if (part.startsWith("/")) 
-			{
-				part = part.substring(1)
-			}	
-			else
-			if (part.endsWith("/"))
-			{
-				part = part.substring(0, part.length-1)
-			}
-			
-			// Assemble the url
-			url += ((i > 0) ? "/" : "") + part	
-		}
-		
-		return url
-	}	
-	
-	// REST Client http-call method. The first lines of code show you the parameters you can send in the 'param' JS object
-	this.makeRequest = function(params) {
-		// Get token if necessary
-		if (!this.gotToken && !this.gettingToken) {
-			this.gettingToken = true;
-			this.getToken();
-			this.gettingToken = false;
-			this.gotToken = true;
-		} 
-		
-		//if (form && this.debug) this.alert("RESTCLIENT.makeRequest(" + toJson(params) + "}");
-			
-		// Here come the various local variables set from parameters passed OR default values
-		var verb = params.verb || "GET";
-		var url = params.url || this.throwException("makeRequest called with no URL");
-		var body = params.body || null;
-		var ctype = params.ctype || "application/json";
-		var where = params.where || "";
-		var headers = params.headers || {};
-		var accept = params.accept || "application/json";
-		var gettingToken = params.gettingToken || false;
-		var username = params.username || "";
-		var password = params.password || "";
-//		var contextRoot = params.contextRoot || this.contextRoot;
-		var contextRoot = (typeof(params.contextRoot) == "undefined") ? this.contextRoot : params.contextRoot;
-		
-		var returnType = params.expectedReturnType || "JS object";
-		
-		var alreadyImportedCert = false;
-		
-		// A little garbage collection. Why not? :)
-		java.lang.Runtime.getRuntime().gc();
-		
-		// Empty out the requestEntry before setting it up for the call
-		this.requestEntry.removeAllAttributes();
-		
-		// Prepare the url
-		var origUrl = url;
-		if (gettingToken) {
-			url = this.assembleUrl([this.baseUrl, url]) // Skip the context root for these calls
-		} else {
-			url = this.assembleUrl([this.baseUrl, contextRoot, url])
-		}	
-
-		if (url == this.assembleUrl([this.baseUrl, contextRoot])){
-			url = this.assembleUrl([this.baseUrl, contextRoot, "me"])
-		}	
-		
-/* old code - can be deleted - I think		
-		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
-			if (this.baseUrl.endsWith("/")) {
-				this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length-1) // remove / at end of baseUrl if found
-			}	
-			url = this.baseUrl + url;
-		}
-*/		
-		// If a body is passed, this must be a POST (I think)
-		if (typeof body !== "undefined" && body !== null) {
-			verb = "POST";
-	
-			if (typeof body != "string") {
-				this.requestEntry["http.body"] = toJson(body);
-			} else {
-				this.requestEntry["http.body"] = body;
-			}
-		}	
-		
-		// Set up the global HTTP Connector
-		this.http.setParam("method", verb.toUpperCase());
-		this.http.setParam("url", url);
-		this.http.setParam("username", username);
-		this.http.setParam("password", password);
-	
-		// Now set up the request entry
-		this.requestEntry["http.url"] = url;
-		this.requestEntry["http.method"] = verb.toUpperCase();
-		this.requestEntry["http.Content-Type"] = ctype;
-//		this.requestEntry["http.Accept"] = accept;
-//		this.requestEntry["http.Connection"] = "keep-alive";
-
-		// if credentials set then send them
-		if (username != ""){
-			this.requestEntry["http.remote_user"] = username;
-			this.requestEntry["http.remote_password"] = password;
-		}		
-		 				
-		for (var hdr in headers) {
-			this.requestEntry["http." + hdr] = headers[hdr]
-		}
-		
-		// Reinitialize the HTTP Client connector so the updated parameters are applied
-		this.http.terminate();
-		this.http.initialize(null);
-	
-		alreadyImportedCert = false; 
-		var reply = null;
-		// Make the call
-		do {
-			var retry = false;
-			try {	
-				//this.alert("\nMaking call:" + this.reduceEntry(this.requestEntry) + "\n");
-				
-				// Set cookies
-				var cookies = this.getCookies();
-				if (cookies && cookies.length > 0) {
-					this.requestEntry.setAttribute("http.Cookie",this.getCookies()); // In case these have been changed since last time
-				}	
-				if (this.CSRFToken) {
-					this.requestEntry["http.CSRFToken"] = this.CSRFToken
-				}
-//				if (this.ltpaToken2) {
-//					this.requestEntry["http.ltpaToken2"] = this.ltpaToken2
-//				}
-					
-				if (this.debug) {
-					this.logDetails({msg : "Request to itim", 
-								obj : this.httpEntry(this.requestEntry, true), 
-								url : url, 
-								verb : verb, 
-								ctype : ctype, 
-								where : where,
-								sent: true});
-				}
-	
-		
-				// *****************************************************************************************
-				// ****************         Make the actual request         ********************************
-				// *****************************************************************************************
-
-				var retEntry = this.http.queryReply(this.requestEntry);
-
-				retEntry["http.url"] = url; // Another fix from @@Chat
-				
-				if (this.debug) {
-					this.logDetails({msg : "Response from itim", 
-								obj : this.httpEntry(retEntry),
-								where: where,
-								sent: false,
-							    entry : retEntry});
-				}
-
-				// Grab any cookies if found - also made more robust thanks to @@Chat
-				if (retEntry["http.Set-Cookie"]) {
-					var cookies = retEntry.getString("http.Set-Cookie");
-					this.cookieArrayList.add(cookies)
-				}
-				
-				if (retEntry["http.CSRFToken"]) {
-					this.CSRFToken = retEntry.getString("http.CSRFToken")
-				}	
-
-				// Grab the CSRFToken if found
-				if (retEntry.getString("http.CSRFToken")) {
-					this.CSRFToken = retEntry.getString("http.CSRFToken");
-				}	
-				
-				var retCode = retEntry.getString("http.responseCode");
-				
-				// Are we getting redirected?
-				if (retCode.startsWith("3") && false) { //@@TODO could be an ITIM thing 
-					this.requestEntry["http.url"] = retEntry.getString("http.location");
-					retry = true
-				}
-				
-				// If not retrying then figure out what to return
-				if (!retry) {
-					// Decide what to return, based on the returnType argument passed in and continue processing this request
-					if (returnType == "JS object") {
-						reply = this.parseReply(retEntry);
-					} else { // returnType == "entry"
-						reply = retEntry
-					}
-				}	
-				
-			} catch (ex) {
-				//if (form && this.debug) this.alert("Exception: " + ex);
-				
-				// If the token has expired, get a new one
-				if (ex.toString().indexOf("Unauthorized") >= 0) {
-					this.getToken();
-					retry = true
-				} else
-				// Else if we first must import the client cert, then do so. The Server must be restarted after.
-				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
-					if ((ex.toString().indexOf("Certificate chaining error") >= 0) && alreadyImportedCert) {
-						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
-					}
-					this.getCertificate();
-					alreadyImportedCert = true;
-					retry = true;
-				} else
-				// If a redirect - follow the redirect
-				if (typeof retEntry != "undefined" && retEntry && retEntry.getString("http.responseCode").startsWith("3")) { // @@Chat
-					this.requestEntry["http.url"] = retEntry.getString("http.Location");
- 					retry = true;
-				} else {
-					throw ex;
-				}	
-			}
-		} while (retry);
-				
-		//if (form && this.debug) this.alert("reply: " + toJson(reply));
-		
-		return reply;
-	}
-	
-	// Remove some attributes from an Entry
-	this.reduceEntry = function(entryArg) {
-		var entry = system.newEntry();
-		entry = entryArg.clone();
-		entry.removeAttribute("http.base");
-		entry.removeAttribute("http.body.response");
-		entry.removeAttribute("http.ipaddress");
-		entry.removeAttribute("http.bodyAsBytes");
-		return entry
-	}	
-	
-	// Handle terminate to close the connector
-	this.terminate = function() {
-		this.http.terminate();
-		this.CSRFToken = null
-	}
-	
-	// Handle alerting - @@ DISABLED for now
-	this.alert = function(msg) {
-		if (!this.debug) return; // changed from 'continue' thanks to @@Chat
-		task.logmsg(msg);
-		main.logmsg(msg);
-		java.lang.System.out.println(msg)
-	}	
-		
-	
-	// Get the client certificate from the server and import it to the TDI keystore
-	this.getCertificate = function() {
-		this.logmsg("! Getting client cert");
-		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(this.baseUrl, 443);
-		this.logmsg("! Result: " + msg)
-	}
-	
-	// Log specifics arguments passed to makeRequest()
-	this.logDetails = function(params, sent) {
-		sent = sent || false;
-		var msg = params.msg;
-		var obj = params.obj; 
-		var url = params.url;
-		var verb = params.verb;
-		var ctype = params.ctype; 
-		var where = params.where;
-		
-		//if (!this.debug) continue;
-		if (url && url.endsWith("openapi") > 0) continue;
-		
-		if (msg == null) {
-			msg = "*unknown entry*";
-		}
-	
-		var s = new java.lang.StringBuffer();
-		
-		if (where != null) {
-			s.append("\n<<" + where + ">> " + msg);
-		} else {
-			s.append("\n---------> " + msg);
-		}
-		
-		
-		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
-		if (ctype != null) { s.append("   " + ctype); } 
-		if (url != null) { s.append("   " + url); } 
-		s.append("\n");
-	
-		if (obj != null) {
-			if (obj instanceof com.ibm.di.entry.Entry) {	
-				s.append(this.httpEntry(obj, sent))	
-			} else {
-				s.append(obj.toString());
-			}
-		}	
-	
-		this.logmsg(s.toString());
-	}
-
-	this.throwException = function(msg) {
-		throw new java.lang.Exception(msg);
-	}
-
-	// Checks the validity of the reply and sets up for Iteration
-	this.parseReply = function(replyEntry) {
-		if (replyEntry === null) { return } 
-		
-		var status = replyEntry.getString("http.responseCode");
-	
-		// Check the return status
-		if (status == "401") { // Unauthorized - time to renew the token
-			this.throwException("Unauthorized")
-		}
-		if (!status.startsWith("2")) {
-			this.throwException("Error response from ITIM. Response code: " 
-								+ status
-								+ "    Message: " + replyEntry.getString("http.responseMsg"));
-		}
-		
-		// Now parse the body
-		var body = replyEntry.getString("http.bodyAsString");
-	
-		try {
-			var reply = fromJson(body);
-		} catch (ex) {
-			this.throwException("Error parsing return payload from itim: " + ex.toString()
-							+ "\n*** dump of reply ***\n" 
-							+ replyEntry)
-		}
-			
-		return reply;
-	}
-	
-	// Left justified text
-	this.LJ = function(txt, len) {
-		txt = txt || "";
-		len = len || txt.length;
-		return (txt + "                                                       ").substring(0, len)
-	}
-	
-	// Returns a string with legible listing of important attributes and their values
-	this.httpEntry = function(entry, sent) {
-		if (!entry) return "";
-		
-		var entry = this.reduceEntry(entry);
-		
-		if (typeof(sent) == "undefined") sent = false;
-		
-		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
-	
-		for (var att in entry) {
-			var name = att.getName();
-			var val = att.toString();
-			txt += "  " + val + "\n"
-		}
-		
-		return txt
-	}
-
-	// Own logmsg() to aid in debugging to output to the log and console
-	this.logmsg = function(lvl, msg) {
-		if (!lvl) { // undefined, and allows just a call to this.logmsg() to log a carriage return
-			lvl = "INFO";
-			msg = ""
-		} else
-		if (!msg) {
-			msg = lvl;
-			lvl = "INFO"
-		}
-		
-		if ("DEBUG".equalsIgnoreCase(lvl)) {
-			// Write to console out also
-			java.lang.System.out.println("|" + this.LJ(lvl,5) + "| " + msg);
-		}
-		
-		// This to allow it to be used by Connector Form Event script
-		task.logmsg(lvl, msg);
-		main.logmsg(lvl, msg);
-		java.lang.System.out.println(((lvl == "INFO") ? "" : lvl) + msg)
-	}	
-}]]></parameter>
-        </Script>
+        
     <Script name="ENTRYLIST class">
             <ModTime>1753271970595</ModTime>
             <parameter name="includeFiles"/>
@@ -20192,6 +20985,503 @@ function RESTCLIENT(args) {
     "cn": "John Doe"
   },
   "orgID": "ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1kZW1vLGRjPWl2aWc"
+}]]></parameter>
+        </Script>
+    <Script name="RESTCLIENT class 20250821 2240">
+            <ModTime>1755807852739</ModTime>
+            <parameter name="includeFiles"/>
+            <parameter name="script"><![CDATA[// 20250116 1116 Created
+// 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
+// 20250121 2104 RestClientConnector form working! RESTCLIENT class doing its job both in the test AL and in the Form
+// 20250123 1819 Tightening up code
+// 20250128 2122 Fixing httpEntry() so it does not fail on argument = null
+// 20250130 1243 Making sure this class works both inside and outside a Connector
+// 20250131 1942 Made this.logmsg() write to both System.out and main.logmsg
+// 20250319 1452 Franz and I made some changes to makeRequest(), adding support for redirection
+// 20250321 2041 Still working on it
+// 20250322 1443 Working now! Added Franz's code, plus made cookie handling better
+// 20250402 1345 Added "accept" arg to makeRequest method, else default is 'application/json'
+// 20250402 1429 Added handling of Redirect for makeRequest method
+// 20250411 1538 Removing this.sessionId since it is a cookie and handled elsewhere. Also renaming .token to .CSRFToken
+// 20250411 1626 Adding handling for contextRoot
+// 20250416 1512 Fixed broken code for retCode 302 and prevent only contextRoot calls
+// 20250423 1421 Fixed rootContext to contextRoot && fixed handling rootContext in makeRequest
+// 20250425 2031 Fixed makeRequest's handling of contextRoot passed in as an argument
+// 20250427 1646 Some fixes and improvements, thanks to suggestions from the TDI LabJam GPT
+// 20250520 1530 A number of changes together with Franz. Trying to figure out how my calls differ from Franz' TDI test AL script
+// 20250522 2241 Simplified cookie setting to just use .getString() - i.e. only first value
+// 20250523 1159 Changed the handling of the CSRFToken read as "http.CSRFToken"
+// 20250629 2222 Added garbage collection and chunk handling, both in makeRequest()
+// 20250702 1424 Franz fixed my misunderstanding of the chunk encoding - the HTTP Connector handles all that
+// 20250819 1029 Changed handling of cookies after seeing how Franz does it - using just Attributes and values
+//
+// This is the class that provides methods for making HTTP requests
+//
+// NOTES:
+//			* It uses its own this.logmsg() for more control over logging
+
+function RESTCLIENT(args) {
+	this.baseUrl = (args.baseUrl || "").trim();
+//	this.authUrl = args.authUrl || ""; // not used
+	this.contextRoot = args.contextRoot || "/itim/rest";
+	this.apikey = args.apikey || "";
+	this.username = args.username || ""; 
+	this.password = args.password || "";
+	this.debug = false //args.debug || false;
+	this.cookies = system.newAttribute("http.Cookie");
+	
+	this.gettingToken = false;
+	this.gotToken = false;
+
+	// The HTTP Client Connector to use
+	this.http = system.getConnector("ibmdi.HTTPClient");
+	
+	// Member variables
+	this.requestEntry = system.newEntry();
+	
+	this.CSRFToken = null;
+	this.sessionId = null; // REMOVE ME REMOVE ME REMOVE ME REMOVE ME !!!!!
+
+	// Get the authentication token. Argument token tells makeRequest not to getToken, and skip parsing the body and instead return http.Set-Cookie
+	this.getToken = function(where) {
+		var retEntry;
+		
+		// Get rid of cookies
+		this.cookies.clear();
+		this.CSRFToken = null;
+		
+		// First the LTPAToken2
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				verb: "POST",
+				url: "/itim/j_security_check", // @@TODO Should make this a parameter under Connections
+				ctype: "application/x-www-form-urlencoded",
+//				headers: {
+//					Authorization: "Bearer " + this.apikey
+//				},
+				body: "j_username=" + this.username + "&j_password=" + this.password,
+				expectedReturnType: "entry",
+				where: "getToken()"
+		});
+
+		// Get CSRFToken
+		retEntry = this.makeRequest({
+				gettingToken: true, // Getting a token, so dont call getToken again
+				expectedReturnType: "entry",
+				verb: "POST",
+				url: "/itim/rest/systemusers/me", // @@TODO Should make this a parameter under Connections
+				ctype: "application/json",
+				expectedReturnType: "entry",
+				where: "getToken()"
+		})
+	}
+	
+	// Get the currently set Cookies
+	this.getCookies = function(where) {
+		return this.cookies
+	}
+ 
+ 	// Put together a URL from an array of parts
+	this.assembleUrl = function(partsArray) {
+		if (!(partsArray instanceof Array)) partsArray = [partsArray]; // Note - instanceof works only for identifying JS arrays
+		var url = "";
+		
+		for (var i = 0; i < partsArray.length; i++) {
+			var part = (partsArray[i] || "").trim();
+			if (!part) continue; // skip empty string
+			
+			// Remove starting and/or ending slashes
+			if (part.startsWith("/")) 
+			{
+				part = part.substring(1)
+			}	
+			else
+			if (part.endsWith("/"))
+			{
+				part = part.substring(0, part.length-1)
+			}
+			
+			// Assemble the url
+			url += ((i > 0) ? "/" : "") + part	
+		}
+		
+		return url
+	}	
+	
+	// REST Client http-call method. The first lines of code show you the parameters you can send in the 'param' JS object
+	this.makeRequest = function(params) {
+		// Get token if necessary
+		if (!this.gotToken && !this.gettingToken) {
+			this.gettingToken = true;
+			this.getToken(params.where || null);
+			this.gettingToken = false;
+			this.gotToken = true;
+		} 
+		
+		//if (form && this.debug) this.alert("RESTCLIENT.makeRequest(" + toJson(params) + "}");
+			
+		// Here come the various local variables set from parameters passed OR default values
+		var verb = params.verb || "GET";
+		var url = params.url || this.throwException("makeRequest called with no URL");
+		var body = params.body || null;
+		var ctype = params.ctype || "application/json";
+		var where = params.where || "";
+		var headers = params.headers || {};
+		var accept = params.accept || "application/vnd.ibm.isim-v1+json";
+		var gettingToken = params.gettingToken || false;
+		var username = params.username || "";
+		var password = params.password || "";
+//		var contextRoot = params.contextRoot || this.contextRoot;
+		var contextRoot = (typeof(params.contextRoot) == "undefined") ? this.contextRoot : params.contextRoot;
+		
+		var returnType = params.expectedReturnType || "JS object";
+		
+		var alreadyImportedCert = false;
+		
+		// A little garbage collection. Why not? :)
+		java.lang.Runtime.getRuntime().gc();
+		
+		// Empty out the requestEntry before setting it up for the call
+		this.requestEntry.removeAllAttributes();
+		
+		// Prepare the url
+		var origUrl = url;
+		if (gettingToken) {
+			url = this.assembleUrl([this.baseUrl, url]) // Skip the context root for these calls
+		} else {
+			url = this.assembleUrl([this.baseUrl, contextRoot, url])
+		}	
+
+		if (url == this.assembleUrl([this.baseUrl, contextRoot])){
+			url = this.assembleUrl([this.baseUrl, contextRoot, "me"])
+		}
+		
+		// @@TODO Is there a better way to handle this?
+		if ("POST".equals(verb)) {
+			p = url.indexOf("{");
+			if (p > 0) {
+				url = url.substring(0, p-1)
+			}
+		}	
+		
+/* old code - can be deleted - I think		
+		if (url.toLowerCase().indexOf(this.baseUrl.toLowerCase()) < 0) {
+			if (this.baseUrl.endsWith("/")) {
+				this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length-1) // remove / at end of baseUrl if found
+			}	
+			url = this.baseUrl + url;
+		}
+*/		
+		// If a body is passed, this must be a POST (I think)
+		if (typeof(body) != "undefined" && verb == "POST") {
+			//verb = "POST";
+	
+			if (typeof body != "string") {
+				try {
+					body = toJson(body);
+				} catch (ex) {
+					body = String(body)
+				}		
+			} 
+
+			this.requestEntry["http.body"] = body
+		}	
+		
+		// Set up the global HTTP Connector
+		this.http.setParam("method", verb.toUpperCase());
+		this.http.setParam("url", url);
+		this.http.setParam("username", username);
+		this.http.setParam("password", password);
+	
+		// Now set up the request entry
+		this.requestEntry["http.url"] = url;
+		this.requestEntry["http.method"] = verb.toUpperCase();
+		this.requestEntry["http.Content-Type"] = ctype;
+		this.requestEntry["http.Accept"] = accept;
+//		this.requestEntry["http.Connection"] = "keep-alive";
+//		this.requestEntry["http.referrer"] = origUrl;
+//		this.requestEntry["http.header.User-Agent"] = "Mozilla/5.0";
+		
+		// if credentials set then send them
+		if (username != ""){
+			this.requestEntry["http.remote_user"] = username;
+			this.requestEntry["http.remote_password"] = password;
+		}		
+		 				
+		for (var hdr in headers) {
+			this.requestEntry["http." + hdr] = headers[hdr]
+		}
+		
+		// Reinitialize the HTTP Client connector so the updated parameters are applied
+		this.http.terminate();
+		this.http.initialize(null);
+	
+		alreadyImportedCert = false; 
+		var reply = null;
+		// Make the call
+		do {
+			var retry = false;
+			try {	
+				//this.alert("\nMaking call:" + this.reduceEntry(this.requestEntry) + "\n");
+				
+				// Set cookies
+ 				this.requestEntry.setAttribute("http.Cookie",this.getCookies(where))
+				
+				
+				if (this.CSRFToken) {
+					this.requestEntry["http.CSRFToken"] = this.CSRFToken
+				}
+//				if (this.ltpaToken2) {
+//					this.requestEntry["http.ltpaToken2"] = this.ltpaToken2
+//				}
+					
+				if (this.debug) {
+					this.logDetails({msg : "Request to itim", 
+								obj : this.httpEntry(this.requestEntry, true), 
+								url : url, 
+								verb : verb, 
+								ctype : ctype, 
+								where : where,
+								sent: true});
+				}
+	
+		
+				// *****************************************************************************************
+				// ****************         Make the actual request         ********************************
+				// *****************************************************************************************
+
+				var retEntry = this.http.queryReply(this.requestEntry);
+
+				retEntry["http.url"] = url; // Another fix from @@Chat
+				
+				if (this.debug) {
+					this.logDetails({msg : "Response from itim", 
+								obj : this.httpEntry(retEntry),
+								where: where,
+								sent: false,
+							    entry : retEntry});
+				}
+
+				if (retEntry["http.Set-Cookie"]) {
+					for (var cookie in retEntry["http.Set-Cookie"]) {
+						if (cookie.indexOf("WASReq") < 0) {
+							this.cookies.addValue(cookie)
+						}	
+					}	
+				}
+				
+				// Grab the CSRFToken if found
+				if (retEntry.getString("http.CSRFToken")) {
+					this.CSRFToken = retEntry.getString("http.CSRFToken");
+				}	
+				
+				var retCode = retEntry.getString("http.responseCode");
+				
+				// Are we getting redirected?
+				if (retCode.startsWith("3") && false) { //@@TODO could be an ITIM thing 
+					this.requestEntry["http.url"] = retEntry.getString("http.location");
+					retry = true
+				}
+				
+				// If not retrying then figure out what to return
+				if (!retry) {
+					// Decide what to return, based on the returnType argument passed in and continue processing this request
+					if (returnType == "JS object") {
+						reply = this.parseReply(retEntry);
+					} else { // returnType == "entry"
+						reply = retEntry
+					}
+				}	
+				
+			} catch (ex) {
+				//if (form && this.debug) this.alert("Exception: " + ex);
+				
+				// If the token has expired, get a new one
+				if (ex.toString().indexOf("Unauthorized") >= 0) {
+					this.getToken();
+					retry = true
+				} else
+				// Else if we first must import the client cert, then do so. The Server must be restarted after.
+				if (ex instanceof javax.net.ssl.SSLHandshakeException) {
+					if ((ex.toString().indexOf("Certificate chaining error") >= 0) && alreadyImportedCert) {
+						this.throwException("You must restart the SDI server in order for the imported certificate to be trusted.")
+					}
+					this.getCertificate();
+					alreadyImportedCert = true;
+					retry = true;
+				} else
+				// If a redirect - follow the redirect
+				if (typeof retEntry != "undefined" && retEntry && retEntry.getString("http.responseCode").startsWith("3")) { // @@Chat
+					this.requestEntry["http.url"] = retEntry.getString("http.Location");
+ 					retry = true;
+				} else {
+					throw ex;
+				}	
+			}
+		} while (retry);
+				
+		//if (form && this.debug) this.alert("reply: " + toJson(reply));
+		
+		return reply;
+	}
+	
+	// Remove some attributes from an Entry
+	this.reduceEntry = function(entryArg) {
+		var entry = system.newEntry();
+		entry = entryArg.clone();
+		entry.removeAttribute("http.base");
+		entry.removeAttribute("http.body.response");
+		entry.removeAttribute("http.ipaddress");
+		entry.removeAttribute("http.bodyAsBytes");
+		return entry
+	}	
+	
+	// Handle terminate to close the connector
+	this.terminate = function() {
+		this.http.terminate();
+		this.CSRFToken = null
+	}
+	
+	// Handle alerting - @@ DISABLED for now
+	this.alert = function(msg) {
+		if (!this.debug) return; // changed from 'continue' thanks to @@Chat
+		task.logmsg(msg);
+		main.logmsg(msg);
+		java.lang.System.out.println(msg)
+	}	
+		
+	
+	// Get the client certificate from the server and import it to the TDI keystore
+	this.getCertificate = function() {
+		this.logmsg("! Getting client cert");
+		var msg = com.ibm.di.security.GetSSLCertificate.installCertificateFrom(this.baseUrl, 443);
+		this.logmsg("! Result: " + msg)
+	}
+	
+	// Log specifics arguments passed to makeRequest()
+	this.logDetails = function(params, sent) {
+		sent = sent || false;
+		var msg = params.msg;
+		var obj = params.obj; 
+		var url = params.url;
+		var verb = params.verb;
+		var ctype = params.ctype; 
+		var where = params.where;
+		
+		//if (!this.debug) continue;
+		if (url && url.endsWith("openapi") > 0) continue;
+		
+		if (msg == null) {
+			msg = "*unknown entry*";
+		}
+	
+		var s = new java.lang.StringBuffer();
+		
+		if (where != null) {
+			s.append("\n<<" + where + ">> " + msg);
+		} else {
+			s.append("\n---------> " + msg);
+		}
+		
+		
+		if (verb != null) { s.append("   " + verb.toUpperCase()); } 
+		if (ctype != null) { s.append("   " + ctype); } 
+		if (url != null) { s.append("   " + url); } 
+		s.append("\n");
+	
+		if (obj != null) {
+			if (obj instanceof com.ibm.di.entry.Entry) {	
+				s.append(this.httpEntry(obj, sent))	
+			} else {
+				s.append(obj.toString());
+			}
+		}	
+	
+		this.logmsg(s.toString());
+	}
+
+	this.throwException = function(msg) {
+		throw new java.lang.Exception(msg);
+	}
+
+	// Checks the validity of the reply and sets up for Iteration
+	this.parseReply = function(replyEntry) {
+		if (replyEntry === null) { return } 
+		
+		var status = replyEntry.getString("http.responseCode");
+	
+		// Check the return status
+		if (status == "401") { // Unauthorized - time to renew the token
+			this.throwException("Unauthorized")
+		}
+		if (!status.startsWith("2")) {
+			this.throwException("Error response from ITIM. Response code: " 
+								+ status
+								+ "    Message: " + replyEntry.getString("http.responseMsg"));
+		}
+		
+		// Now parse the body
+		var body = replyEntry.getString("http.bodyAsString");
+	
+		try {
+			var reply = fromJson(body);
+		} catch (ex) {
+			this.throwException("Error parsing return payload from itim: " + ex.toString()
+							+ "\n*** dump of reply ***\n" 
+							+ replyEntry)
+		}
+			
+		return reply;
+	}
+	
+	// Left justified text
+	this.LJ = function(txt, len) {
+		txt = txt || "";
+		len = len || txt.length;
+		return (txt + "                                                       ").substring(0, len)
+	}
+	
+	// Returns a string with legible listing of important attributes and their values
+	this.httpEntry = function(entry, sent) {
+		if (!entry) return "";
+		
+		var entry = this.reduceEntry(entry);
+		
+		if (typeof(sent) == "undefined") sent = false;
+		
+		var txt = sent ? "--->>>> Request:\n" : "<<<<--- Response:\n";
+	
+		
+		for (var att in entry) {
+			var name = att.getName();
+			var val = att.toString();
+			txt += "  " + val + "\n"
+		}
+		
+		return txt
+	}
+
+	// Own logmsg() to aid in debugging to output to the log and console
+	this.logmsg = function(lvl, msg) {
+		if (!lvl) { // undefined, and allows just a call to this.logmsg() to log a carriage return
+			lvl = "INFO";
+			msg = ""
+		} else
+		if (!msg) {
+			msg = lvl;
+			lvl = "INFO"
+		}
+		
+		if ("DEBUG".equalsIgnoreCase(lvl)) {
+			// Write to console out also
+			java.lang.System.out.println("|" + this.LJ(lvl,5) + "| " + msg);
+		}
+		
+		// This to allow it to be used by Connector Form Event script
+		task.logmsg(lvl, msg);
+		main.logmsg(lvl, msg);
+		java.lang.System.out.println(((lvl == "INFO") ? "" : lvl) + msg)
+	}	
 }]]></parameter>
         </Script>
     </Folder>
