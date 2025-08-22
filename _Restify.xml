@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Thu Aug 21 22:41:39 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Fri Aug 22 12:07:32 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
             <ModTime>1751459018091</ModTime>
@@ -200,7 +200,7 @@ task.dumpEntry(work);
             </InitParams>
         </AssemblyLine>
         <AssemblyLine name="_testITIMRestConnector">
-            <ModTime>1755806238070</ModTime>
+            <ModTime>1755855438140</ModTime>
             <Settings>
                 <parameter name="ALPoolSettingsDialog">showALPoolSettings</parameter>
                 <parameter name="automapattributes">false</parameter>
@@ -222,25 +222,24 @@ SCHEMA class]]></parameter>
             <SandboxConfig/>
             <SimulationConfig>
                 <SimulationStates>
+                    <Component name="ITIMRestClientConnector_iterate" state="Enabled"/>
                     <Component name="ITIMRestClientConnector_add" state="Simulated"/>
                     <Component name="ITIMRestClientConnector_lookup" state="Enabled"/>
                     <Component name="ITIMRestClientConnector_delete" state="Simulated"/>
                     <Component name="ITIMRestClientConnector_update_add" state="Simulated"/>
-                    <Component name="ITIMRestClientConnector_iterate" state="Enabled"/>
                 </SimulationStates>
                 <ProxySettings/>
             </SimulationConfig>
             <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <ModTime>1755806238070</ModTime>
+            <ContainerEF name="EntryFeedContainer"/>
+            <ContainerDF name="DataFlowContainer">
                 <Connector name="ITIMRestClientConnector_iterate">
                     <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1755806238070</ModTime>
+                    <ModTime>1755855438140</ModTime>
                     <ConnectorMode>Iterator</ConnectorMode>
-                    <ConnectorState>Passive</ConnectorState>
+                    <ConnectorState>Enabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755806238070</ModTime>
                         <parameter name="path">/people/person</parameter>
                         <parameter name="searchCrit">ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwNyxvdT0wLG91PXBlb3BsZSxlcmdsb2JhbGlkPTAwMDAwMDAwMDAwMDAwMDAwMDAwLG91PWRlbW8sZGM9aXZpZw</parameter>
                     </Configuration>
@@ -249,7 +248,6 @@ SCHEMA class]]></parameter>
                     </Parser>
                     <AttributeMap name="Input">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755691238642</ModTime>
                         <AttributeMapItem>
                             <Name>*</Name>
                             <Type>simple</Type>
@@ -292,6 +290,10 @@ task.logmsg("---- After GetNext: " + conn);
 // pass work on to add connector]]></Script>
                             <Enabled>true</Enabled>
                         </Hook>
+                        <Hook name="before_getnext">
+                            <Name>before_getnext</Name>
+                            <Enabled>true</Enabled>
+                        </Hook>
                     </Hooks>
                     <CheckpointConfig/>
                     <SandboxConfig/>
@@ -305,9 +307,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </PoolDefinition>
                     <PoolInstance/>
                 </Connector>
-            </ContainerEF>
-            <ContainerDF name="DataFlowContainer">
-                <ModTime>1755805747440</ModTime>
                 <Connector name="ITIMRestClientConnector_add">
                     <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
                     <ModTime>1755805413506</ModTime>
@@ -315,7 +314,6 @@ task.logmsg("---- After GetNext: " + conn);
                     <ConnectorState>Disabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755805413506</ModTime>
                         <parameter name="action">post</parameter>
                         <parameter name="path">/people</parameter>
                     </Configuration>
@@ -327,7 +325,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </AttributeMap>
                     <AttributeMap name="Output">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755591839707</ModTime>
                         <AttributeMapItem>
                             <Name>OrgId</Name>
                             <Type>advanced</Type>
@@ -384,12 +381,11 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
                 <Connector name="ITIMRestClientConnector_lookup">
                     <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1755805487855</ModTime>
+                    <ModTime>1755854898169</ModTime>
                     <ConnectorMode>Lookup</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
+                    <ConnectorState>Disabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755805487855</ModTime>
                     </Configuration>
                     <Parser>
                         <InheritFrom>[parent]</InheritFrom>
@@ -418,7 +414,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755693861542</ModTime>
                         <AdvancedLinkMode>false</AdvancedLinkMode>
                         <Script>searchVal /*defined in AL prolog*/</Script>
                         <LinkCriteriaItem>
@@ -451,12 +446,11 @@ task.logmsg("---- After GetNext: " + conn);
                 </Connector>
                 <Connector name="ITIMRestClientConnector_delete">
                     <InheritFrom>/Connectors/ITIMRestClientConnector</InheritFrom>
-                    <ModTime>1755805747440</ModTime>
+                    <ModTime>1755854901846</ModTime>
                     <ConnectorMode>Delete</ConnectorMode>
-                    <ConnectorState>Enabled</ConnectorState>
+                    <ConnectorState>Disabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755805619909</ModTime>
                         <parameter name="action">delete</parameter>
                         <parameter name="path">/people/{personId}</parameter>
                     </Configuration>
@@ -487,7 +481,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755805747440</ModTime>
                         <AdvancedLinkMode>false</AdvancedLinkMode>
                         <Script>cn = "John Doe"</Script>
                         <LinkCriteriaItem>
@@ -525,7 +518,6 @@ task.logmsg("---- After GetNext: " + conn);
                     <ConnectorState>Disabled</ConnectorState>
                     <Configuration>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755805332573</ModTime>
                         <parameter name="connectorType">@ITIMRestClientConnector_add</parameter>
                         <parameter name="parserOption">Useless</parameter>
                     </Configuration>
@@ -537,7 +529,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </AttributeMap>
                     <AttributeMap name="Output">
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755805724347</ModTime>
                     </AttributeMap>
                     <DeltaSettings>
                         <WhenToCommit>After every database operation</WhenToCommit>
@@ -552,7 +543,6 @@ task.logmsg("---- After GetNext: " + conn);
                     </Schema>
                     <LinkCriteria>
                         <InheritFrom>[parent]</InheritFrom>
-                        <ModTime>1755805702574</ModTime>
                         <LinkCriteriaItem>
                             <Key>1951e434bee</Key>
                             <Attribute>cn</Attribute>
@@ -2719,11 +2709,8 @@ entryList.compareFiles(["ISVG_LCR_TEST", "_testITIMRestConnector"])]]></paramete
                 <ProxySettings/>
             </SimulationConfig>
             <LogConfig/>
-            <ContainerEF name="EntryFeedContainer">
-                <ModTime>1755085623814</ModTime>
-            </ContainerEF>
+            <ContainerEF name="EntryFeedContainer"/>
             <ContainerDF name="DataFlowContainer">
-                <ModTime>1755808136701</ModTime>
                 <Script name="Do it">
                     <ModTime>1755808136701</ModTime>
                     <parameter name="script"><![CDATA[resthost = "https://192.168.252.3:30943";
@@ -3328,12 +3315,12 @@ task.logmsg("---- After GetNext: " + conn);
     <Folder name="Connectors">
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1755808587265</ModTime>
+            <ModTime>1755857251579</ModTime>
             <ConnectorMode>Delta</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1755808587265</ModTime>
+                <ModTime>1755857251579</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="816" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Apr 11 16:29:01 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1744381739943</ModTime>
@@ -3843,7 +3830,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">KKD52OwKk50FesX82NwuqCgYiyWVfFD2eKU9s+Ef1J1zAL4HWgx99hmwnUwwm2xDhCI+svX3GiH048POA2qrLEOXnwu+pnRp/seh5BE6cVdal4dT1h/yiHb6d8WWtx5CY9l0pgWhfjMULiFMhNQH1thONu/V+g/EBXgjpItBYjQ=</parameter>
+                <parameter encrypted="true" name="apikey">NSeW/+VW9ybarlq9/+vb/aM3JJt5oTTgrWR+gTQsxV+x2Uym7wc8UR5Ul/oBKDOdQJtjolLr1SQZo7z+jiqfvuYuxRLay2oTg1C6wZTK1ti8tVpBG3bR3SAarR7oIaigoMXaHrh5WOQhuRbPpGn7GDU+a5EaBKvhEnZ61cq1ekA=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -3854,39 +3841,19 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">gLf7/h0wu1x4XamsuTaKKJ+8SIDyDF0gnpZ783zr3JuQN0kxgrZgV9VPcW+dz9l/odzykLqsuDr65zq3MKR+kY5UzMu1vvwJytsG3bYvB191mb9EU0Yda8Hkr0ZVtipruN89kjo7mptdFi8vUTA7kx4HtZXk7QbhAx06V0SMSwQ=</parameter>
+                <parameter encrypted="true" name="password">NTnthkrDMs/GZFdQRD5bW2avPdBuMQRPUPGGKQP0MyBFL8aEt6L+lcgKrD/sKIf8WcrReF2Vua+CoKHmrbztHUW3IGkdQ/XXxcg3mhJbzypVFkCX7Gdue9FjtGEer0Vlg+j7Xj8YMPX8CpqWxlPHf75Cl+tuLbjcn4Z8dILZ4d4=</parameter>
                 <parameter name="path">/people</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
                 <parameter name="script"><![CDATA[// 20250104 2008 Initial
-// 20250111 1915 Handling queryParameters in url
-// 20250126 1901 Adding queryMode for querySchema to return either params, or schema of data
-// 20250127 1346 initialize(), terminate(), selectEntries() and a test queryReply() in place
-// 20250127	1854 maded querySchema drop the token in the parameters returned
-// 20250128 1503 selectEntries and getNextEntry implemented - ready for more testing I'm sure :)
-// 20250128 1705 Added the check for spoofing
-// 20250128 2136 querySchema() can now return either parameters or data when you press Connect and Next in the Schema pane
-// 20250130 1207 Hopefully now
-// 20250130 1221 Fixing it in place in the Connector
-// 20250131 1928 Gonna get querySchema to work right
-// 20250131 2009 Now looking at getNextEntry() so I can return parameter descriptions with Connect + Next if querySchemaMode == Parameters
-// 20250131 2033 Something still not right - alas, tomorrow
-// 20250202 1313 Looking for my "entry not found" error when Connect while queryMode == Data
-// 20250202 1407 Connect working for both settings!!!! 
-// 20250202 1453 getNextEntry for Connect + Next now it's working!
-// 20250207 1819 looking at selectEntries and getNextEntry, as well as findEntry, putEntry and modEntry. Tonight!!!
-//          1917 Nope - manana
-// 20250211 2024 Fixed mock server for people put, delete and servers - I hope
-// 20250212 1142 Adding putEntry, deleteEntry and findEntry
-// 20250214 1758 Finishing putEntry, deleteEntry and findEntry
-// 20250214 1924 all Connector functions in place
-// 20250219 1419 Removing Query Schema Mode 
-// 20250219 2023 All connector modes supported except modify
-// 20250402 1423 Added __contextRoot global param - @@TODO: Should be a parameter
+// ...
 // 20250411 1621 Making contextRoot a parameter
 // 20250423 1428 Sending contextRoot to RestClient constructor
+// -- new version of ITIM OpenAPI schema 
 // 20250703 0951 Corrected putEntry() to use PUT not POST
 // 20250820 1813 Fixed deleteEntry and now working on support search via Link Crit
+// 20250822 0932 Fixing selectEntries - will need to implement paging as well. Eventually.
+// 20250822 1207 selectEntries & getNextEntry seem to work for data now
 //
 // --- TODO Freetext parameter where all the standard set of parameter values can be set
 //                                        
@@ -3899,12 +3866,13 @@ var __schema = null;						// shared openAPI schema object (SCHEMA class)
 var __initialized = false;					// Do I need this?
 var __emptyEntry = system.newEntry();		// for craftQueryString
 var __http = null; 							// for the RESTCLIENT we will use for the calls
-var __resultSet = null;						// A container for returned entries (selectEntries/findEntry)
+var __resultSet = new java.util.ArrayList; // List of returned items
 var __resultSetIndex = 0;					// Index into the result set
+var __resultSetSize = 0;					// Size of the result set
 var __formEventCalling = false;
-var __contextRoot = "/itim/rest" || connector.getParam("contextRoot");
+var __contextRoot = connector.getParam("contextRoot") || "/itim/rest";
 
-// REMEMBER if you add a parameter, must update this obj
+// @@NOTE @@REMEMBER if you add a parameter to the Connector, you MUST add it to this obj used for param validation and enumeration
 var __paramNames = {
 	action: true,
 	apikey: true,
@@ -4058,22 +4026,35 @@ function alertObject(objName, obj) {
 	debugMsg(arr.toString())
 }
 
+// Utility function to return a file as a string
+function loadFileToString(filepath) {
+	var sb = new java.lang.StringBuilder();
+	var file = system.openFileForInput(filepath);
+	var line;
+	while ((line = file.readLine()) != null) {
+		sb.append(line + "\n");
+	}
+	return sb.toString();
+}
+
 // Return the openAPI schema
 function fetchSchema() {
 	//alert("Fetching schema...")
 	if (__schema) return __schema;
 
-	//alert("About to loadFileToString...");
-//	var schemaJSON = __lib.loadFileToString("_Restify/itim_swagger.json");
-	var schemaSpec = __http.makeRequest({
-			verb: "GET",
-			url: __parameters.schema,
-			expectedReturnType: "body",
-			authUrl: __parameters.authUrl,
-			ctype: "application/json",
-			contextRoot: "",
-			where: "fetchSchema()"		
-	})
+	if (typeof(form) == "undefined") {
+		var schemaSpec = loadFileToString("_Restify/sample_itim_schema.yaml") // @@TODO should NOT be based on a file
+	} else {		
+		var schemaSpec = __http.makeRequest({
+				verb: "GET",
+				url: __parameters.schema,
+				expectedReturnType: "body",
+				authUrl: __parameters.authUrl,
+				ctype: "application/json",
+				contextRoot: "",
+				where: "fetchSchema()"		
+		})
+	}	
     
     // Load the SCHEMA class
     eval(system.getScriptText("SCHEMA c__hlass")) // Load SCHEMA handling class
@@ -4097,8 +4078,9 @@ function parseSchema() {
 	//__schema = __lib.loadFileToString("_Restify/itim_swagger.json");
 
 	//debugMsg("Creating SCHEMA object");
+	
+	// @@TODO Is this only needed for the Connector Form logic? We will find out :)
 	__schema = fetchSchema();
-
 
 	// Force RESTClient to get the tokens again
 	//__http.gotToken = false;
@@ -4247,10 +4229,6 @@ function selectEntries(queryMode) {
 	queryMode = queryMode || "Data"; // defaults to data
 	// Clear out the selected array of entries and set the index to 0
 
-	//resetConnector();@@TODO will not re-init with new params
-
-	//@@TODO is this necesary here: if (typeof(form) == "undefined") __resultSet.clear();
-	
 	// Always get the latest parameter settings
 	var connParams = refreshParameters();
 	// Get the parameters for this path + actoin
@@ -4270,9 +4248,12 @@ function selectEntries(queryMode) {
 			entry[paramName] = beautifyValue(restParams[i]);
 		}
 		
-		__resultSet.add(entry.href)
+		__resultSet.add(entry.href) // @@ TODO Connector Form logic must be updated
 	} else {
-		// ...else work like getNextEntry() usually does and return data
+		// ...else work like selectEntries() usually does and return a result set
+		__resultSetIndex = 0;
+		__resultSetSize = 0;
+		__resultSetObj = fromJson('[]');
 		
 		// Get the path and replace id's as required
 		var usePath = connParams.path;
@@ -4285,7 +4266,7 @@ function selectEntries(queryMode) {
 			action: connParams.action
 		});
 		
-c		// If there is a queryString, prepend it with ?
+		// If there is a queryString, prepend it with ?
 		queryString = queryString ? "?" + queryString : "";
 		
 		//main.logmsg("selectEntries for Data - making call");
@@ -4300,21 +4281,20 @@ c		// If there is a queryString, prepend it with ?
 			});
 		
 			// Update the global __resultSet
-			var resultSetObj = reply;
 			
-			
-			
-			//main.logmsg("selectEntries for Data - toEntry(): " + entry);
-	
-			var resultEntry = system.newEntry();
-			resultEntry.merge(entry);
-			__resultSet.add(resultEntry)
+			for (var item in reply) {
+				__resultSet.add(reply[item]._links.self.href)
+			}
 		} catch (ex) {
 			task.logmsg("ERROR", ex);
 			throw ex
 		}	
 	}
 	return __resultSet	
+}
+
+function jsonToEntry(item) {
+	var atts = item_attributes;
 }
 
 function getNextEntry() {
@@ -4326,13 +4306,38 @@ function getNextEntry() {
 
 	if (typeof(entry) == "undefined") entry = system.newEntry(); // only for testing
 	
-	//main.logmsg("getNextEntry() - getting index " + __resultSetIndex);
-	entry.merge(__resultSet.get(__resultSetIndex));
-	__resultSetIndex++;
+	// First get the next item from __resultSet
+	var thisItemHref = __resultSet.get(__resultSetIndex++);
 
-	result.setStatus(1);
-	//main.logmsg("@@getNextEntry: " + entry);
-	return entry
+	// Now look up this person
+	try {
+		// Make the REST call
+		var thisItem = __http.makeRequest({
+				verb: "GET",
+				url: thisItemHref,
+				ishref: true,
+				ctype: "application/json",
+				where: "getNextEntry()"
+		});
+
+		// Now to convert this to a TDI entry
+		var orgId = thisItem._links.erparent.href;
+		// Return only the actual Id at the end of this href value
+		var p = orgId.lastIndexOf("/");
+		entry.orgId = orgId.substring(p+1);
+		
+		// Now add attributes to the entry object
+		for (var attname in thisItem._attributes) {
+			entry[attname] = thisItem._attributes[attname]
+		}
+
+		result.setStatus(1); // Signal successful getNext
+	} catch (ex) {
+		task.logmsg("ERROR", ex);
+		throw ex
+	} finally {
+		return entry
+	}
 }
 
 function putEntry(entryArg) {
@@ -20166,7 +20171,7 @@ function RESTCLIENT(args) {
 }]]></parameter>
         </Script>
         <Script name="RESTCLIENT class">
-            <ModTime>1755807852739</ModTime>
+            <ModTime>1755856931186</ModTime>
             <parameter name="includeFiles"/>
             <parameter name="script"><![CDATA[// 20250116 1116 Created
 // 20250121 1146 Finishing (I hope) the creation of this Class - vrs.0.9
@@ -20301,6 +20306,19 @@ function RESTCLIENT(args) {
 		// Here come the various local variables set from parameters passed OR default values
 		var verb = params.verb || "GET";
 		var url = params.url || this.throwException("makeRequest called with no URL");
+
+		// if url is an href, remove the root context
+		var isHref = params.ishref || false;
+		if (isHref) {
+			var parts = system.splitString(url, "/");
+			var newUrl = "";
+			for (var i = 2; i < parts.length; i++) {
+				newUrl = newUrl + "/" + parts[i]
+			}
+			url = newUrl
+		}	
+		
+		// Set up the other local variables
 		var body = params.body || null;
 		var ctype = params.ctype || "application/json";
 		var where = params.where || "";

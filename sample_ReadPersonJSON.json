@@ -1,0 +1,31 @@
+{
+  "_links": {
+    "formTemplate": {
+      "href": "/itim/rest/forms?requestee=/itim/rest/people/ZXJnbG9iYWxpZD0zMjg3NTk3Njg0MDU0MDg0MTYsb3U9MCxvdT1wZW9wbGUsZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t&filterId=formSearch"
+    },
+    "manager": {
+      "href": "/itim/rest/people/ZXJnbG9iYWxpZD0zMjg3NTk3NjYzMjY3Njc5MDksb3U9MCxvdT1wZW9wbGUsZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t"
+    },
+    "self": {
+      "href": "/itim/rest/people/ZXJnbG9iYWxpZD0zMjg3NTk3Njg0MDU0MDg0MTYsb3U9MCxvdT1wZW9wbGUsZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t",
+      "title": "Alan Smith"
+    },
+    "erparent": {
+      "href": "/itim/rest/organizationcontainers/organizations/ZXJnbG9iYWxpZD0wMDAwMDAwMDAwMDAwMDAwMDAwMCxvdT1vcmcsZGM9Y29t"
+    }
+  },
+  "_attributes": {
+    "uid": "asmith",
+    "ercustomdisplay": "Smith",
+    "ersupervisor": "erglobalid=328759766326767909,ou=0,ou=people,erglobalid=00000000000000000000,ou=org,dc=com",
+    "mail": "asmith@ibm.com",
+    "manager": "erglobalid=328759766326767909,ou=0,ou=people,erglobalid=00000000000000000000,ou=org,dc=com",
+    "givenname": "Alan",
+    "erpersonstatus": "ACTIVE",
+    "name": "Alan Smith",
+    "sn": "Smith",
+    "cn": "Alan Smith",
+    "personType": "Person",
+    "erparent": "erglobalid=00000000000000000000,ou=org,dc=com"
+  }
+}
