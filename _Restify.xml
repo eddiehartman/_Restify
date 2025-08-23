@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Fri Aug 22 12:07:32 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
+<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig IDIversion="Created by SDI7.2 - 2024-09-23" created="Tue Jun 03 18:59:48 CEST 2025" createdBy="eddiehartman" modified="Sat Aug 23 11:56:37 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Folder name="AssemblyLines">
         <AssemblyLine name="startAL">
             <ModTime>1751459018091</ModTime>
@@ -3315,12 +3315,12 @@ task.logmsg("---- After GetNext: " + conn);
     <Folder name="Connectors">
         <Connector name="ITIMRestClientConnector">
             <InheritFrom>system:/Connectors/ibmdi.ScriptConnector</InheritFrom>
-            <ModTime>1755857251579</ModTime>
+            <ModTime>1755857259834</ModTime>
             <ConnectorMode>Delta</ConnectorMode>
             <ConnectorState>Enabled</ConnectorState>
             <Configuration>
                 <InheritFrom>[parent]</InheritFrom>
-                <ModTime>1755857251579</ModTime>
+                <ModTime>1755857259834</ModTime>
                 <parameter name="$form$"><![CDATA[<?xml version="1.0" encoding="UTF-8"?><MetamergeConfig Cycle="816" UUID="addb9b0b-e0b0-408d-bc18-1e00ff1dbaa6" created="Sun Dec 01 21:11:43 CET 2024" createdBy="eddiehartman" main="Form" modified="Fri Apr 11 16:29:01 CEST 2025" modifiedBy="eddiehartman" version="7.1.1">
     <Form name="Form">
         <ModTime>1744381739943</ModTime>
@@ -3830,7 +3830,7 @@ function write(fname, str) {
                 <parameter name="Operation">servers</parameter>
                 <parameter name="PathToObjects">paths</parameter>
                 <parameter name="action">get</parameter>
-                <parameter encrypted="true" name="apikey">NSeW/+VW9ybarlq9/+vb/aM3JJt5oTTgrWR+gTQsxV+x2Uym7wc8UR5Ul/oBKDOdQJtjolLr1SQZo7z+jiqfvuYuxRLay2oTg1C6wZTK1ti8tVpBG3bR3SAarR7oIaigoMXaHrh5WOQhuRbPpGn7GDU+a5EaBKvhEnZ61cq1ekA=</parameter>
+                <parameter encrypted="true" name="apikey">HL3pSfzYGNMi8IwuAuwzjHATNB5ItfYtl7Sn7tWvIjZ6/CiKfcCw369XKlLhtRfNeEhpiLhCr4eZ8or9SSHA+5qi0GSeI63AG/lIiwQTCjUaEauEYFao6giV7VqlXHlAi/x3oYZ5TbhmnyKauiqvowFY1WESeITlj8dSJV60Fbc=</parameter>
                 <parameter name="authUrl">/itim/j_security_check</parameter>
                 <parameter name="contextRoot">/itim/rest</parameter>
                 <parameter name="debug">false</parameter>
@@ -3841,7 +3841,7 @@ RESTCLIENT class]]></parameter>
                 <parameter name="item">/people</parameter>
                 <parameter name="parameters"><![CDATA[
 ]]></parameter>
-                <parameter encrypted="true" name="password">NTnthkrDMs/GZFdQRD5bW2avPdBuMQRPUPGGKQP0MyBFL8aEt6L+lcgKrD/sKIf8WcrReF2Vua+CoKHmrbztHUW3IGkdQ/XXxcg3mhJbzypVFkCX7Gdue9FjtGEer0Vlg+j7Xj8YMPX8CpqWxlPHf75Cl+tuLbjcn4Z8dILZ4d4=</parameter>
+                <parameter encrypted="true" name="password">Pkbci2wcATfu7ZivX2mYz1D4NE7HMkxnS9w5mSPHAutJjmKtP8L3X2ei1ulQQFhwKAgBfPCGSRKoBltyv0MDmSzMwaEekAg88dEo4CV3WO3k4RP2P5etb2RLZ7qrSQVXEpXnDrySgOv6/LraYWGiB3ZtIqjDQdSiYX1PiacFlo4=</parameter>
                 <parameter name="path">/people</parameter>
                 <parameter name="queryMode">Data</parameter>
                 <parameter name="schema">/openapi</parameter>
@@ -3853,7 +3853,7 @@ RESTCLIENT class]]></parameter>
 // 20250703 0951 Corrected putEntry() to use PUT not POST
 // 20250820 1813 Fixed deleteEntry and now working on support search via Link Crit
 // 20250822 0932 Fixing selectEntries - will need to implement paging as well. Eventually.
-// 20250822 1207 selectEntries & getNextEntry seem to work for data now
+// 20250822 1207 selectEntries & getNextEntry working for data
 //
 // --- TODO Freetext parameter where all the standard set of parameter values can be set
 //                                        
